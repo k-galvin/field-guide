@@ -124,6 +124,17 @@
         <div class="modal-body">
           <input type="hidden" id="spot-id">
 
+          <!-- Photon Live Place Search & URL Parser -->
+          <div class="form-group autocomplete-group" id="autocomplete-group">
+            <label class="form-label text-accent" for="spot-autocomplete-input">Search Place, Cafe, or Paste Google Maps URL</label>
+            <div class="autocomplete-input-wrap">
+              <input type="text" id="spot-autocomplete-input" class="form-input" placeholder="Type place name (e.g. Hart Bageri, Librae Bakery, Hello Kristof)..." autocomplete="off">
+              <span id="autocomplete-spinner" class="autocomplete-spinner" style="display: none;">Searching...</span>
+            </div>
+            <div id="autocomplete-dropdown" class="autocomplete-dropdown" style="display: none;"></div>
+            <span class="form-help">Type a place name for live instant suggestions, or paste a Google Maps link.</span>
+          </div>
+
           <div class="form-group">
             <label class="form-label" for="spot-name">Spot Name *</label>
             <input type="text" id="spot-name" class="form-input" placeholder="e.g. Satén Japanese Tea" required>
@@ -166,27 +177,6 @@
             </div>
           </div>
 
-          <!-- Geocoding Search via OpenStreetMap Nominatim -->
-          <div class="form-group">
-            <label class="form-label" for="spot-search-addr">Locate Address / Place (Free OpenStreetMap)</label>
-            <div style="display: flex; gap: 8px;">
-              <input type="text" id="spot-search-addr" class="form-input" placeholder="Search address or tap on map...">
-              <button type="button" id="btn-geocode-search" class="btn" style="white-space: nowrap;">Search</button>
-            </div>
-            <span class="form-help" id="geocode-status">Or tap on the map to drop coordinates automatically.</span>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="spot-lat">Latitude *</label>
-              <input type="number" step="any" id="spot-lat" class="form-input" placeholder="35.7032" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="spot-lng">Longitude *</label>
-              <input type="number" step="any" id="spot-lng" class="form-input" placeholder="139.5985" required>
-            </div>
-          </div>
-
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="spot-hours">Hours / Days Open</label>
@@ -216,6 +206,31 @@
             <label class="form-label" for="spot-notes">Personal Field Notes / Tips</label>
             <textarea id="spot-notes" class="form-textarea" placeholder="What to order, seating tip, best morning light, ceramic makers on display..."></textarea>
           </div>
+
+          <!-- Collapsible Coordinates & Advanced Geocoding -->
+          <details class="advanced-coords-details" id="advanced-coords-details">
+            <summary class="advanced-coords-summary">Advanced: Coordinates & Fallback Search</summary>
+            <div class="advanced-coords-body">
+              <div class="form-row" style="margin-top: 8px;">
+                <div class="form-group">
+                  <label class="form-label" for="spot-lat">Latitude *</label>
+                  <input type="number" step="any" id="spot-lat" class="form-input" placeholder="35.7032" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="spot-lng">Longitude *</label>
+                  <input type="number" step="any" id="spot-lng" class="form-input" placeholder="139.5985" required>
+                </div>
+              </div>
+              <div class="form-group" style="margin-top: 8px;">
+                <label class="form-label" for="spot-search-addr">Fallback Address Search (OpenStreetMap)</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="spot-search-addr" class="form-input" placeholder="Search street address...">
+                  <button type="button" id="btn-geocode-search" class="btn" style="white-space: nowrap;">Search</button>
+                </div>
+                <span class="form-help" id="geocode-status">Or tap on the map to drop coordinates automatically.</span>
+              </div>
+            </div>
+          </details>
         </div>
 
         <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">

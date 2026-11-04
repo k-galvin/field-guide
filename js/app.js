@@ -39,6 +39,13 @@ import {
   subscribeToRemoteChanges,
   mapRowToSpot
 } from './supabase.js';
+import {
+  searchPhotonPlaces,
+  parseGoogleMapsUrl,
+  mapOsmTagToCategory,
+  extractNeighborhood,
+  extractCity
+} from './photon.js';
 
 // Application State
 let spots = [];
@@ -106,6 +113,10 @@ const spotNotesInput = document.getElementById('spot-notes');
 const spotSearchAddr = document.getElementById('spot-search-addr');
 const btnGeocodeSearch = document.getElementById('btn-geocode-search');
 const geocodeStatus = document.getElementById('geocode-status');
+const spotAutocompleteInput = document.getElementById('spot-autocomplete-input');
+const autocompleteDropdown = document.getElementById('autocomplete-dropdown');
+const autocompleteSpinner = document.getElementById('autocomplete-spinner');
+const advancedCoordsDetails = document.getElementById('advanced-coords-details');
 
 // KML Elements
 const kmlDropzone = document.getElementById('kml-dropzone');
@@ -354,6 +365,41 @@ function setupEventListeners() {
 
   // Geocoding Search via OpenStreetMap
   btnGeocodeSearch.addEventListener('click', handleGeocodeSearch);
+
+  // Photon Autocomplete Events
+  if (spotAutocompleteInput) {
+    spotAutocompleteInput.addEventListener('input', handleAutocompleteInput);
+    spotAutocompleteInput.addEventListener('keydown', (e) => {
+      if (!currentAutocompleteResults.length || autocompleteDropdown.style.display === 'none') return;
+      const items = autocompleteDropdown.querySelectorAll('.autocomplete-item');
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedAutocompleteIndex = (selectedAutocompleteIndex + 1) % items.length;
+        items.forEach((it, i) => it.classList.toggle('selected', i === selectedAutocompleteIndex));
+        if (items[selectedAutocompleteIndex]) items[selectedAutocompleteIndex].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedAutocompleteIndex = (selectedAutocompleteIndex - 1 + items.length) % items.length;
+        items.forEach((it, i) => it.classList.toggle('selected', i === selectedAutocompleteIndex));
+        if (items[selectedAutocompleteIndex]) items[selectedAutocompleteIndex].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') {
+        if (selectedAutocompleteIndex >= 0 && currentAutocompleteResults[selectedAutocompleteIndex]) {
+          e.preventDefault();
+          selectAutocompletePlace(currentAutocompleteResults[selectedAutocompleteIndex]);
+        }
+      } else if (e.key === 'Escape') {
+        hideAutocompleteDropdown();
+      }
+    });
+  }
+
+  // Dismiss dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (autocompleteDropdown && !e.target.closest('#autocomplete-group')) {
+      hideAutocompleteDropdown();
+    }
+  });
 
   // KML Dropzone & File Input
   kmlDropzone.addEventListener('click', () => kmlFileInput.click());
@@ -793,7 +839,15 @@ function openAddSpotModal() {
   if (photoPreviewImg) photoPreviewImg.src = '';
   if (photoPreviewWrap) photoPreviewWrap.style.display = 'none';
   if (btnDeleteSpot) btnDeleteSpot.style.display = 'none';
+  if (spotAutocompleteInput) spotAutocompleteInput.value = '';
+  const autocompleteGroup = document.getElementById('autocomplete-group');
+  if (autocompleteGroup) autocompleteGroup.style.display = 'block';
+  hideAutocompleteDropdown();
+  if (advancedCoordsDetails) advancedCoordsDetails.open = false;
   openModal(modalSpot);
+  setTimeout(() => {
+    if (spotAutocompleteInput) spotAutocompleteInput.focus();
+  }, 120);
 }
 
 function openAddSpotModalWithCoords(lat, lng) {
@@ -801,6 +855,7 @@ function openAddSpotModalWithCoords(lat, lng) {
   spotLatInput.value = lat.toFixed(6);
   spotLngInput.value = lng.toFixed(6);
   geocodeStatus.textContent = `Coordinates set from map: [${lat.toFixed(4)}, ${lng.toFixed(4)}]`;
+  reverseGeocodeCoords(lat, lng);
 }
 
 function openEditSpotModal(spot) {
@@ -817,6 +872,10 @@ function openEditSpotModal(spot) {
   spotHoursInput.value = spot.hours || '';
   spotFavoriteCheckbox.checked = !!spot.favorite;
   spotNotesInput.value = spot.notes || '';
+  const autocompleteGroup = document.getElementById('autocomplete-group');
+  if (autocompleteGroup) autocompleteGroup.style.display = 'none';
+  hideAutocompleteDropdown();
+  if (advancedCoordsDetails) advancedCoordsDetails.open = true;
   if (spotPhotoUrlInput) spotPhotoUrlInput.value = spot.photoUrl || '';
   if (spotPhotoFileInput) spotPhotoFileInput.value = '';
   if (spot.photoUrl) {
@@ -897,6 +956,164 @@ function handleSpotFormSubmit(e) {
   if (spotToSync) {
     updateSyncStatus('syncing', 'syncing...');
     upsertRemoteSpot(spotToSync).then(() => updateSyncStatus('synced', 'synced'));
+  }
+}
+
+/**
+ * Photon Live Search-As-You-Type Autocomplete & Link Extractor
+ */
+let autocompleteTimer = null;
+let currentAutocompleteResults = [];
+let selectedAutocompleteIndex = -1;
+
+function getCurrentCityBias() {
+  const currentCitySpots = spots.filter(s => s.city.toLowerCase() === activeCity.toLowerCase());
+  if (currentCitySpots.length > 0) {
+    return { lat: currentCitySpots[0].lat, lng: currentCitySpots[0].lng };
+  }
+  return userCoords || null;
+}
+
+async function handleAutocompleteInput(e) {
+  const val = e.target.value.trim();
+
+  // 1. Check if user pasted a Google Maps URL
+  const parsedUrl = parseGoogleMapsUrl(val);
+  if (parsedUrl) {
+    if (parsedUrl.name) spotNameInput.value = parsedUrl.name;
+    spotLatInput.value = parsedUrl.lat.toFixed(6);
+    spotLngInput.value = parsedUrl.lng.toFixed(6);
+    geocodeStatus.textContent = `Coordinates extracted from Google Maps link: [${parsedUrl.lat.toFixed(4)}, ${parsedUrl.lng.toFixed(4)}]`;
+    
+    // Auto-reverse geocode the coordinates to get city and neighborhood
+    reverseGeocodeCoords(parsedUrl.lat, parsedUrl.lng);
+    hideAutocompleteDropdown();
+    return;
+  }
+
+  // 2. Clear debounce timer
+  clearTimeout(autocompleteTimer);
+  if (val.length < 2) {
+    hideAutocompleteDropdown();
+    return;
+  }
+
+  autocompleteTimer = setTimeout(async () => {
+    if (autocompleteSpinner) autocompleteSpinner.style.display = 'inline-block';
+    const bias = getCurrentCityBias();
+    const results = await searchPhotonPlaces(val, bias);
+    if (autocompleteSpinner) autocompleteSpinner.style.display = 'none';
+
+    renderAutocompleteDropdown(results);
+  }, 200);
+}
+
+function renderAutocompleteDropdown(results) {
+  if (!autocompleteDropdown) return;
+  currentAutocompleteResults = results || [];
+  selectedAutocompleteIndex = -1;
+
+  if (currentAutocompleteResults.length === 0) {
+    autocompleteDropdown.innerHTML = '<div style="padding: 0.65rem 0.85rem; font-family: var(--font-mono); font-size: 11px; color: var(--ink-secondary);">No places found. Continue typing or tap map to drop coordinates.</div>';
+    autocompleteDropdown.style.display = 'block';
+    return;
+  }
+
+  const CATEGORY_LABEL_MAP = {
+    matcha_coffee: 'coffee & matcha',
+    pastry_bakery: 'pastry & bakery',
+    food_wine: 'dining & wine',
+    shops_retail: 'shops & retail',
+    museums_art: 'museums & art',
+    concerts_music: 'concerts & music',
+    ceramics_craft: 'ceramics & craft',
+    books_cinema: 'books & cinema',
+    parks_nature: 'parks & nature',
+    surf_movement: 'surf & movement',
+    other: 'place'
+  };
+
+  autocompleteDropdown.innerHTML = currentAutocompleteResults.map((r, idx) => `
+    <div class="autocomplete-item" data-index="${idx}">
+      <div class="autocomplete-name-row">
+        <span class="autocomplete-item-name">${escapeHtml(r.name)}</span>
+        <span class="autocomplete-item-badge">${CATEGORY_LABEL_MAP[r.category] || r.osmType}</span>
+      </div>
+      <div class="autocomplete-item-addr">${escapeHtml(r.formattedAddress || r.city || '')}</div>
+    </div>
+  `).join('');
+
+  autocompleteDropdown.style.display = 'block';
+
+  // Attach click events
+  autocompleteDropdown.querySelectorAll('.autocomplete-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.getAttribute('data-index'), 10);
+      if (!isNaN(idx) && currentAutocompleteResults[idx]) {
+        selectAutocompletePlace(currentAutocompleteResults[idx]);
+      }
+    });
+  });
+}
+
+function selectAutocompletePlace(place) {
+  spotNameInput.value = place.name;
+  spotLatInput.value = place.lat.toFixed(6);
+  spotLngInput.value = place.lng.toFixed(6);
+
+  if (place.neighborhood) {
+    spotNeighborhoodInput.value = place.neighborhood;
+  }
+
+  if (place.category && place.category !== 'other') {
+    spotCategorySelect.value = place.category;
+  }
+
+  // Handle City matching or adding
+  if (place.city) {
+    let matchedCity = cities.find(c => c.toLowerCase() === place.city.toLowerCase());
+    if (!matchedCity) {
+      cities.push(place.city);
+      saveStoredCities(cities);
+      renderCityDropdowns();
+      matchedCity = place.city;
+    }
+    spotCitySelect.value = matchedCity;
+  }
+
+  geocodeStatus.textContent = `Location set: ${place.formattedAddress || place.name}`;
+  spotAutocompleteInput.value = place.name;
+  hideAutocompleteDropdown();
+}
+
+function hideAutocompleteDropdown() {
+  if (autocompleteDropdown) autocompleteDropdown.style.display = 'none';
+  if (autocompleteSpinner) autocompleteSpinner.style.display = 'none';
+}
+
+async function reverseGeocodeCoords(lat, lng) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'ArchivalFieldGuide/1.0' } });
+    const data = await res.json();
+    if (data && data.address) {
+      const a = data.address;
+      const hood = a.suburb || a.neighbourhood || a.district || a.road || '';
+      const c = a.city || a.town || a.municipality || a.county || '';
+      if (hood && !spotNeighborhoodInput.value) spotNeighborhoodInput.value = hood;
+      if (c && !spotCitySelect.value) {
+        let matchedCity = cities.find(ct => ct.toLowerCase() === c.toLowerCase());
+        if (!matchedCity) {
+          cities.push(c);
+          saveStoredCities(cities);
+          renderCityDropdowns();
+          matchedCity = c;
+        }
+        spotCitySelect.value = matchedCity;
+      }
+    }
+  } catch (e) {
+    console.warn('Reverse geocoding failed:', e);
   }
 }
 

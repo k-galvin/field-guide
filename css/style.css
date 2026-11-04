@@ -1130,6 +1130,132 @@ html, body {
   letter-spacing: 0.1em;
 }
 
+/* Photon Place Autocomplete */
+.autocomplete-group {
+  position: relative;
+  background: rgba(0, 71, 171, 0.03);
+  border: 1px dashed rgba(0, 71, 171, 0.3);
+  padding: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.autocomplete-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.autocomplete-input-wrap input {
+  width: 100%;
+  padding-right: 2rem;
+  background: #fff;
+  border-color: rgba(0, 71, 171, 0.35);
+}
+
+.autocomplete-input-wrap input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 71, 171, 0.1);
+}
+
+.autocomplete-spinner {
+  position: absolute;
+  right: 10px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--accent-blue);
+  pointer-events: none;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid var(--border-medium);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.autocomplete-item {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: background 0.15s ease;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.selected {
+  background: #f0f5ff;
+}
+
+.autocomplete-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.autocomplete-item-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-black);
+}
+
+.autocomplete-item-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  background: rgba(0, 71, 171, 0.08);
+  color: var(--accent-blue);
+  border: 1px solid rgba(0, 71, 171, 0.2);
+  white-space: nowrap;
+}
+
+.autocomplete-item-addr {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.advanced-coords-details {
+  border-top: 1px solid var(--border-light);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.advanced-coords-summary {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+}
+
+.advanced-coords-summary:hover {
+  color: var(--accent-blue);
+}
+
 /* Dropzone for KML */
 .dropzone {
   border: 1px dashed var(--border-light);

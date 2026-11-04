@@ -7,6 +7,7 @@ const files = [
   'js/kml-parser.js',
   'js/map.js',
   'js/supabase.js',
+  'js/photon.js',
   'js/app.js'
 ];
 
