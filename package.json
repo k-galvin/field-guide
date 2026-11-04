@@ -1,7 +1,7 @@
 {
-  "name": "cool-planck",
+  "name": "archival-field-guide",
   "version": "1.0.0",
-  "description": "",
+  "description": "Archival Field Guide — Personal city index & day loop walking sequencer",
   "main": "index.js",
   "scripts": {
     "build": "node build.js",

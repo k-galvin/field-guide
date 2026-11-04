@@ -1,4 +1,4 @@
-// Supabase Real-time Sync Client for Flâneur Field Guide
+// Supabase Real-time Sync Client for Archival Field Guide
 
 const SUPABASE_URL = 'https://oaqzbymmhusbhvscfcrp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Y8hY9if-e5PdwcmCKALzsQ_bzUpYVHp';

@@ -2,7 +2,7 @@
 "use strict";
 
 // --- js/storage.js ---
-// Storage management for Flâneur Field Guide
+// Storage management for Archival Field Guide
 
 const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
@@ -141,7 +141,7 @@ function exportBackupJSON(spots, cities) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `flaneur-fieldguide-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `archival-field-guide-backup-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -1075,7 +1075,7 @@ function invalidateMapSize() {
 
 
 // --- js/supabase.js ---
-// Supabase Real-time Sync Client for Flâneur Field Guide
+// Supabase Real-time Sync Client for Archival Field Guide
 
 const SUPABASE_URL = 'https://oaqzbymmhusbhvscfcrp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Y8hY9if-e5PdwcmCKALzsQ_bzUpYVHp';
@@ -1322,7 +1322,7 @@ function mapRowToSpot(row) {
 
 
 // --- js/app.js ---
-// Main Application Controller for Flâneur
+// Main Application Controller for Archival Field Guide
 
 
 
@@ -2202,7 +2202,7 @@ async function handleGeocodeSearch() {
 
   try {
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
-    const res = await fetch(url, { headers: { 'User-Agent': 'FlaneurFieldGuide/1.0' } });
+    const res = await fetch(url, { headers: { 'User-Agent': 'ArchivalFieldGuide/1.0' } });
     const data = await res.json();
 
     if (data && data.length > 0) {

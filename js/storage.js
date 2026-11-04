@@ -1,4 +1,4 @@
-// Storage management for Flâneur Field Guide
+// Storage management for Archival Field Guide
 
 const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
@@ -137,7 +137,7 @@ export function exportBackupJSON(spots, cities) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `flaneur-fieldguide-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `archival-field-guide-backup-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }

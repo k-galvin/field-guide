@@ -1,4 +1,4 @@
-// Main Application Controller for Flâneur
+// Main Application Controller for Archival Field Guide
 
 import {
   getStoredSpots,
@@ -911,7 +911,7 @@ async function handleGeocodeSearch() {
 
   try {
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
-    const res = await fetch(url, { headers: { 'User-Agent': 'FlaneurFieldGuide/1.0' } });
+    const res = await fetch(url, { headers: { 'User-Agent': 'ArchivalFieldGuide/1.0' } });
     const data = await res.json();
 
     if (data && data.length > 0) {
