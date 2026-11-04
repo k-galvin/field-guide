@@ -1,6 +1,6 @@
 # Archival Field Guide — Day Loops & Personal City Index
 
-A zero-API, minimalist personal field guide (known as **Field Guide**) designed to consolidate the travel workflow across:
+A zero-API, minimalist personal field guide designed to consolidate the travel workflow across:
 1. **Google MyMaps** (pre-trip research)
 2. **Google Maps Saved Lists** (in-city live proximity)
 3. **Step App** (post-trip permanent city guides & archives)
