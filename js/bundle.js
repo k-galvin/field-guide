@@ -1430,28 +1430,9 @@ function init() {
   cities = getStoredCities();
   const storedSpots = getStoredSpots();
   if (storedSpots && storedSpots.length > 0) {
-    // Backfill photos from SAMPLE_SPOTS if missing
-    spots = storedSpots.map(s => {
-      if (!s.photoUrl) {
-        const sample = SAMPLE_SPOTS.find(sp => sp.id === s.id || sp.name.toLowerCase() === s.name.toLowerCase());
-        if (sample && sample.photoUrl) {
-          return { ...s, photoUrl: sample.photoUrl };
-        }
-      }
-      return s;
-    });
-
-    // Merge in any new curated sample spots
-    SAMPLE_SPOTS.forEach(sample => {
-      if (!spots.some(sp => sp.id === sample.id || sp.name.toLowerCase() === sample.name.toLowerCase())) {
-        spots.push(sample);
-      }
-    });
-
-    saveStoredSpots(spots);
+    spots = storedSpots;
   } else {
-    spots = SAMPLE_SPOTS;
-    saveStoredSpots(spots);
+    spots = [];
   }
 
   // Populate category chips with SVGs
@@ -1517,22 +1498,19 @@ async function syncWithSupabase(manual = false) {
       return;
     }
 
-    // 2. Identify all local spots not yet in Supabase
+    // 2. Push any newly created local spots (e.g. created offline via + Add Spot)
     const remoteMap = new Map(remote.map(r => [r.id, r]));
-    const uncommitted = spots.filter(loc => !remoteMap.has(loc.id));
+    const localNewSpots = spots.filter(s => !remoteMap.has(s.id) && String(s.id).startsWith('spot-'));
 
-    if (uncommitted.length > 0) {
-      console.log(`Pushing ${uncommitted.length} uncommitted spots to Supabase...`);
-      updateSyncStatus('syncing', `uploading ${uncommitted.length}...`);
-      await pushSpotsToRemote(uncommitted);
+    if (localNewSpots.length > 0) {
+      console.log(`Pushing ${localNewSpots.length} newly added local spots to Supabase...`);
+      updateSyncStatus('syncing', `uploading ${localNewSpots.length}...`);
+      await pushSpotsToRemote(localNewSpots);
+      remote.push(...localNewSpots);
     }
 
-    // 3. Build unified spots set (remote + uncommitted)
-    const unifiedMap = new Map();
-    remote.forEach(r => unifiedMap.set(r.id, r));
-    uncommitted.forEach(u => unifiedMap.set(u.id, u));
-
-    spots = Array.from(unifiedMap.values());
+    // Remote Supabase is source of truth
+    spots = remote;
     saveStoredSpots(spots);
 
     // 4. Auto-discover any imported cities
