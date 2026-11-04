@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Archival — Field Index & Day Loops</title>
+  <meta name="description" content="Personal field index, Google MyMaps KML consolidator, live proximity, and day loop walking sequencer.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Archival">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" href="css/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="logo-area">
+      <div class="spine-dot"></div>
+      <h1 class="logo-title">archival</h1>
+      <span class="archival-overline text-accent">field guide</span>
+    </div>
+    <div class="header-actions">
+      <span id="sync-status" class="sync-indicator" title="Supabase Cloud Sync Status">
+        <span class="sync-dot"></span> <span id="sync-status-text">synced</span>
+      </span>
+      <button id="btn-near-me" class="btn" title="Sort spots by walking distance from current location">
+        near me
+      </button>
+      <button id="btn-day-loop" class="btn" title="Sequence a walking day loop">
+        day loop
+      </button>
+      <button id="btn-import-kml" class="btn" title="Import Google MyMaps KML or Backup JSON">
+        import
+      </button>
+      <button id="btn-add-spot" class="btn btn-primary">
+        + add spot
+      </button>
+      <button id="btn-export-backup" class="btn" title="Export backup JSON">
+        export
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Split Layout -->
+  <main class="app-container" id="app-container">
+    <div class="blueprint-pattern"></div>
+
+    <!-- Left Sidebar: Feed & Filters -->
+    <aside class="sidebar">
+      <!-- Search & City Select -->
+      <section class="filter-section">
+        <div class="city-row">
+          <select id="city-select" class="city-select" aria-label="Select City Guide">
+            <!-- Populated via JS -->
+          </select>
+          <button id="btn-manage-cities" class="btn" style="padding: 0.45rem 0.75rem;" title="Add/Manage Cities">
+            + city
+          </button>
+        </div>
+
+        <div class="search-input-wrapper">
+          <input type="text" id="search-input" class="search-input" placeholder="SEARCH SPOTS..." aria-label="Search spots">
+        </div>
+
+        <!-- Status Filter Tabs -->
+        <div class="status-tabs" role="tablist">
+          <button class="status-tab active" data-status="all" role="tab">all (<span id="count-all">0</span>)</button>
+          <button class="status-tab" data-status="wishlist" role="tab">wishlist (<span id="count-wishlist">0</span>)</button>
+          <button class="status-tab" data-status="visited" role="tab">visited (<span id="count-visited">0</span>)</button>
+        </div>
+
+        <!-- Category Filter Chips -->
+        <div class="category-chips" id="category-chips">
+          <button class="chip active" data-cat="all">all</button>
+          <button class="chip" data-cat="matcha_coffee">coffee & matcha</button>
+          <button class="chip" data-cat="ceramics_craft">ceramics & craft</button>
+          <button class="chip" data-cat="pastry_bakery">bakery & pastry</button>
+          <button class="chip" data-cat="books_cinema">cinema & books</button>
+          <button class="chip" data-cat="food_wine">dining & wine</button>
+          <button class="chip" data-cat="surf_movement">surf & movement</button>
+        </div>
+      </section>
+
+        <!-- Spot Feed List -->
+        <section class="spot-feed" id="spot-feed" aria-live="polite">
+          <div class="spot-feed-header">
+            <span id="spots-count-label">Showing 0 spots</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="distance-sort-indicator" style="display: none; font-size: 10px; font-family: var(--font-mono); color: var(--accent-blue);">near me</span>
+              <div class="view-mode-toggle" role="group" aria-label="View Mode">
+                <button type="button" class="view-btn active" id="view-mode-visual" title="Visual Step photo cards">visual</button>
+                <button type="button" class="view-btn" id="view-mode-compact" title="Compact list view">compact</button>
+              </div>
+            </div>
+          </div>
+          <div id="spots-list-container" class="spots-list visual-mode">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </section>
+    </aside>
+
+    <!-- Right Map Container -->
+    <section class="map-container" aria-label="Interactive Map">
+      <div id="map"></div>
+    </section>
+
+    <!-- Mobile View Switcher (Bottom Pill) -->
+    <nav class="mobile-view-toggle" aria-label="Mobile View Switcher">
+      <button class="mobile-toggle-btn active" id="mobile-toggle-list">List</button>
+      <button class="mobile-toggle-btn" id="mobile-toggle-map">Map</button>
+    </nav>
+  </main>
+
+  <!-- Modal: Add / Edit Spot -->
+  <div class="modal-overlay" id="modal-spot" role="dialog" aria-modal="true" aria-labelledby="modal-spot-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-spot-title">Add New Spot</h2>
+        <button type="button" class="modal-close-btn" data-close-modal="modal-spot">&times;</button>
+      </div>
+      <form id="form-spot">
+        <div class="modal-body">
+          <input type="hidden" id="spot-id">
+
+          <div class="form-group">
+            <label class="form-label" for="spot-name">Spot Name *</label>
+            <input type="text" id="spot-name" class="form-input" placeholder="e.g. Satén Japanese Tea" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="spot-city">City *</label>
+              <select id="spot-city" class="form-select" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="spot-neighborhood">Neighborhood / Pocket</label>
+              <input type="text" id="spot-neighborhood" class="form-input" placeholder="e.g. Nishi-Ogikubo, Le Marais">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="spot-category">Category *</label>
+              <select id="spot-category" class="form-select" required>
+                <option value="matcha_coffee">Coffee & Matcha</option>
+                <option value="pastry_bakery">Bakery & Pastry</option>
+                <option value="food_wine">Dining & Wine</option>
+                <option value="shops_retail">Shops & Boutiques</option>
+                <option value="museums_art">Museums & Galleries</option>
+                <option value="concerts_music">Concerts & Music</option>
+                <option value="ceramics_craft">Ceramics & Craft</option>
+                <option value="books_cinema">Cinema & Books</option>
+                <option value="parks_nature">Parks & Gardens</option>
+                <option value="surf_movement">Surf & Movement</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="spot-status">Status</label>
+              <select id="spot-status" class="form-select">
+                <option value="wishlist">Wishlist (To Visit)</option>
+                <option value="visited">Visited (Permanent Guide)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Geocoding Search via OpenStreetMap Nominatim -->
+          <div class="form-group">
+            <label class="form-label" for="spot-search-addr">Locate Address / Place (Free OpenStreetMap)</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="spot-search-addr" class="form-input" placeholder="Search address or tap on map...">
+              <button type="button" id="btn-geocode-search" class="btn" style="white-space: nowrap;">Search</button>
+            </div>
+            <span class="form-help" id="geocode-status">Or tap on the map to drop coordinates automatically.</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="spot-lat">Latitude *</label>
+              <input type="number" step="any" id="spot-lat" class="form-input" placeholder="35.7032" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="spot-lng">Longitude *</label>
+              <input type="number" step="any" id="spot-lng" class="form-input" placeholder="139.5985" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="spot-hours">Hours / Days Open</label>
+              <input type="text" id="spot-hours" class="form-input" placeholder="e.g. Tue-Sun, 10:00 - 19:00">
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 8px; padding-top: 22px;">
+              <input type="checkbox" id="spot-favorite" style="width: 15px; height: 15px; accent-color: var(--accent-blue);">
+              <label for="spot-favorite" class="form-label" style="cursor: pointer;">Mark as Starred / Priority</label>
+            </div>
+          </div>
+
+          <!-- Spot Photography (Step Visual Guide) -->
+          <div class="form-group">
+            <label class="form-label" for="spot-photo-url">Spot Photo (Step Visual Guide)</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="url" id="spot-photo-url" class="form-input" placeholder="Paste photo URL (Unsplash, web image)...">
+              <label for="spot-photo-file" class="btn" style="white-space: nowrap; cursor: pointer; margin: 0;">Upload</label>
+              <input type="file" id="spot-photo-file" accept="image/*" style="display: none;">
+            </div>
+            <div id="photo-preview-wrap" style="display: none; margin-top: 8px; position: relative;">
+              <img id="photo-preview-img" src="" alt="Spot preview" style="width: 100%; height: 140px; object-fit: cover; border: 1px solid var(--border-light);">
+              <button type="button" id="btn-remove-photo" style="position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.65); color: #fff; border: none; font-size: 10px; padding: 3px 8px; cursor: pointer; font-family: var(--font-mono); text-transform: uppercase;">remove</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="spot-notes">Personal Field Notes / Tips</label>
+            <textarea id="spot-notes" class="form-textarea" placeholder="What to order, seating tip, best morning light, ceramic makers on display..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <button type="button" id="btn-delete-spot" class="btn btn-danger" style="display: none;">Delete Spot</button>
+          <div style="display: flex; gap: 0.75rem; margin-left: auto;">
+            <button type="button" class="btn" data-close-modal="modal-spot">Cancel</button>
+            <button type="submit" class="btn btn-accent">Save Spot</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Import Google MyMaps KML / JSON Backup -->
+  <div class="modal-overlay" id="modal-kml" role="dialog" aria-modal="true" aria-labelledby="modal-kml-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-kml-title">Import Spots / Backup</h2>
+        <button type="button" class="modal-close-btn" data-close-modal="modal-kml">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--ink-secondary); line-height: 1.4;">
+          Drop any <strong>.kml</strong> file from Google MyMaps or a <strong>.json</strong> backup from another device. Spots will be extracted and added to your field guide.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="kml-target-city">Assign to City Guide</label>
+          <select id="kml-target-city" class="form-select"></select>
+        </div>
+
+        <div class="dropzone" id="kml-dropzone">
+          <div class="dropzone-title">Drop your .kml or .json backup file here</div>
+          <div class="dropzone-desc">or click to browse from your device</div>
+          <input type="file" id="kml-file-input" accept=".kml,.xml,.json" style="display: none;">
+        </div>
+
+        <div id="kml-preview" style="display: none; padding: 10px; background: var(--bg-subtle); border-radius: 6px; font-size: 0.82rem;">
+          <div id="kml-preview-count" style="font-weight: 500; margin-bottom: 4px;"></div>
+          <div id="kml-preview-list" style="max-height: 120px; overflow-y: auto; color: var(--ink-secondary);"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-close-modal="modal-kml">Cancel</button>
+        <button type="button" id="btn-confirm-kml-import" class="btn btn-accent" disabled>Import Spots</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Day Loop Planner -->
+  <div class="modal-overlay" id="modal-loop" role="dialog" aria-modal="true" aria-labelledby="modal-loop-title">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-loop-title">Walking Day Loop</h2>
+        <button type="button" class="modal-close-btn" data-close-modal="modal-loop">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--ink-secondary);">
+          Pick a starting spot, and Flâneur will automatically sequence an optimized walking arc without zig-zagging.
+        </p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="loop-start-spot">Starting Spot (e.g. Morning Matcha)</label>
+            <select id="loop-start-spot" class="form-select"></select>
+          </div>
+          <div class="form-group" style="max-width: 140px;">
+            <label class="form-label" for="loop-max-stops">Stops to Include</label>
+            <select id="loop-max-stops" class="form-select">
+              <option value="3">3 Stops</option>
+              <option value="4" selected>4 Stops</option>
+              <option value="5">5 Stops</option>
+              <option value="6">6 Stops</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="loop-stats-bar" id="loop-stats-bar">
+          <div class="loop-stat-item">
+            <span class="loop-stat-value" id="loop-total-dist">0 km</span>
+            <span class="loop-stat-label">Total Distance</span>
+          </div>
+          <div class="loop-stat-item">
+            <span class="loop-stat-value" id="loop-total-time">0 min</span>
+            <span class="loop-stat-label">Est. Walk Time</span>
+          </div>
+          <div class="loop-stat-item">
+            <span class="loop-stat-value" id="loop-stop-count">0</span>
+            <span class="loop-stat-label">Curated Stops</span>
+          </div>
+        </div>
+
+        <div class="loop-timeline" id="loop-timeline">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" id="btn-draw-loop-map">View on Map</button>
+        <a id="btn-launch-nav-loop" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-accent">
+          ↗ Open in Maps App
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: City Manager -->
+  <div class="modal-overlay" id="modal-cities" role="dialog" aria-modal="true" aria-labelledby="modal-cities-title">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-cities-title">City Guides</h2>
+        <button type="button" class="modal-close-btn" data-close-modal="modal-cities">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="new-city-input" class="form-input" placeholder="e.g. Kyoto, London, New York">
+          <button type="button" id="btn-add-new-city" class="btn btn-accent" style="white-space: nowrap;">Add City</button>
+        </div>
+        <div id="cities-list-manage" style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-close-modal="modal-cities">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor & Application Scripts -->
+  <script src="vendor/leaflet.js"></script>
+  <script src="vendor/supabase.js"></script>
+  <script src="js/bundle.js"></script>
+</body>
+</html>
