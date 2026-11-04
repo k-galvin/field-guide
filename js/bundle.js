@@ -1099,7 +1099,7 @@ function getSupabase() {
 /**
  * Fetch all spots from remote Supabase table
  */
-export async function fetchRemoteSpots() {
+async function fetchRemoteSpots() {
   const sb = getSupabase();
   if (sb) {
     try {
@@ -1131,7 +1131,7 @@ export async function fetchRemoteSpots() {
 /**
  * Upsert a spot to remote Supabase table
  */
-export async function upsertRemoteSpot(spot) {
+async function upsertRemoteSpot(spot) {
   const row = mapSpotToRow(spot);
   const sb = getSupabase();
   if (sb) {
@@ -1165,7 +1165,7 @@ export async function upsertRemoteSpot(spot) {
 /**
  * Delete a spot from remote Supabase table
  */
-export async function deleteRemoteSpot(id) {
+async function deleteRemoteSpot(id) {
   const sb = getSupabase();
   if (sb) {
     try {
@@ -1195,7 +1195,7 @@ export async function deleteRemoteSpot(id) {
 /**
  * Seed initial spots if remote table is empty
  */
-export async function seedRemoteSpotsIfEmpty(localSpots) {
+async function seedRemoteSpotsIfEmpty(localSpots) {
   try {
     const existing = await fetchRemoteSpots();
     if (existing && existing.length === 0 && localSpots && localSpots.length > 0) {
@@ -1247,7 +1247,7 @@ function subscribeToRemoteChanges(callback) {
 /**
  * Push an array of spots to remote Supabase table (batch upsert)
  */
-export async function pushSpotsToRemote(spotsArray) {
+async function pushSpotsToRemote(spotsArray) {
   if (!spotsArray || spotsArray.length === 0) return true;
   const rows = spotsArray.map(mapSpotToRow);
 

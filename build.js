@@ -18,7 +18,7 @@ for (const f of files) {
   content = content.replace(/import\s*\{[\s\S]*?\}\s*from\s*['"][^'"]+['"];?/g, '');
   content = content.replace(/import\s+.*?\s+from\s*['"][^'"]+['"];?/g, '');
   // Strip export keywords
-  content = content.replace(/export\s+(const|let|var|function|class)\s+/g, '$1 ');
+  content = content.replace(/export\s+(async\s+)?(const|let|var|function|class)\s+/g, '$1$2 ');
   content = content.replace(/export\s*\{[\s\S]*?\};?/g, '');
   content = content.replace(/export\s+default\s+.*?;?/g, '');
   bundleContent += `// --- ${f} ---\n${content}\n\n`;
