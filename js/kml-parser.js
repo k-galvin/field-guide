@@ -65,8 +65,10 @@ export function parseKML(kmlText, targetCity = '') {
       category = 'concerts_music';
     } else if (/vintage|shop|boutique|clothing|apparel|store|goods|market|flea/.test(lowerText)) {
       category = 'shops_retail';
-    } else if (/book|bookstore|cinema|film|theatre|theater|repertory/.test(lowerText)) {
-      category = 'books_cinema';
+    } else if (/cinema|film|theatre|theater|repertory|movie|screening|cinémathèque|cinematheque/.test(lowerText)) {
+      category = 'theater_cinema';
+    } else if (/book|bookstore|library|monograph|zines|press|livraria|libreria/.test(lowerText)) {
+      category = 'books';
     } else if (/restaurant|bistro|wine|dining|dinner|bar|tapas|brunch|ramen/.test(lowerText)) {
       category = 'food_wine';
     } else if (/park|garden|botanical|square|walk|trail|forest|nature|jardin/.test(lowerText)) {

@@ -32,6 +32,27 @@ assert.strictEqual(stats.legs.length, 2);
 assert(stats.totalDistanceKm > 0);
 console.log(`✓ Loop stats verified: total dist = ${stats.totalDistanceKm.toFixed(2)} km`);
 
-// Test KML parser (mock XML)
-// In Node environment DOMParser is from browser, but we can verify in browser or mock
+import { CATEGORIES, CATEGORY_MAP, normalizeSpotCategory } from '../js/storage.js';
+import { mapOsmTagToCategory } from '../js/photon.js';
+
+// Test category split for theater/cinema vs books
+console.log('Testing category definitions...');
+assert(CATEGORIES.some(c => c.id === 'books' && c.label === 'books'), 'books category should exist');
+assert(CATEGORIES.some(c => c.id === 'theater_cinema' && c.label === 'theater & cinema'), 'theater_cinema category should exist');
+assert(CATEGORY_MAP.has('books'), 'CATEGORY_MAP should have books');
+assert(CATEGORY_MAP.has('theater_cinema'), 'CATEGORY_MAP should have theater_cinema');
+
+// Test normalizeSpotCategory
+const cinemaSpot = normalizeSpotCategory({ name: 'Cinema du Pantheon', notes: 'Indie cinema', category: 'books_cinema' });
+assert.strictEqual(cinemaSpot.category, 'theater_cinema', 'Cinema spot should normalize to theater_cinema');
+
+const bookSpot = normalizeSpotCategory({ name: 'Skylight Books', notes: 'Independent bookstore', category: 'books_cinema' });
+assert.strictEqual(bookSpot.category, 'books', 'Bookstore spot should normalize to books');
+
+// Test Photon categorization
+assert.strictEqual(mapOsmTagToCategory({ osm_value: 'cinema' }, 'Film Center'), 'theater_cinema');
+assert.strictEqual(mapOsmTagToCategory({ osm_value: 'theatre' }, 'Globe Theatre'), 'theater_cinema');
+assert.strictEqual(mapOsmTagToCategory({ osm_value: 'books' }, 'Daunt Books'), 'books');
+console.log('✓ Category separation and normalization verified');
+
 console.log('All Day Loop algorithms verified successfully!');

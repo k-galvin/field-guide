@@ -226,12 +226,17 @@ function mapSpotToRow(spot) {
 }
 
 export function mapRowToSpot(row) {
+  let category = row.category;
+  if (category === 'books_cinema') {
+    const text = `${row.name || ''} ${row.notes || ''}`.toLowerCase();
+    category = /cinema|film|theatre|theater|repertory|movie|screening/.test(text) ? 'theater_cinema' : 'books';
+  }
   return {
     id: row.id,
     name: row.name,
     city: row.city,
     neighborhood: row.neighborhood || '',
-    category: row.category,
+    category: category,
     status: row.status || 'wishlist',
     favorite: !!row.favorite,
     lat: row.lat,

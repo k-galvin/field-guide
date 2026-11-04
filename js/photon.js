@@ -24,15 +24,17 @@ export function mapOsmTagToCategory(props = {}, name = '') {
   if (['museum', 'gallery', 'artwork', 'arts_centre'].includes(osmValue) || /museum|gallery|art|exhibition/.test(lowerName)) {
     return 'museums_art';
   }
-  if (['nightclub', 'music_venue', 'theatre', 'cinema'].includes(osmValue)) {
-    if (osmValue === 'cinema' || /book|cinema|theatre|theater/.test(lowerName)) return 'books_cinema';
+  if (['theatre', 'cinema'].includes(osmValue) || /cinema|film|theatre|theater|movie|screening|cinémathèque|cinematheque/.test(lowerName)) {
+    return 'theater_cinema';
+  }
+  if (['nightclub', 'music_venue'].includes(osmValue) || /concert|orchestra|jazz|gig|live music/.test(lowerName)) {
     return 'concerts_music';
   }
   if (['pottery', 'ceramics'].includes(osmValue) || /ceramic|pottery|clay|atelier/.test(lowerName)) {
     return 'ceramics_craft';
   }
-  if (['books', 'stationery', 'library'].includes(osmValue) || /book|books|libreria|livraria/.test(lowerName)) {
-    return 'books_cinema';
+  if (['books', 'stationery', 'library'].includes(osmValue) || /book|books|bookstore|libreria|livraria/.test(lowerName)) {
+    return 'books';
   }
   if (['park', 'garden', 'viewpoint', 'nature_reserve'].includes(osmValue) || /park|garden|lookout|miradouro|forest/.test(lowerName)) {
     return 'parks_nature';

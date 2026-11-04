@@ -7,7 +7,8 @@ import {
   saveStoredCities,
   exportBackupJSON,
   CATEGORIES,
-  CATEGORY_MAP
+  CATEGORY_MAP,
+  normalizeSpotCategory
 } from './storage.js';
 import { SAMPLE_SPOTS } from './sample-data.js';
 import {
@@ -831,6 +832,7 @@ function openAddSpotModal() {
   editingSpotId = null;
   document.getElementById('modal-spot-title').textContent = 'Add New Spot';
   formSpot.reset();
+  renderCategoryDropdown();
   spotIdInput.value = '';
   spotCitySelect.value = activeCity !== 'all' ? activeCity : (cities[0] || 'Tokyo');
   geocodeStatus.textContent = 'Or tap on the map to drop coordinates automatically.';
@@ -859,8 +861,10 @@ function openAddSpotModalWithCoords(lat, lng) {
 }
 
 function openEditSpotModal(spot) {
+  if (spot) normalizeSpotCategory(spot);
   editingSpotId = spot.id;
   document.getElementById('modal-spot-title').textContent = 'Edit Spot';
+  renderCategoryDropdown();
   spotIdInput.value = spot.id;
   spotNameInput.value = spot.name;
   spotCitySelect.value = spot.city;
@@ -1027,7 +1031,9 @@ function renderAutocompleteDropdown(results) {
     museums_art: 'museums & art',
     concerts_music: 'concerts & music',
     ceramics_craft: 'ceramics & craft',
-    books_cinema: 'books & cinema',
+    books: 'books',
+    theater_cinema: 'theater & cinema',
+    books_cinema: 'books',
     parks_nature: 'parks & nature',
     surf_movement: 'surf & movement',
     other: 'place'

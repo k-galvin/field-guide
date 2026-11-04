@@ -56,23 +56,30 @@ export const CATEGORIES = [
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"></path><path d="M9 3v2c0 1-2 2-3 4-1.5 3-1 6 1 8 1.5 1.5 2 2.5 2 4h6c0-1.5.5-2.5 2-4 2-2 2.5-5 1-8-1-2-3-3-3-4V3"></path><line x1="7" y1="21" x2="17" y2="21"></line></svg>'
   },
   {
-    id: 'books_cinema',
-    label: 'cinema & books',
+    id: 'books',
+    label: 'books',
     code: '08',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
   },
   {
+    id: 'theater_cinema',
+    label: 'theater & cinema',
+    code: '09',
+    color: '#0047ab',
+    iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"></rect><line x1="7" x2="7" y1="2" y2="22"></line><line x1="17" x2="17" y1="2" y2="22"></line><line x1="2" x2="22" y1="12" y2="12"></line><line x1="2" x2="7" y1="7" y2="7"></line><line x1="2" x2="7" y1="17" y2="17"></line><line x1="17" x2="22" y1="17" y2="17"></line><line x1="17" x2="22" y1="7" y2="7"></line></svg>'
+  },
+  {
     id: 'parks_nature',
     label: 'parks & gardens',
-    code: '09',
+    code: '10',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>'
   },
   {
     id: 'surf_movement',
     label: 'surf & movement',
-    code: '10',
+    code: '11',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13c3-3 6-3 9 0s6 3 9 0"></path><path d="M2 17c3-3 6-3 9 0s6 3 9 0"></path><path d="M2 9c3-3 6-3 9 0s6 3 9 0"></path></svg>'
   },
@@ -86,6 +93,21 @@ export const CATEGORIES = [
 ];
 
 export const CATEGORY_MAP = new Map(CATEGORIES.map(c => [c.id, c]));
+// Alias books_cinema for seamless backwards compatibility
+CATEGORY_MAP.set('books_cinema', CATEGORY_MAP.get('books'));
+
+export function normalizeSpotCategory(spot) {
+  if (!spot) return spot;
+  if (spot.category === 'books_cinema') {
+    const text = `${spot.name || ''} ${spot.notes || ''}`.toLowerCase();
+    if (/cinema|film|theatre|theater|repertory|movie|screening/.test(text)) {
+      spot.category = 'theater_cinema';
+    } else {
+      spot.category = 'books';
+    }
+  }
+  return spot;
+}
 
 export function getStoredCities() {
   try {
@@ -111,7 +133,7 @@ export function getStoredSpots() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : null;
+    return Array.isArray(parsed) ? parsed.map(normalizeSpotCategory) : null;
   } catch (e) {
     console.error('Failed to parse stored spots', e);
     return null;
