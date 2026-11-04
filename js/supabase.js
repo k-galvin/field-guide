@@ -167,17 +167,56 @@ export function subscribeToRemoteChanges(callback) {
   }
 }
 
+/**
+ * Push an array of spots to remote Supabase table (batch upsert)
+ */
+export async function pushSpotsToRemote(spotsArray) {
+  if (!spotsArray || spotsArray.length === 0) return true;
+  const rows = spotsArray.map(mapSpotToRow);
+
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      const { error } = await sb.from('spots').upsert(rows);
+      if (error) throw error;
+      return true;
+    } catch (e) {
+      console.warn('Supabase JS batch upsert failed, trying REST:', e);
+    }
+  }
+
+  // REST fallback
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(rows)
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('REST batch upsert failed:', err);
+    return false;
+  }
+}
+
 function mapSpotToRow(spot) {
+  const lat = typeof spot.lat === 'number' ? spot.lat : parseFloat(spot.lat);
+  const lng = typeof spot.lng === 'number' ? spot.lng : parseFloat(spot.lng);
   return {
-    id: spot.id,
-    name: spot.name,
-    city: spot.city,
+    id: String(spot.id || ('spot-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7))),
+    name: spot.name || 'Untitled Spot',
+    city: spot.city || 'Tokyo',
     neighborhood: spot.neighborhood || null,
-    category: spot.category,
+    category: spot.category || 'other',
     status: spot.status || 'wishlist',
     favorite: !!spot.favorite,
-    lat: spot.lat,
-    lng: spot.lng,
+    lat: isNaN(lat) ? 0 : lat,
+    lng: isNaN(lng) ? 0 : lng,
     hours: spot.hours || null,
     notes: spot.notes || null,
     visit_date: spot.visitDate || null,

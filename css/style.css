@@ -121,10 +121,19 @@ html, body {
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: rgba(0, 0, 0, 0.45);
+  color: rgba(0, 0, 0, 0.55);
   padding: 0.45rem 0.75rem;
   background: var(--gray);
   border: 1px solid var(--border-light);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.sync-indicator:hover {
+  background: var(--light-gray);
+  border-color: rgba(0, 71, 171, 0.4);
+  color: var(--accent);
 }
 
 .sync-dot {

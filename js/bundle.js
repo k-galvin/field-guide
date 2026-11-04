@@ -1244,17 +1244,56 @@ function subscribeToRemoteChanges(callback) {
   }
 }
 
+/**
+ * Push an array of spots to remote Supabase table (batch upsert)
+ */
+export async function pushSpotsToRemote(spotsArray) {
+  if (!spotsArray || spotsArray.length === 0) return true;
+  const rows = spotsArray.map(mapSpotToRow);
+
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      const { error } = await sb.from('spots').upsert(rows);
+      if (error) throw error;
+      return true;
+    } catch (e) {
+      console.warn('Supabase JS batch upsert failed, trying REST:', e);
+    }
+  }
+
+  // REST fallback
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(rows)
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('REST batch upsert failed:', err);
+    return false;
+  }
+}
+
 function mapSpotToRow(spot) {
+  const lat = typeof spot.lat === 'number' ? spot.lat : parseFloat(spot.lat);
+  const lng = typeof spot.lng === 'number' ? spot.lng : parseFloat(spot.lng);
   return {
-    id: spot.id,
-    name: spot.name,
-    city: spot.city,
+    id: String(spot.id || ('spot-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7))),
+    name: spot.name || 'Untitled Spot',
+    city: spot.city || 'Tokyo',
     neighborhood: spot.neighborhood || null,
-    category: spot.category,
+    category: spot.category || 'other',
     status: spot.status || 'wishlist',
     favorite: !!spot.favorite,
-    lat: spot.lat,
-    lng: spot.lng,
+    lat: isNaN(lat) ? 0 : lat,
+    lng: isNaN(lng) ? 0 : lng,
     hours: spot.hours || null,
     notes: spot.notes || null,
     visit_date: spot.visitDate || null,
@@ -1465,60 +1504,92 @@ function updateSyncStatus(state, text) {
   }
 }
 
-async function initCloudSync() {
-  updateSyncStatus('syncing', 'syncing...');
+async function syncWithSupabase(manual = false) {
+  updateSyncStatus('syncing', manual ? 'syncing...' : 'syncing...');
 
   try {
-    // 1. Seed Supabase if empty with initial curated spots
-    await seedRemoteSpotsIfEmpty(spots);
-
-    // 2. Fetch remote spots from Supabase
+    // 1. Fetch current remote spots from Supabase
     const remote = await fetchRemoteSpots();
-    if (remote && remote.length > 0) {
-      // Merge: remote takes precedence, preserve any local uncommitted spots
-      const remoteMap = new Map(remote.map(r => [r.id, r]));
-      const merged = [...remote];
-      spots.forEach(loc => {
-        if (!remoteMap.has(loc.id)) {
-          merged.push(loc);
-          upsertRemoteSpot(loc); // upload un-synced local spots
-        }
-      });
 
-      spots = merged;
-      saveStoredSpots(spots);
-      applyFiltersAndRender();
+    if (remote === null) {
+      updateSyncStatus('offline', 'offline');
+      if (manual) alert('Could not reach Supabase. Operating in local offline mode.');
+      return;
     }
 
-    updateSyncStatus('synced', 'synced');
+    // 2. Identify all local spots not yet in Supabase
+    const remoteMap = new Map(remote.map(r => [r.id, r]));
+    const uncommitted = spots.filter(loc => !remoteMap.has(loc.id));
 
-    // 3. Realtime WebSocket listener for changes from other devices (e.g. phone -> laptop)
-    subscribeToRemoteChanges((payload) => {
-      console.log('Realtime change from Supabase:', payload);
-      updateSyncStatus('syncing', 'syncing...');
-      const { eventType, new: newRow, old: oldRow } = payload;
+    if (uncommitted.length > 0) {
+      console.log(`Pushing ${uncommitted.length} uncommitted spots to Supabase...`);
+      updateSyncStatus('syncing', `uploading ${uncommitted.length}...`);
+      await pushSpotsToRemote(uncommitted);
+    }
 
-      if (eventType === 'INSERT' || eventType === 'UPDATE') {
-        const updated = mapRowToSpot(newRow);
-        const idx = spots.findIndex(s => s.id === updated.id);
-        if (idx !== -1) {
-          spots[idx] = updated;
-        } else {
-          spots.unshift(updated);
-        }
-      } else if (eventType === 'DELETE') {
-        spots = spots.filter(s => s.id !== oldRow.id);
+    // 3. Build unified spots set (remote + uncommitted)
+    const unifiedMap = new Map();
+    remote.forEach(r => unifiedMap.set(r.id, r));
+    uncommitted.forEach(u => unifiedMap.set(u.id, u));
+
+    spots = Array.from(unifiedMap.values());
+    saveStoredSpots(spots);
+
+    // 4. Auto-discover any imported cities
+    const storedCities = getStoredCities();
+    const citySet = new Set(storedCities.map(c => c.toLowerCase()));
+    let newCityAdded = false;
+    spots.forEach(s => {
+      if (s.city && !citySet.has(s.city.toLowerCase())) {
+        storedCities.push(s.city);
+        citySet.add(s.city.toLowerCase());
+        newCityAdded = true;
       }
-
-      saveStoredSpots(spots);
-      applyFiltersAndRender();
-      setTimeout(() => updateSyncStatus('synced', 'synced'), 600);
     });
+    if (newCityAdded) {
+      saveStoredCities(storedCities);
+      cities = storedCities;
+      renderCityDropdowns();
+    }
 
+    applyFiltersAndRender();
+    updateSyncStatus('synced', `synced (${spots.length})`);
+
+    if (manual) {
+      alert(`Sync complete! ${spots.length} total spots synced across cloud and device.`);
+    }
   } catch (err) {
-    console.warn('Supabase cloud sync failed, operating in offline mode:', err);
+    console.error('Supabase sync error:', err);
     updateSyncStatus('offline', 'offline');
+    if (manual) alert('Sync error: ' + err.message);
   }
+}
+
+async function initCloudSync() {
+  await syncWithSupabase(false);
+
+  // Realtime WebSocket listener for changes from other devices (e.g. phone <-> laptop)
+  subscribeToRemoteChanges((payload) => {
+    console.log('Realtime change from Supabase:', payload);
+    updateSyncStatus('syncing', 'syncing...');
+    const { eventType, new: newRow, old: oldRow } = payload;
+
+    if (eventType === 'INSERT' || eventType === 'UPDATE') {
+      const updated = mapRowToSpot(newRow);
+      const idx = spots.findIndex(s => s.id === updated.id);
+      if (idx !== -1) {
+        spots[idx] = updated;
+      } else {
+        spots.unshift(updated);
+      }
+    } else if (eventType === 'DELETE') {
+      spots = spots.filter(s => s.id !== oldRow.id);
+    }
+
+    saveStoredSpots(spots);
+    applyFiltersAndRender();
+    setTimeout(() => updateSyncStatus('synced', `synced (${spots.length})`), 400);
+  });
 }
 
 /**
@@ -1566,6 +1637,14 @@ function setupEventListeners() {
       if (editingSpotId) {
         deleteSpot(editingSpotId);
       }
+    });
+  }
+
+  // Sync Status Click Trigger
+  const syncStatusEl = document.getElementById('sync-status');
+  if (syncStatusEl) {
+    syncStatusEl.addEventListener('click', () => {
+      syncWithSupabase(true);
     });
   }
 
@@ -2227,18 +2306,28 @@ function handleConfirmKmlImport() {
   if (pendingKmlSpots.length === 0) return;
 
   const targetCity = kmlTargetCity.value;
-  pendingKmlSpots.forEach(s => {
-    s.city = targetCity;
-  });
+  const count = pendingKmlSpots.length;
+  const toImport = pendingKmlSpots.map(s => ({ ...s, city: targetCity }));
 
-  spots = [...pendingKmlSpots, ...spots];
+  spots = [...toImport, ...spots];
   saveStoredSpots(spots);
 
-  // Sync imported spots to Supabase
-  updateSyncStatus('syncing', 'syncing...');
-  Promise.all(pendingKmlSpots.map(s => upsertRemoteSpot(s))).then(() => {
-    updateSyncStatus('synced', 'synced');
+  // Sync imported spots to Supabase via batch push
+  updateSyncStatus('syncing', `uploading ${count}...`);
+  pushSpotsToRemote(toImport).then(() => {
+    updateSyncStatus('synced', `synced (${spots.length})`);
+  }).catch(err => {
+    console.warn('Batch upload failed:', err);
   });
+
+  // Ensure target city is in stored cities list
+  const storedCities = getStoredCities();
+  if (!storedCities.some(c => c.toLowerCase() === targetCity.toLowerCase())) {
+    storedCities.push(targetCity);
+    saveStoredCities(storedCities);
+    cities = storedCities;
+    renderCityDropdowns();
+  }
 
   // Switch to this city
   activeCity = targetCity;
@@ -2250,7 +2339,7 @@ function handleConfirmKmlImport() {
   btnConfirmKmlImport.disabled = true;
 
   applyFiltersAndRender();
-  alert(`Successfully imported ${pendingKmlSpots.length || 'new'} spots into ${targetCity}!`);
+  alert(`Successfully imported ${count} spots into ${targetCity}! Syncing to Supabase cloud.`);
 }
 
 /**
