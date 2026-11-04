@@ -39,8 +39,14 @@ import { mapOsmTagToCategory } from '../js/photon.js';
 console.log('Testing category definitions...');
 assert(CATEGORIES.some(c => c.id === 'books' && c.label === 'books'), 'books category should exist');
 assert(CATEGORIES.some(c => c.id === 'theater_cinema' && c.label === 'theater & cinema'), 'theater_cinema category should exist');
+assert(CATEGORIES.some(c => c.id === 'brunch_lunch' && c.label === 'brunch & lunch'), 'brunch_lunch category should exist');
+assert(CATEGORIES.some(c => c.id === 'bars_nightlife' && c.label === 'bars & nightlife'), 'bars_nightlife category should exist');
+assert(CATEGORIES.some(c => c.id === 'hotels_stays' && c.label === 'hotels & stays'), 'hotels_stays category should exist');
 assert(CATEGORY_MAP.has('books'), 'CATEGORY_MAP should have books');
 assert(CATEGORY_MAP.has('theater_cinema'), 'CATEGORY_MAP should have theater_cinema');
+assert(CATEGORY_MAP.has('brunch_lunch'), 'CATEGORY_MAP should have brunch_lunch');
+assert(CATEGORY_MAP.has('bars_nightlife'), 'CATEGORY_MAP should have bars_nightlife');
+assert(CATEGORY_MAP.has('hotels_stays'), 'CATEGORY_MAP should have hotels_stays');
 
 // Test normalizeSpotCategory
 const cinemaSpot = normalizeSpotCategory({ name: 'Cinema du Pantheon', notes: 'Indie cinema', category: 'books_cinema' });
@@ -53,6 +59,9 @@ assert.strictEqual(bookSpot.category, 'books', 'Bookstore spot should normalize 
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'cinema' }, 'Film Center'), 'theater_cinema');
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'theatre' }, 'Globe Theatre'), 'theater_cinema');
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'books' }, 'Daunt Books'), 'books');
+assert.strictEqual(mapOsmTagToCategory({ osm_value: 'hotel' }, 'Ace Hotel'), 'hotels_stays');
+assert.strictEqual(mapOsmTagToCategory({ osm_value: 'bar' }, 'Bar Termini'), 'bars_nightlife');
+assert.strictEqual(mapOsmTagToCategory({ osm_value: 'deli' }, 'Katz Deli'), 'brunch_lunch');
 console.log('✓ Category separation and normalization verified');
 
 console.log('All Day Loop algorithms verified successfully!');

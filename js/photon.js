@@ -18,7 +18,16 @@ export function mapOsmTagToCategory(props = {}, name = '') {
   if (osmValue === 'cafe' || osmValue === 'coffee' || osmValue === 'tea' || /coffee|matcha|cafe|espresso|roaster|tea/.test(lowerName)) {
     return 'matcha_coffee';
   }
-  if (['restaurant', 'bar', 'pub', 'bistro', 'fast_food', 'food_court', 'wine'].includes(osmValue) || /restaurant|bistro|wine|tacos|pizza|ramen|deli|taqueria/.test(lowerName)) {
+  if (['hotel', 'guest_house', 'hostel', 'motel', 'apartment', 'chalet'].includes(osmValue) || /hotel|hostel|inn\b|ryokan|guesthouse|residence|lodging|bed & breakfast|suites\b/.test(lowerName)) {
+    return 'hotels_stays';
+  }
+  if (['bar', 'pub', 'lounge', 'biergarten'].includes(osmValue) || /cocktail|cocktails|speakeasy|listening bar|pub\b|tavern|taproom|saloon|brewery/.test(lowerName)) {
+    return 'bars_nightlife';
+  }
+  if (['deli', 'sandwich', 'fast_food', 'food_court', 'canteen'].includes(osmValue) || /brunch|lunch|sandwich|deli\b|bagel|bagels|diner|all-day café|all-day cafe/.test(lowerName)) {
+    return 'brunch_lunch';
+  }
+  if (['restaurant', 'bistro', 'wine'].includes(osmValue) || /restaurant|bistro|wine|tacos|pizza|ramen|taqueria|trattoria|izakaya/.test(lowerName)) {
     return 'food_wine';
   }
   if (['museum', 'gallery', 'artwork', 'arts_centre'].includes(osmValue) || /museum|gallery|art|exhibition/.test(lowerName)) {

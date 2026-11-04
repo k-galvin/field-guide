@@ -69,7 +69,13 @@ export function parseKML(kmlText, targetCity = '') {
       category = 'theater_cinema';
     } else if (/book|bookstore|library|monograph|zines|press|livraria|libreria/.test(lowerText)) {
       category = 'books';
-    } else if (/restaurant|bistro|wine|dining|dinner|bar|tapas|brunch|ramen/.test(lowerText)) {
+    } else if (/hotel|hostel|inn\b|ryokan|guesthouse|residence|lodging|suites\b/.test(lowerText)) {
+      category = 'hotels_stays';
+    } else if (/cocktail|cocktails|speakeasy|listening bar|pub\b|tavern|taproom|saloon|bar\b/.test(lowerText)) {
+      category = 'bars_nightlife';
+    } else if (/brunch|lunch|sandwich|deli\b|bagel|bagels|diner/.test(lowerText)) {
+      category = 'brunch_lunch';
+    } else if (/restaurant|bistro|wine|dining|dinner|tapas|ramen|trattoria|izakaya/.test(lowerText)) {
       category = 'food_wine';
     } else if (/park|garden|botanical|square|walk|trail|forest|nature|jardin/.test(lowerText)) {
       category = 'parks_nature';

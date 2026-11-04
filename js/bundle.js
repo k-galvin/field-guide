@@ -25,65 +25,86 @@ const CATEGORIES = [
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17c1-3 3-7 8-7s7 4 8 7"></path><path d="M3 13c1.5-4 5.5-8 9-8s7.5 4 9 8"></path><path d="M7 16a3 3 0 0 1 5-2 3 3 0 0 1 5 2"></path></svg>'
   },
   {
+    id: 'brunch_lunch',
+    label: 'brunch & lunch',
+    code: '03',
+    color: '#0047ab',
+    iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"></path><path d="M15 2v19"></path><path d="M5 2v19"></path><path d="M2 2v6a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2"></path></svg>'
+  },
+  {
     id: 'food_wine',
     label: 'dining & wine',
-    code: '03',
+    code: '04',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"></path><path d="M12 15v7"></path><path d="M12 15a5 5 0 0 0 5-5V3H7v7a5 5 0 0 0 5 5z"></path></svg>'
   },
   {
+    id: 'bars_nightlife',
+    label: 'bars & nightlife',
+    code: '05',
+    color: '#0047ab',
+    iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-7 8-7-8Z"></path></svg>'
+  },
+  {
+    id: 'hotels_stays',
+    label: 'hotels & stays',
+    code: '06',
+    color: '#0047ab',
+    iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"></path><path d="M2 8h18a2 2 0 0 1 2 2v10"></path><path d="M2 17h20"></path><path d="M6 8v9"></path></svg>'
+  },
+  {
     id: 'shops_retail',
     label: 'shops & boutiques',
-    code: '04',
+    code: '07',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>'
   },
   {
     id: 'museums_art',
     label: 'museums & galleries',
-    code: '05',
+    code: '08',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="22" x2="22" y2="22"></line><line x1="4" y1="9" x2="4" y2="20"></line><line x1="9" y1="9" x2="9" y2="20"></line><line x1="15" y1="9" x2="15" y2="20"></line><line x1="20" y1="9" x2="20" y2="20"></line><polygon points="12 2 2 7 22 7"></polygon></svg>'
   },
   {
     id: 'concerts_music',
     label: 'concerts & music',
-    code: '06',
+    code: '09',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>'
   },
   {
     id: 'ceramics_craft',
     label: 'ceramics & craft',
-    code: '07',
+    code: '10',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"></path><path d="M9 3v2c0 1-2 2-3 4-1.5 3-1 6 1 8 1.5 1.5 2 2.5 2 4h6c0-1.5.5-2.5 2-4 2-2 2.5-5 1-8-1-2-3-3-3-4V3"></path><line x1="7" y1="21" x2="17" y2="21"></line></svg>'
   },
   {
     id: 'books',
     label: 'books',
-    code: '08',
+    code: '11',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
   },
   {
     id: 'theater_cinema',
     label: 'theater & cinema',
-    code: '09',
+    code: '12',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"></rect><line x1="7" x2="7" y1="2" y2="22"></line><line x1="17" x2="17" y1="2" y2="22"></line><line x1="2" x2="22" y1="12" y2="12"></line><line x1="2" x2="7" y1="7" y2="7"></line><line x1="2" x2="7" y1="17" y2="17"></line><line x1="17" x2="22" y1="17" y2="17"></line><line x1="17" x2="22" y1="7" y2="7"></line></svg>'
   },
   {
     id: 'parks_nature',
     label: 'parks & gardens',
-    code: '10',
+    code: '13',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>'
   },
   {
     id: 'surf_movement',
     label: 'surf & movement',
-    code: '11',
+    code: '14',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13c3-3 6-3 9 0s6 3 9 0"></path><path d="M2 17c3-3 6-3 9 0s6 3 9 0"></path><path d="M2 9c3-3 6-3 9 0s6 3 9 0"></path></svg>'
   },
@@ -835,7 +856,13 @@ function parseKML(kmlText, targetCity = '') {
       category = 'theater_cinema';
     } else if (/book|bookstore|library|monograph|zines|press|livraria|libreria/.test(lowerText)) {
       category = 'books';
-    } else if (/restaurant|bistro|wine|dining|dinner|bar|tapas|brunch|ramen/.test(lowerText)) {
+    } else if (/hotel|hostel|inn\b|ryokan|guesthouse|residence|lodging|suites\b/.test(lowerText)) {
+      category = 'hotels_stays';
+    } else if (/cocktail|cocktails|speakeasy|listening bar|pub\b|tavern|taproom|saloon|bar\b/.test(lowerText)) {
+      category = 'bars_nightlife';
+    } else if (/brunch|lunch|sandwich|deli\b|bagel|bagels|diner/.test(lowerText)) {
+      category = 'brunch_lunch';
+    } else if (/restaurant|bistro|wine|dining|dinner|tapas|ramen|trattoria|izakaya/.test(lowerText)) {
       category = 'food_wine';
     } else if (/park|garden|botanical|square|walk|trail|forest|nature|jardin/.test(lowerText)) {
       category = 'parks_nature';
@@ -1371,7 +1398,16 @@ function mapOsmTagToCategory(props = {}, name = '') {
   if (osmValue === 'cafe' || osmValue === 'coffee' || osmValue === 'tea' || /coffee|matcha|cafe|espresso|roaster|tea/.test(lowerName)) {
     return 'matcha_coffee';
   }
-  if (['restaurant', 'bar', 'pub', 'bistro', 'fast_food', 'food_court', 'wine'].includes(osmValue) || /restaurant|bistro|wine|tacos|pizza|ramen|deli|taqueria/.test(lowerName)) {
+  if (['hotel', 'guest_house', 'hostel', 'motel', 'apartment', 'chalet'].includes(osmValue) || /hotel|hostel|inn\b|ryokan|guesthouse|residence|lodging|bed & breakfast|suites\b/.test(lowerName)) {
+    return 'hotels_stays';
+  }
+  if (['bar', 'pub', 'lounge', 'biergarten'].includes(osmValue) || /cocktail|cocktails|speakeasy|listening bar|pub\b|tavern|taproom|saloon|brewery/.test(lowerName)) {
+    return 'bars_nightlife';
+  }
+  if (['deli', 'sandwich', 'fast_food', 'food_court', 'canteen'].includes(osmValue) || /brunch|lunch|sandwich|deli\b|bagel|bagels|diner|all-day café|all-day cafe/.test(lowerName)) {
+    return 'brunch_lunch';
+  }
+  if (['restaurant', 'bistro', 'wine'].includes(osmValue) || /restaurant|bistro|wine|tacos|pizza|ramen|taqueria|trattoria|izakaya/.test(lowerName)) {
     return 'food_wine';
   }
   if (['museum', 'gallery', 'artwork', 'arts_centre'].includes(osmValue) || /museum|gallery|art|exhibition/.test(lowerName)) {
@@ -2516,7 +2552,10 @@ function renderAutocompleteDropdown(results) {
   const CATEGORY_LABEL_MAP = {
     matcha_coffee: 'coffee & matcha',
     pastry_bakery: 'pastry & bakery',
+    brunch_lunch: 'brunch & lunch',
     food_wine: 'dining & wine',
+    bars_nightlife: 'bars & nightlife',
+    hotels_stays: 'hotels & stays',
     shops_retail: 'shops & retail',
     museums_art: 'museums & art',
     concerts_music: 'concerts & music',

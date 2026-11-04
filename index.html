@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-title" content="Field Guide">
   <meta name="theme-color" content="#ffffff">
   <link rel="stylesheet" href="css/leaflet.css">
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
 
@@ -75,11 +75,14 @@
         <div class="category-chips" id="category-chips">
           <button class="chip active" data-cat="all">all</button>
           <button class="chip" data-cat="matcha_coffee">coffee & matcha</button>
-          <button class="chip" data-cat="ceramics_craft">ceramics & craft</button>
           <button class="chip" data-cat="pastry_bakery">bakery & pastry</button>
+          <button class="chip" data-cat="brunch_lunch">brunch & lunch</button>
+          <button class="chip" data-cat="food_wine">dining & wine</button>
+          <button class="chip" data-cat="bars_nightlife">bars & nightlife</button>
+          <button class="chip" data-cat="hotels_stays">hotels & stays</button>
+          <button class="chip" data-cat="ceramics_craft">ceramics & craft</button>
           <button class="chip" data-cat="books">books</button>
           <button class="chip" data-cat="theater_cinema">theater & cinema</button>
-          <button class="chip" data-cat="food_wine">dining & wine</button>
           <button class="chip" data-cat="surf_movement">surf & movement</button>
         </div>
       </section>
@@ -158,7 +161,10 @@
               <select id="spot-category" class="form-select" required>
                 <option value="matcha_coffee">Coffee & Matcha</option>
                 <option value="pastry_bakery">Bakery & Pastry</option>
+                <option value="brunch_lunch">Brunch & Lunch</option>
                 <option value="food_wine">Dining & Wine</option>
+                <option value="bars_nightlife">Bars & Nightlife</option>
+                <option value="hotels_stays">Hotels & Stays</option>
                 <option value="shops_retail">Shops & Boutiques</option>
                 <option value="museums_art">Museums & Galleries</option>
                 <option value="concerts_music">Concerts & Music</option>
@@ -362,6 +368,6 @@
   <!-- Vendor & Application Scripts -->
   <script src="vendor/leaflet.js"></script>
   <script src="vendor/supabase.js"></script>
-  <script src="js/bundle.js?v=2"></script>
+  <script src="js/bundle.js?v=3"></script>
 </body>
 </html>
