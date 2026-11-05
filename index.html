@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-title" content="Field Guide">
   <meta name="theme-color" content="#ffffff">
   <link rel="stylesheet" href="css/leaflet.css">
-  <link rel="stylesheet" href="css/style.css?v=4">
+  <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body>
 
@@ -52,11 +52,21 @@
       <!-- Search & City Select -->
       <section class="filter-section">
         <div class="city-row">
-          <select id="city-select" class="city-select" aria-label="Select City Guide">
-            <!-- Populated via JS -->
+          <button type="button" id="btn-city-atlas-trigger" class="city-atlas-trigger" aria-label="Open City Atlas" title="Open City Atlas & Destination Index">
+            <div class="city-trigger-left">
+              <span class="city-trigger-code" id="active-city-code">TYO</span>
+              <span class="city-trigger-name" id="active-city-name">Tokyo</span>
+            </div>
+            <div class="city-trigger-right">
+              <span class="city-trigger-count" id="active-city-count">0 spots</span>
+              <span class="city-trigger-chevron">⊞ atlas</span>
+            </div>
+          </button>
+          <select id="city-select" class="city-select" style="display: none;" aria-hidden="true">
+            <!-- Backwards compatibility for scripts -->
           </select>
-          <button id="btn-manage-cities" class="btn" style="padding: 0.45rem 0.75rem;" title="Add/Manage Cities">
-            + city
+          <button id="btn-manage-cities" class="btn city-atlas-btn-add" title="Open Atlas / Add City">
+            +
           </button>
         </div>
 
@@ -347,23 +357,41 @@
     </div>
   </div>
 
-  <!-- Modal: City Manager -->
+  <!-- Modal: City Atlas & Destination Index -->
   <div class="modal-overlay" id="modal-cities" role="dialog" aria-modal="true" aria-labelledby="modal-cities-title">
-    <div class="modal-card" style="max-width: 420px;">
+    <div class="modal-card modal-card-atlas">
       <div class="modal-header">
-        <h2 class="modal-title" id="modal-cities-title">City Guides</h2>
+        <div>
+          <div class="atlas-modal-overline">ARCHIVAL FIELD GUIDE</div>
+          <h2 class="modal-title" id="modal-cities-title">City Atlas & Index</h2>
+        </div>
         <button type="button" class="modal-close-btn" data-close-modal="modal-cities">&times;</button>
       </div>
-      <div class="modal-body">
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="new-city-input" class="form-input" placeholder="e.g. Kyoto, London, New York">
-          <button type="button" id="btn-add-new-city" class="btn btn-accent" style="white-space: nowrap;">Add City</button>
+      <div class="modal-body atlas-modal-body">
+        <!-- Atlas Controls Toolbar -->
+        <div class="atlas-toolbar">
+          <div class="atlas-search-wrap">
+            <input type="text" id="atlas-search-input" class="atlas-search-input" placeholder="Search city, country, or 3-letter code (e.g. TYO, UK, Lisbon)..." autocomplete="off">
+          </div>
+          <div class="atlas-filter-tabs">
+            <button type="button" class="atlas-tab active" id="atlas-tab-active" data-tab="active">With Spots (<span id="atlas-active-count">0</span>)</button>
+            <button type="button" class="atlas-tab" id="atlas-tab-all" data-tab="all">All Destinations (<span id="atlas-all-count">0</span>)</button>
+          </div>
         </div>
-        <div id="cities-list-manage" style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
-          <!-- Populated by JS -->
+
+        <!-- Add City Inline Bar -->
+        <div class="atlas-add-row">
+          <input type="text" id="new-city-input" class="form-input" placeholder="Add custom destination (e.g. Kyoto, Lisbon, Austin)...">
+          <button type="button" id="btn-add-new-city" class="btn btn-accent" style="white-space: nowrap;">+ Add Destination</button>
+        </div>
+
+        <!-- Atlas Cards Grid -->
+        <div class="atlas-grid" id="cities-list-manage">
+          <!-- Populated dynamically via JS -->
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="atlas-footer-hint">Tap any card to switch guide & center map.</span>
         <button type="button" class="btn" data-close-modal="modal-cities">Done</button>
       </div>
     </div>
@@ -372,6 +400,6 @@
   <!-- Vendor & Application Scripts -->
   <script src="vendor/leaflet.js"></script>
   <script src="vendor/supabase.js"></script>
-  <script src="js/bundle.js?v=4"></script>
+  <script src="js/bundle.js?v=5"></script>
 </body>
 </html>

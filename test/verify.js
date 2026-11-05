@@ -32,7 +32,7 @@ assert.strictEqual(stats.legs.length, 2);
 assert(stats.totalDistanceKm > 0);
 console.log(`✓ Loop stats verified: total dist = ${stats.totalDistanceKm.toFixed(2)} km`);
 
-import { CATEGORIES, CATEGORY_MAP, normalizeSpotCategory } from '../js/storage.js';
+import { CATEGORIES, CATEGORY_MAP, normalizeSpotCategory, getCityMeta, DEFAULT_CITIES } from '../js/storage.js';
 import { mapOsmTagToCategory } from '../js/photon.js';
 
 // Test category split for theater/cinema vs books
@@ -63,5 +63,14 @@ assert.strictEqual(mapOsmTagToCategory({ osm_value: 'hotel' }, 'Ace Hotel'), 'ho
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'bar' }, 'Bar Termini'), 'bars_nightlife');
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'deli' }, 'Katz Deli'), 'brunch_lunch');
 console.log('✓ Category separation and normalization verified');
+
+console.log('Testing City Atlas metadata...');
+assert.strictEqual(getCityMeta('Tokyo').code, 'TYO');
+assert.strictEqual(getCityMeta('London').code, 'LON');
+assert.strictEqual(getCityMeta('New York').code, 'NYC');
+assert.strictEqual(getCityMeta('Paris').code, 'PAR');
+assert.strictEqual(getCityMeta('Unknownville').code, 'UNK');
+assert(DEFAULT_CITIES.length > 50, 'DEFAULT_CITIES should have indexed global destinations');
+console.log('✓ City Atlas metadata verified');
 
 console.log('All Day Loop algorithms verified successfully!');

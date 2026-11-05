@@ -3,7 +3,96 @@
 const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
 
-export const DEFAULT_CITIES = ['Tokyo', 'Paris', 'Los Angeles', 'Copenhagen', 'New York'];
+export const DEFAULT_CITIES = [
+  'Tokyo', 'London', 'Paris', 'New York', 'Los Angeles', 'Copenhagen', 'Lisbon', 'Kyoto',
+  'San Francisco', 'Berlin', 'Rome', 'Milan', 'Venice', 'Mexico City', 'Seoul', 'Amsterdam',
+  'Vienna', 'Barcelona', 'Madrid', 'Stockholm', 'Oslo', 'Helsinki', 'Porto', 'Prague',
+  'Dublin', 'Edinburgh', 'Rotterdam', 'Dessau', 'Kobe', 'Vancouver', 'Toronto', 'Montreal',
+  'São Paulo', 'Buenos Aires', 'Austin', 'Seattle', 'Nashville', 'New Orleans', 'Detroit',
+  'Philadelphia', 'Chicago', 'Miami', 'Marrakesh', 'Istanbul', 'Bangkok', 'Hong Kong',
+  'Mumbai', 'Munich', 'Hanoi', 'Auckland', 'Florence', 'Geneva', 'Lyon', 'Manchester',
+  'Portland', 'Düsseldorf', 'Leipzig', 'Ikast', 'Antwerp', 'Lagos', 'Kyiv', 'Oxford',
+  'Liverpool', 'Memphis'
+];
+
+export const KNOWN_CITY_META = {
+  'tokyo': { code: 'TYO', country: 'Japan' },
+  'paris': { code: 'PAR', country: 'France' },
+  'los angeles': { code: 'LAX', country: 'USA' },
+  'copenhagen': { code: 'CPH', country: 'Denmark' },
+  'new york': { code: 'NYC', country: 'USA' },
+  'london': { code: 'LON', country: 'UK' },
+  'lisbon': { code: 'LIS', country: 'Portugal' },
+  'san francisco': { code: 'SFO', country: 'USA' },
+  'kyoto': { code: 'KYO', country: 'Japan' },
+  'berlin': { code: 'BER', country: 'Germany' },
+  'rome': { code: 'ROM', country: 'Italy' },
+  'milan': { code: 'MIL', country: 'Italy' },
+  'venice': { code: 'VCE', country: 'Italy' },
+  'mexico city': { code: 'CDMX', country: 'Mexico' },
+  'seoul': { code: 'SEL', country: 'South Korea' },
+  'amsterdam': { code: 'AMS', country: 'Netherlands' },
+  'vienna': { code: 'VIE', country: 'Austria' },
+  'barcelona': { code: 'BCN', country: 'Spain' },
+  'madrid': { code: 'MAD', country: 'Spain' },
+  'stockholm': { code: 'ARN', country: 'Sweden' },
+  'oslo': { code: 'OSL', country: 'Norway' },
+  'helsinki': { code: 'HEL', country: 'Finland' },
+  'porto': { code: 'OPO', country: 'Portugal' },
+  'prague': { code: 'PRG', country: 'Czech Republic' },
+  'dublin': { code: 'DUB', country: 'Ireland' },
+  'edinburgh': { code: 'EDI', country: 'UK' },
+  'rotterdam': { code: 'RTM', country: 'Netherlands' },
+  'dessau': { code: 'DES', country: 'Germany' },
+  'kobe': { code: 'UKB', country: 'Japan' },
+  'vancouver': { code: 'YVR', country: 'Canada' },
+  'toronto': { code: 'YYZ', country: 'Canada' },
+  'montreal': { code: 'YUL', country: 'Canada' },
+  'são paulo': { code: 'GRU', country: 'Brazil' },
+  'sao paulo': { code: 'GRU', country: 'Brazil' },
+  'buenos aires': { code: 'EZE', country: 'Argentina' },
+  'austin': { code: 'AUS', country: 'USA' },
+  'seattle': { code: 'SEA', country: 'USA' },
+  'nashville': { code: 'BNA', country: 'USA' },
+  'new orleans': { code: 'MSY', country: 'USA' },
+  'detroit': { code: 'DTW', country: 'USA' },
+  'philadelphia': { code: 'PHL', country: 'USA' },
+  'chicago': { code: 'ORD', country: 'USA' },
+  'miami': { code: 'MIA', country: 'USA' },
+  'marrakesh': { code: 'RAK', country: 'Morocco' },
+  'istanbul': { code: 'IST', country: 'Turkey' },
+  'bangkok': { code: 'BKK', country: 'Thailand' },
+  'hong kong': { code: 'HKG', country: 'Hong Kong' },
+  'mumbai': { code: 'BOM', country: 'India' },
+  'munich': { code: 'MUC', country: 'Germany' },
+  'hanoi': { code: 'HAN', country: 'Vietnam' },
+  'auckland': { code: 'AKL', country: 'New Zealand' },
+  'florence': { code: 'FLR', country: 'Italy' },
+  'geneva': { code: 'GVA', country: 'Switzerland' },
+  'lyon': { code: 'LYS', country: 'France' },
+  'manchester': { code: 'MAN', country: 'UK' },
+  'portland': { code: 'PDX', country: 'USA' },
+  'düsseldorf': { code: 'DUS', country: 'Germany' },
+  'dusseldorf': { code: 'DUS', country: 'Germany' },
+  'leipzig': { code: 'LEJ', country: 'Germany' },
+  'ikast': { code: 'IKA', country: 'Denmark' },
+  'antwerp': { code: 'ANR', country: 'Belgium' },
+  'lagos': { code: 'LOS', country: 'Nigeria' },
+  'kyiv': { code: 'IEV', country: 'Ukraine' },
+  'oxford': { code: 'OXF', country: 'UK' },
+  'liverpool': { code: 'LPL', country: 'UK' },
+  'memphis': { code: 'MEM', country: 'USA' }
+};
+
+export function getCityMeta(cityName) {
+  if (!cityName) return { code: '---', country: 'Destination' };
+  const lower = cityName.toLowerCase().trim();
+  if (KNOWN_CITY_META[lower]) {
+    return KNOWN_CITY_META[lower];
+  }
+  const code = cityName.replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase() || 'DST';
+  return { code, country: 'Destination' };
+}
 
 export const CATEGORIES = [
   {
@@ -135,7 +224,18 @@ export function getStoredCities() {
     const raw = localStorage.getItem(CITIES_KEY);
     if (!raw) return DEFAULT_CITIES;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_CITIES;
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      const set = new Set(parsed.map(c => c.toLowerCase()));
+      const merged = [...parsed];
+      DEFAULT_CITIES.forEach(c => {
+        if (!set.has(c.toLowerCase())) {
+          merged.push(c);
+          set.add(c.toLowerCase());
+        }
+      });
+      return merged;
+    }
+    return DEFAULT_CITIES;
   } catch (e) {
     return DEFAULT_CITIES;
   }

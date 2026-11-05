@@ -7,7 +7,96 @@
 const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
 
-const DEFAULT_CITIES = ['Tokyo', 'Paris', 'Los Angeles', 'Copenhagen', 'New York'];
+const DEFAULT_CITIES = [
+  'Tokyo', 'London', 'Paris', 'New York', 'Los Angeles', 'Copenhagen', 'Lisbon', 'Kyoto',
+  'San Francisco', 'Berlin', 'Rome', 'Milan', 'Venice', 'Mexico City', 'Seoul', 'Amsterdam',
+  'Vienna', 'Barcelona', 'Madrid', 'Stockholm', 'Oslo', 'Helsinki', 'Porto', 'Prague',
+  'Dublin', 'Edinburgh', 'Rotterdam', 'Dessau', 'Kobe', 'Vancouver', 'Toronto', 'Montreal',
+  'São Paulo', 'Buenos Aires', 'Austin', 'Seattle', 'Nashville', 'New Orleans', 'Detroit',
+  'Philadelphia', 'Chicago', 'Miami', 'Marrakesh', 'Istanbul', 'Bangkok', 'Hong Kong',
+  'Mumbai', 'Munich', 'Hanoi', 'Auckland', 'Florence', 'Geneva', 'Lyon', 'Manchester',
+  'Portland', 'Düsseldorf', 'Leipzig', 'Ikast', 'Antwerp', 'Lagos', 'Kyiv', 'Oxford',
+  'Liverpool', 'Memphis'
+];
+
+const KNOWN_CITY_META = {
+  'tokyo': { code: 'TYO', country: 'Japan' },
+  'paris': { code: 'PAR', country: 'France' },
+  'los angeles': { code: 'LAX', country: 'USA' },
+  'copenhagen': { code: 'CPH', country: 'Denmark' },
+  'new york': { code: 'NYC', country: 'USA' },
+  'london': { code: 'LON', country: 'UK' },
+  'lisbon': { code: 'LIS', country: 'Portugal' },
+  'san francisco': { code: 'SFO', country: 'USA' },
+  'kyoto': { code: 'KYO', country: 'Japan' },
+  'berlin': { code: 'BER', country: 'Germany' },
+  'rome': { code: 'ROM', country: 'Italy' },
+  'milan': { code: 'MIL', country: 'Italy' },
+  'venice': { code: 'VCE', country: 'Italy' },
+  'mexico city': { code: 'CDMX', country: 'Mexico' },
+  'seoul': { code: 'SEL', country: 'South Korea' },
+  'amsterdam': { code: 'AMS', country: 'Netherlands' },
+  'vienna': { code: 'VIE', country: 'Austria' },
+  'barcelona': { code: 'BCN', country: 'Spain' },
+  'madrid': { code: 'MAD', country: 'Spain' },
+  'stockholm': { code: 'ARN', country: 'Sweden' },
+  'oslo': { code: 'OSL', country: 'Norway' },
+  'helsinki': { code: 'HEL', country: 'Finland' },
+  'porto': { code: 'OPO', country: 'Portugal' },
+  'prague': { code: 'PRG', country: 'Czech Republic' },
+  'dublin': { code: 'DUB', country: 'Ireland' },
+  'edinburgh': { code: 'EDI', country: 'UK' },
+  'rotterdam': { code: 'RTM', country: 'Netherlands' },
+  'dessau': { code: 'DES', country: 'Germany' },
+  'kobe': { code: 'UKB', country: 'Japan' },
+  'vancouver': { code: 'YVR', country: 'Canada' },
+  'toronto': { code: 'YYZ', country: 'Canada' },
+  'montreal': { code: 'YUL', country: 'Canada' },
+  'são paulo': { code: 'GRU', country: 'Brazil' },
+  'sao paulo': { code: 'GRU', country: 'Brazil' },
+  'buenos aires': { code: 'EZE', country: 'Argentina' },
+  'austin': { code: 'AUS', country: 'USA' },
+  'seattle': { code: 'SEA', country: 'USA' },
+  'nashville': { code: 'BNA', country: 'USA' },
+  'new orleans': { code: 'MSY', country: 'USA' },
+  'detroit': { code: 'DTW', country: 'USA' },
+  'philadelphia': { code: 'PHL', country: 'USA' },
+  'chicago': { code: 'ORD', country: 'USA' },
+  'miami': { code: 'MIA', country: 'USA' },
+  'marrakesh': { code: 'RAK', country: 'Morocco' },
+  'istanbul': { code: 'IST', country: 'Turkey' },
+  'bangkok': { code: 'BKK', country: 'Thailand' },
+  'hong kong': { code: 'HKG', country: 'Hong Kong' },
+  'mumbai': { code: 'BOM', country: 'India' },
+  'munich': { code: 'MUC', country: 'Germany' },
+  'hanoi': { code: 'HAN', country: 'Vietnam' },
+  'auckland': { code: 'AKL', country: 'New Zealand' },
+  'florence': { code: 'FLR', country: 'Italy' },
+  'geneva': { code: 'GVA', country: 'Switzerland' },
+  'lyon': { code: 'LYS', country: 'France' },
+  'manchester': { code: 'MAN', country: 'UK' },
+  'portland': { code: 'PDX', country: 'USA' },
+  'düsseldorf': { code: 'DUS', country: 'Germany' },
+  'dusseldorf': { code: 'DUS', country: 'Germany' },
+  'leipzig': { code: 'LEJ', country: 'Germany' },
+  'ikast': { code: 'IKA', country: 'Denmark' },
+  'antwerp': { code: 'ANR', country: 'Belgium' },
+  'lagos': { code: 'LOS', country: 'Nigeria' },
+  'kyiv': { code: 'IEV', country: 'Ukraine' },
+  'oxford': { code: 'OXF', country: 'UK' },
+  'liverpool': { code: 'LPL', country: 'UK' },
+  'memphis': { code: 'MEM', country: 'USA' }
+};
+
+function getCityMeta(cityName) {
+  if (!cityName) return { code: '---', country: 'Destination' };
+  const lower = cityName.toLowerCase().trim();
+  if (KNOWN_CITY_META[lower]) {
+    return KNOWN_CITY_META[lower];
+  }
+  const code = cityName.replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase() || 'DST';
+  return { code, country: 'Destination' };
+}
 
 const CATEGORIES = [
   {
@@ -139,7 +228,18 @@ function getStoredCities() {
     const raw = localStorage.getItem(CITIES_KEY);
     if (!raw) return DEFAULT_CITIES;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_CITIES;
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      const set = new Set(parsed.map(c => c.toLowerCase()));
+      const merged = [...parsed];
+      DEFAULT_CITIES.forEach(c => {
+        if (!set.has(c.toLowerCase())) {
+          merged.push(c);
+          set.add(c.toLowerCase());
+        }
+      });
+      return merged;
+    }
+    return DEFAULT_CITIES;
   } catch (e) {
     return DEFAULT_CITIES;
   }
@@ -1585,14 +1685,24 @@ let userCoords = null; // { lat, lng }
 let isNearMeSorted = false;
 let pendingKmlSpots = [];
 let editingSpotId = null;
+let atlasActiveTab = 'active'; // 'active' (with spots) | 'all'
+let atlasSearchQuery = '';
 
 // DOM Elements
+const btnCityAtlasTrigger = document.getElementById('btn-city-atlas-trigger');
 const citySelect = document.getElementById('city-select');
 const searchInput = document.getElementById('search-input');
 const statusTabs = document.querySelectorAll('.status-tab');
 const spotsListContainer = document.getElementById('spots-list-container');
 const spotsCountLabel = document.getElementById('spots-count-label');
 const distanceSortIndicator = document.getElementById('distance-sort-indicator');
+
+// Atlas Controls
+const atlasSearchInput = document.getElementById('atlas-search-input');
+const atlasTabActive = document.getElementById('atlas-tab-active');
+const atlasTabAll = document.getElementById('atlas-tab-all');
+const atlasActiveCountEl = document.getElementById('atlas-active-count');
+const atlasAllCountEl = document.getElementById('atlas-all-count');
 
 // View Mode and Photos
 const viewModeVisual = document.getElementById('view-mode-visual');
@@ -1680,6 +1790,12 @@ function init() {
     spots = storedSpots;
   } else {
     spots = [];
+  }
+
+  // Restore active city preference if available
+  const savedActiveCity = localStorage.getItem('flaneur_active_city');
+  if (savedActiveCity && (savedActiveCity === 'all' || cities.some(c => c.toLowerCase() === savedActiveCity.toLowerCase()))) {
+    activeCity = savedActiveCity;
   }
 
   // Populate category chips with SVGs
@@ -1876,8 +1992,42 @@ function setupEventListeners() {
   // Export Backup
   btnExportBackup.addEventListener('click', () => exportBackupJSON(spots, cities));
 
-  // Manage Cities
-  btnManageCities.addEventListener('click', openCityManagerModal);
+  // Manage Cities & City Atlas
+  if (btnManageCities) btnManageCities.addEventListener('click', openCityManagerModal);
+  if (btnCityAtlasTrigger) btnCityAtlasTrigger.addEventListener('click', openCityManagerModal);
+
+  // Atlas Controls
+  if (atlasSearchInput) {
+    atlasSearchInput.addEventListener('input', (e) => {
+      atlasSearchQuery = e.target.value.toLowerCase().trim();
+      renderCityManagerList();
+    });
+  }
+
+  if (atlasTabActive && atlasTabAll) {
+    atlasTabActive.addEventListener('click', () => {
+      atlasActiveTab = 'active';
+      atlasTabActive.classList.add('active');
+      atlasTabAll.classList.remove('active');
+      renderCityManagerList();
+    });
+    atlasTabAll.addEventListener('click', () => {
+      atlasActiveTab = 'all';
+      atlasTabAll.classList.add('active');
+      atlasTabActive.classList.remove('active');
+      renderCityManagerList();
+    });
+  }
+
+  const newCityInput = document.getElementById('new-city-input');
+  if (newCityInput) {
+    newCityInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAddNewCity();
+      }
+    });
+  }
 
   // Modal Closers
   document.querySelectorAll('[data-close-modal]').forEach(btn => {
@@ -2853,14 +3003,47 @@ function executeDrawLoopOnMap() {
 }
 
 /**
- * City Management
+ * City Management & City Atlas (Concept 2: Typographic Cards Grid)
  */
+function setActiveCity(cityName) {
+  activeCity = cityName;
+  localStorage.setItem('flaneur_active_city', cityName);
+  if (citySelect) citySelect.value = cityName;
+  updateCityTriggerButton();
+  clearLoopPolyline();
+  applyFiltersAndRender();
+}
+
+function updateCityTriggerButton() {
+  const triggerCode = document.getElementById('active-city-code');
+  const triggerName = document.getElementById('active-city-name');
+  const triggerCount = document.getElementById('active-city-count');
+  if (!triggerName) return;
+
+  if (activeCity === 'all') {
+    if (triggerCode) triggerCode.textContent = 'ALL';
+    triggerName.textContent = 'All Destinations';
+    if (triggerCount) triggerCount.textContent = `${spots.length} spots`;
+  } else {
+    const meta = getCityMeta(activeCity);
+    if (triggerCode) triggerCode.textContent = meta.code;
+    triggerName.textContent = activeCity;
+    const citySpotsCount = spots.filter(s => s.city.toLowerCase() === activeCity.toLowerCase()).length;
+    if (triggerCount) triggerCount.textContent = `${citySpotsCount} ${citySpotsCount === 1 ? 'spot' : 'spots'}`;
+  }
+}
+
 function renderCityDropdowns() {
-  // Main city selector
-  citySelect.innerHTML = `
-    <option value="all">All Cities</option>
-    ${cities.map(c => `<option value="${c}" ${c.toLowerCase() === activeCity.toLowerCase() ? 'selected' : ''}>${c}</option>`).join('')}
-  `;
+  // Main city selector (kept in DOM for script compat)
+  if (citySelect) {
+    citySelect.innerHTML = `
+      <option value="all">All Cities</option>
+      ${cities.map(c => `<option value="${c}" ${c.toLowerCase() === activeCity.toLowerCase() ? 'selected' : ''}>${c}</option>`).join('')}
+    `;
+  }
+
+  // Update trigger button
+  updateCityTriggerButton();
 
   // Spot modal city select
   spotCitySelect.innerHTML = cities.map(c => `<option value="${c}">${c}</option>`).join('');
@@ -2870,34 +3053,155 @@ function renderCityDropdowns() {
 }
 
 function openCityManagerModal() {
+  atlasSearchQuery = '';
+  if (atlasSearchInput) atlasSearchInput.value = '';
   renderCityManagerList();
   openModal(modalCities);
+  setTimeout(() => {
+    if (atlasSearchInput) atlasSearchInput.focus();
+  }, 100);
 }
 
 function renderCityManagerList() {
   const listEl = document.getElementById('cities-list-manage');
-  listEl.innerHTML = cities.map(c => {
-    const count = spots.filter(s => s.city.toLowerCase() === c.toLowerCase()).length;
-    return `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-subtle); border-radius: 6px;">
-        <span style="font-weight: 500;">${c} <span style="font-size: 0.75rem; color: var(--ink-muted);">(${count} spots)</span></span>
-        <button type="button" class="btn" data-delete-city="${c}" style="padding: 2px 8px; font-size: 0.7rem; color: #a64b4b;">Remove</button>
+  if (!listEl) return;
+
+  // Build city statistics
+  const cityStats = cities.map(cityName => {
+    const citySpots = spots.filter(s => s.city.toLowerCase() === cityName.toLowerCase());
+    const visitedCount = citySpots.filter(s => s.status === 'visited').length;
+    const meta = getCityMeta(cityName);
+    return {
+      name: cityName,
+      code: meta.code,
+      country: meta.country,
+      totalSpots: citySpots.length,
+      visitedCount: visitedCount,
+      visitedPercent: citySpots.length > 0 ? Math.round((visitedCount / citySpots.length) * 100) : 0,
+      isActive: activeCity.toLowerCase() === cityName.toLowerCase()
+    };
+  });
+
+  // Calculate tab badge counts
+  const activeCitiesCount = cityStats.filter(c => c.totalSpots > 0 || c.isActive).length;
+  if (atlasActiveCountEl) atlasActiveCountEl.textContent = activeCitiesCount;
+  if (atlasAllCountEl) atlasAllCountEl.textContent = cities.length;
+
+  // Filter by tab
+  let displayCities = cityStats;
+  if (atlasActiveTab === 'active') {
+    displayCities = displayCities.filter(c => c.totalSpots > 0 || c.isActive);
+  }
+
+  // Filter by search query
+  if (atlasSearchQuery) {
+    displayCities = displayCities.filter(c => {
+      return (
+        c.name.toLowerCase().includes(atlasSearchQuery) ||
+        c.country.toLowerCase().includes(atlasSearchQuery) ||
+        c.code.toLowerCase().includes(atlasSearchQuery)
+      );
+    });
+  }
+
+  // Sort: active city first, then by spots count descending, then alphabetical
+  displayCities.sort((a, b) => {
+    if (a.isActive) return -1;
+    if (b.isActive) return 1;
+    if (b.totalSpots !== a.totalSpots) return b.totalSpots - a.totalSpots;
+    return a.name.localeCompare(b.name);
+  });
+
+  if (displayCities.length === 0) {
+    listEl.innerHTML = `
+      <div style="grid-column: 1 / -1; padding: 2.5rem 1rem; text-align: center; color: var(--ink-secondary); font-family: var(--font-mono); font-size: 13px;">
+        No destinations found matching "${escapeHtml(atlasSearchQuery)}".
+        <div style="margin-top: 8px; color: var(--ink-muted);">Use the field above to add it to your atlas!</div>
       </div>
     `;
-  }).join('');
+    return;
+  }
 
+  listEl.innerHTML = `
+    <!-- "All Destinations" Card -->
+    ${!atlasSearchQuery ? `
+      <div class="atlas-card ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
+        <div class="atlas-card-header">
+          <span class="atlas-card-code">[ ALL ]</span>
+          ${activeCity === 'all' ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
+        </div>
+        <div class="atlas-card-body">
+          <h3 class="atlas-card-title">All Destinations</h3>
+          <span class="atlas-card-country">Global Field Guide</span>
+        </div>
+        <div class="atlas-card-footer">
+          <div class="atlas-card-stats">
+            <span class="atlas-spot-count"><strong>${spots.length}</strong> spots</span>
+            <span class="atlas-visited-count">${spots.filter(s => s.status === 'visited').length} visited</span>
+          </div>
+          <div class="atlas-progress-bar">
+            <div class="atlas-progress-fill" style="width: ${spots.length > 0 ? Math.round((spots.filter(s => s.status === 'visited').length / spots.length) * 100) : 0}%"></div>
+          </div>
+        </div>
+      </div>
+    ` : ''}
+
+    ${displayCities.map(c => `
+      <div class="atlas-card ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
+        <div class="atlas-card-header">
+          <span class="atlas-card-code">[ ${c.code} ]</span>
+          <div class="atlas-card-badges">
+            ${c.isActive ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
+            ${c.totalSpots === 0 && !c.isActive ? `
+              <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" title="Remove empty city">×</button>
+            ` : ''}
+          </div>
+        </div>
+        <div class="atlas-card-body">
+          <h3 class="atlas-card-title">${escapeHtml(c.name)}</h3>
+          <span class="atlas-card-country">${escapeHtml(c.country)}</span>
+        </div>
+        <div class="atlas-card-footer">
+          ${c.totalSpots > 0 ? `
+            <div class="atlas-card-stats">
+              <span class="atlas-spot-count"><strong>${c.totalSpots}</strong> ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
+              <span class="atlas-visited-count">${c.visitedCount} visited</span>
+            </div>
+            <div class="atlas-progress-bar">
+              <div class="atlas-progress-fill" style="width: ${c.visitedPercent}%"></div>
+            </div>
+          ` : `
+            <span class="atlas-empty-label">0 spots · wishlist index</span>
+          `}
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  // Attach card click handlers
+  listEl.querySelectorAll('[data-select-city]').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('[data-delete-city]')) return;
+      const targetCity = card.getAttribute('data-select-city');
+      setActiveCity(targetCity);
+      closeModal(modalCities);
+    });
+  });
+
+  // Attach remove city handlers
   listEl.querySelectorAll('[data-delete-city]').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
       const cityToRemove = btn.getAttribute('data-delete-city');
-      if (confirm(`Remove ${cityToRemove} from city list? Spots assigned to it will remain preserved.`)) {
+      if (confirm(`Remove ${cityToRemove} from destinations list?`)) {
         cities = cities.filter(c => c !== cityToRemove);
         saveStoredCities(cities);
         if (activeCity.toLowerCase() === cityToRemove.toLowerCase()) {
-          activeCity = cities[0] || 'Tokyo';
-          applyFiltersAndRender();
+          setActiveCity(cities[0] || 'Tokyo');
+        } else {
+          renderCityDropdowns();
+          renderCityManagerList();
         }
-        renderCityDropdowns();
-        renderCityManagerList();
       }
     });
   });
@@ -2914,6 +3218,9 @@ function handleAddNewCity() {
     renderCityDropdowns();
     renderCityManagerList();
     input.value = '';
+    // Automatically switch to the newly created city
+    setActiveCity(newCity);
+    closeModal(modalCities);
   }
 }
 
