@@ -2892,6 +2892,10 @@ function renderCityManagerList() {
       if (confirm(`Remove ${cityToRemove} from city list? Spots assigned to it will remain preserved.`)) {
         cities = cities.filter(c => c !== cityToRemove);
         saveStoredCities(cities);
+        if (activeCity.toLowerCase() === cityToRemove.toLowerCase()) {
+          activeCity = cities[0] || 'Tokyo';
+          applyFiltersAndRender();
+        }
         renderCityDropdowns();
         renderCityManagerList();
       }
