@@ -70,7 +70,8 @@ assert.strictEqual(getCityMeta('London').code, 'LON');
 assert.strictEqual(getCityMeta('New York').code, 'NYC');
 assert.strictEqual(getCityMeta('Paris').code, 'PAR');
 assert.strictEqual(getCityMeta('Unknownville').code, 'UNK');
-assert(DEFAULT_CITIES.length > 50, 'DEFAULT_CITIES should have indexed global destinations');
+assert(DEFAULT_CITIES.length >= 5, 'DEFAULT_CITIES should have starter destinations');
+assert.strictEqual(getCityMeta('Dessau').code, 'DES');
 console.log('✓ City Atlas metadata verified');
 
 console.log('All Day Loop algorithms verified successfully!');

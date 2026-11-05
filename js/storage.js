@@ -4,15 +4,8 @@ const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 export const DEFAULT_CITIES = [
-  'Tokyo', 'London', 'Paris', 'New York', 'Los Angeles', 'Copenhagen', 'Lisbon', 'Kyoto',
-  'San Francisco', 'Berlin', 'Rome', 'Milan', 'Venice', 'Mexico City', 'Seoul', 'Amsterdam',
-  'Vienna', 'Barcelona', 'Madrid', 'Stockholm', 'Oslo', 'Helsinki', 'Porto', 'Prague',
-  'Dublin', 'Edinburgh', 'Rotterdam', 'Dessau', 'Kobe', 'Vancouver', 'Toronto', 'Montreal',
-  'São Paulo', 'Buenos Aires', 'Austin', 'Seattle', 'Nashville', 'New Orleans', 'Detroit',
-  'Philadelphia', 'Chicago', 'Miami', 'Marrakesh', 'Istanbul', 'Bangkok', 'Hong Kong',
-  'Mumbai', 'Munich', 'Hanoi', 'Auckland', 'Florence', 'Geneva', 'Lyon', 'Manchester',
-  'Portland', 'Düsseldorf', 'Leipzig', 'Ikast', 'Antwerp', 'Lagos', 'Kyiv', 'Oxford',
-  'Liverpool', 'Memphis'
+  'Los Angeles', 'London', 'San Francisco', 'New York', 'Kyoto',
+  'Copenhagen', 'Mexico City', 'Lisbon', 'Tokyo'
 ];
 
 export const KNOWN_CITY_META = {
@@ -225,15 +218,7 @@ export function getStoredCities() {
     if (!raw) return DEFAULT_CITIES;
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      const set = new Set(parsed.map(c => c.toLowerCase()));
-      const merged = [...parsed];
-      DEFAULT_CITIES.forEach(c => {
-        if (!set.has(c.toLowerCase())) {
-          merged.push(c);
-          set.add(c.toLowerCase());
-        }
-      });
-      return merged;
+      return parsed;
     }
     return DEFAULT_CITIES;
   } catch (e) {

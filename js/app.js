@@ -481,6 +481,30 @@ function setupEventListeners() {
   // Add New City in Manager
   document.getElementById('btn-add-new-city').addEventListener('click', handleAddNewCity);
 
+  // Prune Empty Cities in Manager
+  const btnPruneEmpty = document.getElementById('btn-prune-empty-cities');
+  if (btnPruneEmpty) {
+    btnPruneEmpty.addEventListener('click', () => {
+      const emptyCities = cities.filter(c => !spots.some(s => s.city.toLowerCase() === c.toLowerCase()));
+      if (emptyCities.length === 0) {
+        alert('All destinations currently have spots. No empty cities to prune.');
+        return;
+      }
+      if (confirm(`Remove all ${emptyCities.length} empty destinations (with 0 spots) from your list?`)) {
+        cities = cities.filter(c => spots.some(s => s.city.toLowerCase() === c.toLowerCase()));
+        if (cities.length === 0) cities = ['Los Angeles'];
+        saveStoredCities(cities);
+        if (!cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
+          setActiveCity(cities[0] || 'all');
+        } else {
+          renderCityDropdowns();
+          renderCityManagerList();
+          applyFiltersAndRender();
+        }
+      }
+    });
+  }
+
   // Mobile View Toggles
   mobileToggleList.addEventListener('click', () => {
     mobileToggleList.classList.add('active');
@@ -1527,8 +1551,8 @@ function renderCityManagerList() {
           <span class="atlas-card-code">[ ${c.code} ]</span>
           <div class="atlas-card-badges">
             ${c.isActive ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
-            ${c.totalSpots === 0 && !c.isActive ? `
-              <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" title="Remove empty city">×</button>
+            ${!c.isActive || displayCities.length > 1 ? `
+              <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="${c.totalSpots > 0 ? `Delete city and its ${c.totalSpots} spots` : 'Remove city'}">×</button>
             ` : ''}
           </div>
         </div>
@@ -1565,17 +1589,31 @@ function renderCityManagerList() {
 
   // Attach remove city handlers
   listEl.querySelectorAll('[data-delete-city]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const cityToRemove = btn.getAttribute('data-delete-city');
-      if (confirm(`Remove ${cityToRemove} from destinations list?`)) {
-        cities = cities.filter(c => c !== cityToRemove);
+      const spotCount = parseInt(btn.getAttribute('data-spot-count') || '0', 10);
+      const confirmMsg = spotCount > 0
+        ? `Delete ${cityToRemove} and all ${spotCount} spots inside it?`
+        : `Remove ${cityToRemove} from destinations list?`;
+
+      if (confirm(confirmMsg)) {
+        if (spotCount > 0) {
+          const spotsToDelete = spots.filter(s => s.city.toLowerCase() === cityToRemove.toLowerCase());
+          for (const s of spotsToDelete) {
+            deleteRemoteSpot(s.id);
+          }
+          spots = spots.filter(s => s.city.toLowerCase() !== cityToRemove.toLowerCase());
+          saveStoredSpots(spots);
+        }
+        cities = cities.filter(c => c.toLowerCase() !== cityToRemove.toLowerCase());
         saveStoredCities(cities);
         if (activeCity.toLowerCase() === cityToRemove.toLowerCase()) {
-          setActiveCity(cities[0] || 'Tokyo');
+          setActiveCity(cities[0] || 'all');
         } else {
           renderCityDropdowns();
           renderCityManagerList();
+          applyFiltersAndRender();
         }
       }
     });
