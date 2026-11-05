@@ -2,6 +2,7 @@
 // Zero API keys required, free global geocoding service.
 
 let activeAbortController = null;
+let photonUnavailableUntil = 0; // Timestamp when Photon circuit-breaker expires
 
 /**
  * Intelligent mapping from OpenStreetMap tags to Field Guide categories
@@ -59,7 +60,7 @@ export function mapOsmTagToCategory(props = {}, name = '') {
 }
 
 /**
- * Extract clean neighborhood from Photon properties
+ * Extract clean neighborhood from Photon or Nominatim properties
  */
 export function extractNeighborhood(props = {}) {
   return (
@@ -67,17 +68,20 @@ export function extractNeighborhood(props = {}) {
     props.district ||
     props.suburb ||
     props.neighbourhood ||
+    props.city_district ||
     props.quarter ||
+    props.hamlet ||
     props.street ||
+    props.road ||
     ''
   ).trim();
 }
 
 /**
- * Extract city name from Photon properties
+ * Extract city name from Photon or Nominatim properties
  */
 export function extractCity(props = {}) {
-  let c = props.city || props.town || props.municipality || props.county || props.state || '';
+  let c = props.city || props.town || props.municipality || props.village || props.county || props.state || '';
   // Normalize common city variants
   if (/københavn|copenhagen/i.test(c)) return 'Copenhagen';
   if (/lisboa|lisbon/i.test(c)) return 'Lisbon';
@@ -93,7 +97,67 @@ export function extractCity(props = {}) {
 }
 
 /**
- * Query Photon Komoot API with optional location biasing
+ * Fallback geocoder using OpenStreetMap Nominatim when Photon is unreachable
+ */
+async function searchNominatimPlaces(trimmed, biasCoords, signal) {
+  let url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(trimmed)}&format=json&addressdetails=1&limit=6`;
+  if (biasCoords && typeof biasCoords.lat === 'number' && typeof biasCoords.lng === 'number') {
+    url += `&viewbox=${biasCoords.lng - 0.5},${biasCoords.lat + 0.5},${biasCoords.lng + 0.5},${biasCoords.lat - 0.5}&bounded=0`;
+  }
+
+  try {
+    const res = await fetch(url, { signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const items = await res.json();
+    if (!Array.isArray(items)) return [];
+
+    return items.map(item => {
+      const addr = item.address || {};
+      const lat = parseFloat(item.lat) || 0;
+      const lng = parseFloat(item.lon) || 0;
+      const name = item.name || (item.display_name ? item.display_name.split(',')[0].trim() : trimmed);
+
+      const props = {
+        osm_key: item.class || '',
+        osm_value: item.type || '',
+        name,
+        ...addr
+      };
+
+      const city = extractCity(props);
+      const neighborhood = extractNeighborhood(props);
+      const category = mapOsmTagToCategory(props, name);
+
+      // Build address subtitle
+      const addressParts = [];
+      if (neighborhood && neighborhood.toLowerCase() !== name.toLowerCase()) addressParts.push(neighborhood);
+      const road = addr.road || addr.street;
+      if (road && road.toLowerCase() !== neighborhood.toLowerCase()) {
+        addressParts.push(road + (addr.house_number ? ` ${addr.house_number}` : ''));
+      }
+      if (city) addressParts.push(city);
+      if (addr.country) addressParts.push(addr.country);
+
+      return {
+        name,
+        city,
+        neighborhood,
+        category,
+        lat,
+        lng,
+        osmType: item.type || item.class || 'place',
+        formattedAddress: addressParts.join(', ')
+      };
+    });
+  } catch (err) {
+    if (err.name === 'AbortError') return [];
+    console.warn('Nominatim fallback also failed:', err);
+    return [];
+  }
+}
+
+/**
+ * Query Photon Komoot API with location biasing, with automatic fallback to Nominatim
  */
 export async function searchPhotonPlaces(query, biasCoords = null) {
   const trimmed = (query || '').trim();
@@ -104,6 +168,12 @@ export async function searchPhotonPlaces(query, biasCoords = null) {
     activeAbortController.abort();
   }
   activeAbortController = new AbortController();
+  const signal = activeAbortController.signal;
+
+  // Circuit breaker: if Photon failed recently, route directly to Nominatim
+  if (Date.now() < photonUnavailableUntil) {
+    return searchNominatimPlaces(trimmed, biasCoords, signal);
+  }
 
   let url = `https://photon.komoot.io/api/?q=${encodeURIComponent(trimmed)}&limit=6`;
   if (biasCoords && typeof biasCoords.lat === 'number' && typeof biasCoords.lng === 'number') {
@@ -111,7 +181,14 @@ export async function searchPhotonPlaces(query, biasCoords = null) {
   }
 
   try {
-    const res = await fetch(url, { signal: activeAbortController.signal });
+    // 2.5s timeout for Photon
+    const timeoutId = setTimeout(() => {
+      // Don't abort the global controller, just trip the circuit breaker
+    }, 2500);
+
+    const res = await fetch(url, { signal });
+    clearTimeout(timeoutId);
+
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const features = data.features || [];
@@ -146,8 +223,12 @@ export async function searchPhotonPlaces(query, biasCoords = null) {
     });
   } catch (err) {
     if (err.name === 'AbortError') return [];
-    console.warn('Photon autocomplete failed:', err);
-    return [];
+    
+    // Mark Photon unavailable for 5 minutes so subsequent keystrokes don't hang
+    photonUnavailableUntil = Date.now() + 5 * 60 * 1000;
+    console.warn('Photon autocomplete failed (server down/refused). Seamlessly falling back to OpenStreetMap Nominatim:', err.message || err);
+    
+    return searchNominatimPlaces(trimmed, biasCoords, signal);
   }
 }
 
