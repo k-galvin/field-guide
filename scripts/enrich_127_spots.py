@@ -389,7 +389,7 @@ ENRICHMENTS = {
         "notes": "Beloved neighborhood bakery turning out cardamom rolls, golden saffron buns, and artisan sourdough bread."
     },
     "spot-1793849928678": { # STHLM GRÖN
-        "notes": "Boutique plant shop in Södermalm filled with rare tropical houseplants, handmade ceramics, and botanical decor."
+        "notes": "Curated vintage and secondhand clothing boutique by Mariatorget featuring handpicked European knitwear, denim, tailoring, and designer pieces."
     },
 
     # === VIENNA ===
