@@ -237,7 +237,7 @@ ENRICHMENTS = {
     },
     "spot-1793849002170": { # Joon
         "neighborhood": "North Park",
-        "notes": "Cozy bakery and boutique blending Persian culinary traditions with modern pastries, aromatic spices, and specialty coffee."
+        "notes": "Sister-owned lifestyle boutique and gift shop filled with design-led home goods, jewelry, stationery, and curated finds from independent makers."
     },
     "spot-1793849044852": { # Little While
         "neighborhood": "North Park",
