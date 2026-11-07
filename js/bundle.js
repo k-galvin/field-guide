@@ -14,6 +14,16 @@ const DEFAULT_CITIES = [
 ];
 
 const KNOWN_CITY_META = {
+  'costa mesa': { code: 'SNA', country: 'California, USA' },
+  'newport beach': { code: 'NPB', country: 'California, USA' },
+  'laguna beach': { code: 'LGB', country: 'California, USA' },
+  'san diego': { code: 'SAN', country: 'California, USA' },
+  'joshua tree': { code: 'JTR', country: 'California, USA' },
+  'budapest': { code: 'BUD', country: 'Hungary' },
+  'santa ana': { code: 'SNA', country: 'California, USA' },
+  'orange': { code: 'ORA', country: 'California, USA' },
+  'huntington beach': { code: 'HB', country: 'California, USA' },
+  'encinitas': { code: 'ENC', country: 'California, USA' },
   'tokyo': { code: 'TYO', country: 'Japan' },
   'paris': { code: 'PAR', country: 'France' },
   'los angeles': { code: 'LAX', country: 'USA' },
@@ -1014,10 +1024,82 @@ function createMarkerIcon(category, isFavorite, isVisited) {
   });
 }
 
+const KNOWN_CITY_COORDS = {
+  'costa mesa': [33.6411, -117.9187],
+  'newport beach': [33.6189, -117.9289],
+  'laguna beach': [33.5427, -117.7854],
+  'san diego': [32.7157, -117.1611],
+  'joshua tree': [34.1347, -116.3131],
+  'san francisco': [37.7749, -122.4194],
+  'london': [51.5074, -0.1278],
+  'copenhagen': [55.6761, 12.5683],
+  'lisbon': [38.7223, -9.1393],
+  'prague': [50.0755, 14.4378],
+  'edinburgh': [55.9533, -3.1883],
+  'vienna': [48.2082, 16.3738],
+  'budapest': [47.4979, 19.0402],
+  'stockholm': [59.3293, 18.0686],
+  'mexico city': [19.4326, -99.1332],
+  'los angeles': [34.0522, -118.2437],
+  'santa ana': [33.7455, -117.8677],
+  'orange': [33.7879, -117.8531],
+  'huntington beach': [33.6595, -117.9988],
+  'helsinki': [60.1699, 24.9384],
+  'encinitas': [33.0370, -117.2920]
+};
+
+/**
+ * Centers the map on a given city and fits all its spots smoothly
+ */
+function centerCityOnMap(cityName, allSpots = []) {
+  if (!mapInstance) return;
+
+  if (!cityName || cityName === 'all') {
+    const validSpots = (allSpots || []).filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+    if (validSpots.length > 0) {
+      try {
+        const bounds = validSpots.map(s => [s.lat, s.lng]);
+        mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 13, animate: true });
+        return;
+      } catch (e) {
+        // ignore
+      }
+    }
+    return;
+  }
+
+  // Find spots in this city
+  const citySpots = (allSpots || []).filter(s =>
+    s.city && s.city.trim().toLowerCase() === cityName.trim().toLowerCase() &&
+    typeof s.lat === 'number' && typeof s.lng === 'number'
+  );
+
+  if (citySpots.length === 1) {
+    mapInstance.setView([citySpots[0].lat, citySpots[0].lng], 14, { animate: true });
+    return;
+  }
+
+  if (citySpots.length > 1) {
+    try {
+      const bounds = citySpots.map(s => [s.lat, s.lng]);
+      mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15, animate: true });
+      return;
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Fallback to known city center coordinates if 0 spots yet
+  const lower = cityName.trim().toLowerCase();
+  if (KNOWN_CITY_COORDS[lower]) {
+    mapInstance.setView(KNOWN_CITY_COORDS[lower], 13, { animate: true });
+  }
+}
+
 /**
  * Initializes Leaflet map with CartoDB Positron tiles
  */
-function initMap(elementId, initialCenter = [35.6811, 139.8078], initialZoom = 13) {
+function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 13) {
   if (mapInstance) {
     mapInstance.remove();
   }
@@ -1745,7 +1827,7 @@ function parseGoogleMapsUrl(input = '') {
 // Application State
 let spots = [];
 let cities = [];
-let activeCity = 'Tokyo';
+let activeCity = 'Costa Mesa';
 let activeStatus = 'all';
 let activeCategory = 'all';
 let searchQuery = '';
@@ -1860,10 +1942,16 @@ function init() {
     spots = [];
   }
 
-  // Restore active city preference if available
+  // Restore active city preference if available and valid in Field Guide
   const savedActiveCity = localStorage.getItem('flaneur_active_city');
   if (savedActiveCity && (savedActiveCity === 'all' || cities.some(c => c.toLowerCase() === savedActiveCity.toLowerCase()))) {
     activeCity = savedActiveCity;
+  } else if (spots.length > 0 && spots[0].city) {
+    activeCity = spots[0].city;
+  } else if (cities.length > 0) {
+    activeCity = cities[0];
+  } else {
+    activeCity = 'Costa Mesa';
   }
 
   // Populate category chips with SVGs
@@ -1872,15 +1960,18 @@ function init() {
   // Populate category selector in modal
   renderCategoryDropdown();
 
-  // Populate city selectors
+  // Populate city selectors & trigger label
   renderCityDropdowns();
 
   // Find center for initial city
-  const citySpots = spots.filter(s => s.city.toLowerCase() === activeCity.toLowerCase());
-  const initialCenter = citySpots.length > 0 ? [citySpots[0].lat, citySpots[0].lng] : [35.6811, 139.8078];
+  const citySpots = spots.filter(s => s.city && s.city.trim().toLowerCase() === activeCity.trim().toLowerCase());
+  const initialCenter = citySpots.length > 0
+    ? [citySpots[0].lat, citySpots[0].lng]
+    : (KNOWN_CITY_COORDS[activeCity.toLowerCase()] || [33.6411, -117.9187]);
 
   // Initialize Map
   initMap('map', initialCenter, 13);
+  centerCityOnMap(activeCity, spots);
 
   // Set Map click handler to easily add spots
   setOnMapClickListener((lat, lng) => {
@@ -1978,9 +2069,9 @@ async function syncWithSupabase(manual = false) {
     if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
       activeCity = cities[0] || 'all';
       localStorage.setItem('flaneur_active_city', activeCity);
-      updateCityTriggerButton();
     }
-
+    updateCityTriggerButton();
+    centerCityOnMap(activeCity, spots);
     applyFiltersAndRender();
     updateSyncStatus('synced', `synced (${spots.length})`);
 
@@ -2027,9 +2118,7 @@ async function initCloudSync() {
 function setupEventListeners() {
   // City Select Change
   citySelect.addEventListener('change', (e) => {
-    activeCity = e.target.value;
-    clearLoopPolyline();
-    applyFiltersAndRender();
+    setActiveCity(e.target.value);
   });
 
   // Search Input
@@ -2229,7 +2318,10 @@ function setupEventListeners() {
     mobileToggleMap.classList.add('active');
     mobileToggleList.classList.remove('active');
     appContainer.classList.add('show-map');
-    setTimeout(invalidateMapSize, 150);
+    setTimeout(() => {
+      invalidateMapSize();
+      centerCityOnMap(activeCity, spots);
+    }, 120);
   });
 
   // View Mode Switcher (Visual Step Photo Cards vs Compact List)
@@ -2430,12 +2522,16 @@ function renderSpotCards(spotsToRender) {
       </div>
     ` : '';
 
+    const locationLabel = spot.neighborhood
+      ? `${escapeHtml(spot.neighborhood)} · ${escapeHtml(spot.city)}`
+      : escapeHtml(spot.city);
+
     card.innerHTML = `
       ${mediaHtml}
       <div class="card-content">
         <div class="card-top">
           <div class="card-title-group">
-            <span class="card-neighborhood">${escapeHtml(spot.neighborhood || spot.city)}</span>
+            <span class="card-neighborhood">${locationLabel}</span>
             <h2 class="card-name">${escapeHtml(spot.name.toLowerCase())}</h2>
           </div>
           <button type="button" class="card-fav-btn ${spot.favorite ? 'is-favorite' : ''}" title="Starred / Priority spot" aria-label="Starred / Priority spot">
@@ -2744,7 +2840,15 @@ function handleSpotFormSubmit(e) {
   const spotToSync = editingSpotId ? spots.find(s => s.id === editingSpotId) : spots[0];
   saveStoredSpots(spots);
   closeModal(modalSpot);
-  applyFiltersAndRender();
+
+  // If new spot was added to a different city than currently viewing, switch to that city
+  if (city && activeCity !== 'all' && activeCity.toLowerCase() !== city.toLowerCase()) {
+    setActiveCity(city);
+  } else {
+    centerCityOnMap(activeCity, spots);
+    applyFiltersAndRender();
+  }
+
   if (spotToSync) {
     updateSyncStatus('syncing', 'syncing...');
     upsertRemoteSpot(spotToSync).then(() => updateSyncStatus('synced', 'synced'));
@@ -3123,6 +3227,7 @@ function setActiveCity(cityName) {
   if (citySelect) citySelect.value = cityName;
   updateCityTriggerButton();
   clearLoopPolyline();
+  centerCityOnMap(activeCity, spots);
   applyFiltersAndRender();
 }
 

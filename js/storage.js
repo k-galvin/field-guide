@@ -10,6 +10,16 @@ export const DEFAULT_CITIES = [
 ];
 
 export const KNOWN_CITY_META = {
+  'costa mesa': { code: 'SNA', country: 'California, USA' },
+  'newport beach': { code: 'NPB', country: 'California, USA' },
+  'laguna beach': { code: 'LGB', country: 'California, USA' },
+  'san diego': { code: 'SAN', country: 'California, USA' },
+  'joshua tree': { code: 'JTR', country: 'California, USA' },
+  'budapest': { code: 'BUD', country: 'Hungary' },
+  'santa ana': { code: 'SNA', country: 'California, USA' },
+  'orange': { code: 'ORA', country: 'California, USA' },
+  'huntington beach': { code: 'HB', country: 'California, USA' },
+  'encinitas': { code: 'ENC', country: 'California, USA' },
   'tokyo': { code: 'TYO', country: 'Japan' },
   'paris': { code: 'PAR', country: 'France' },
   'los angeles': { code: 'LAX', country: 'USA' },

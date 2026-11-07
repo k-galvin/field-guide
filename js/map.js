@@ -33,10 +33,82 @@ function createMarkerIcon(category, isFavorite, isVisited) {
   });
 }
 
+export const KNOWN_CITY_COORDS = {
+  'costa mesa': [33.6411, -117.9187],
+  'newport beach': [33.6189, -117.9289],
+  'laguna beach': [33.5427, -117.7854],
+  'san diego': [32.7157, -117.1611],
+  'joshua tree': [34.1347, -116.3131],
+  'san francisco': [37.7749, -122.4194],
+  'london': [51.5074, -0.1278],
+  'copenhagen': [55.6761, 12.5683],
+  'lisbon': [38.7223, -9.1393],
+  'prague': [50.0755, 14.4378],
+  'edinburgh': [55.9533, -3.1883],
+  'vienna': [48.2082, 16.3738],
+  'budapest': [47.4979, 19.0402],
+  'stockholm': [59.3293, 18.0686],
+  'mexico city': [19.4326, -99.1332],
+  'los angeles': [34.0522, -118.2437],
+  'santa ana': [33.7455, -117.8677],
+  'orange': [33.7879, -117.8531],
+  'huntington beach': [33.6595, -117.9988],
+  'helsinki': [60.1699, 24.9384],
+  'encinitas': [33.0370, -117.2920]
+};
+
+/**
+ * Centers the map on a given city and fits all its spots smoothly
+ */
+export function centerCityOnMap(cityName, allSpots = []) {
+  if (!mapInstance) return;
+
+  if (!cityName || cityName === 'all') {
+    const validSpots = (allSpots || []).filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+    if (validSpots.length > 0) {
+      try {
+        const bounds = validSpots.map(s => [s.lat, s.lng]);
+        mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 13, animate: true });
+        return;
+      } catch (e) {
+        // ignore
+      }
+    }
+    return;
+  }
+
+  // Find spots in this city
+  const citySpots = (allSpots || []).filter(s =>
+    s.city && s.city.trim().toLowerCase() === cityName.trim().toLowerCase() &&
+    typeof s.lat === 'number' && typeof s.lng === 'number'
+  );
+
+  if (citySpots.length === 1) {
+    mapInstance.setView([citySpots[0].lat, citySpots[0].lng], 14, { animate: true });
+    return;
+  }
+
+  if (citySpots.length > 1) {
+    try {
+      const bounds = citySpots.map(s => [s.lat, s.lng]);
+      mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15, animate: true });
+      return;
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Fallback to known city center coordinates if 0 spots yet
+  const lower = cityName.trim().toLowerCase();
+  if (KNOWN_CITY_COORDS[lower]) {
+    mapInstance.setView(KNOWN_CITY_COORDS[lower], 13, { animate: true });
+  }
+}
+
 /**
  * Initializes Leaflet map with CartoDB Positron tiles
  */
-export function initMap(elementId, initialCenter = [35.6811, 139.8078], initialZoom = 13) {
+export function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 13) {
   if (mapInstance) {
     mapInstance.remove();
   }
