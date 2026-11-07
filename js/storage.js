@@ -4,9 +4,10 @@ const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 export const DEFAULT_CITIES = [
-  'Costa Mesa', 'Newport Beach', 'Laguna Beach', 'San Diego', 'Joshua Tree',
-  'San Francisco', 'London', 'Copenhagen', 'Lisbon', 'Prague', 'Edinburgh', 'Vienna',
-  'Budapest', 'Stockholm', 'Mexico City', 'Los Angeles'
+  'Budapest', 'Copenhagen', 'Costa Mesa', 'Edinburgh', 'Encinitas',
+  'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Laguna Beach', 'Lisbon',
+  'London', 'Los Angeles', 'Mexico City', 'Newport Beach', 'Orange',
+  'Prague', 'San Diego', 'San Francisco', 'Santa Ana', 'Stockholm', 'Vienna'
 ];
 
 export const KNOWN_CITY_META = {

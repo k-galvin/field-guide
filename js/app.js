@@ -9,7 +9,8 @@ import {
   CATEGORIES,
   CATEGORY_MAP,
   normalizeSpotCategory,
-  getCityMeta
+  getCityMeta,
+  DEFAULT_CITIES
 } from './storage.js';
 import { SAMPLE_SPOTS } from './sample-data.js';
 import {
@@ -41,7 +42,10 @@ import {
   pushSpotsToRemote,
   seedRemoteSpotsIfEmpty,
   subscribeToRemoteChanges,
-  mapRowToSpot
+  mapRowToSpot,
+  fetchRemoteCities,
+  upsertRemoteCity,
+  deleteRemoteCity
 } from './supabase.js';
 import {
   searchPhotonPlaces,
@@ -161,12 +165,23 @@ const mobileToggleMap = document.getElementById('mobile-toggle-map');
  */
 function init() {
   // Load stored data or default
-  cities = getStoredCities();
+  const storedCities = getStoredCities();
   const storedSpots = getStoredSpots();
   if (storedSpots && storedSpots.length > 0) {
     spots = storedSpots;
   } else {
     spots = [];
+  }
+
+  // Sanitize stored cities: only keep cities that are in DEFAULT_CITIES or currently have spots
+  const validDefaultSet = new Set(DEFAULT_CITIES.map(c => c.toLowerCase()));
+  const spotCitySet = new Set(spots.map(s => (s.city || '').toLowerCase()).filter(Boolean));
+  cities = storedCities.filter(c => {
+    const l = c.toLowerCase();
+    return validDefaultSet.has(l) || spotCitySet.has(l);
+  });
+  if (cities.length === 0) {
+    cities = [...DEFAULT_CITIES];
   }
 
   // Restore active city preference if available and valid in Field Guide
@@ -262,33 +277,25 @@ async function syncWithSupabase(manual = false) {
     spots = remote;
     saveStoredSpots(spots);
 
-    // 4. Clean & synchronize cities from field_guide_spots
+    // 4. Synchronize cities strictly from dedicated field_guide_cities and spots
+    const remoteCities = await fetchRemoteCities();
     const spotCityNames = [...new Set(spots.map(s => s.city).filter(Boolean))];
-    const storedCities = getStoredCities();
 
-    const activeCityNames = [];
-    const seen = new Set();
+    let combinedCities = (Array.isArray(remoteCities) && remoteCities.length > 0)
+      ? remoteCities
+      : [...DEFAULT_CITIES];
+
+    // Ensure any city present in spots is represented
+    const citySet = new Set(combinedCities.map(c => c.toLowerCase()));
     spotCityNames.forEach(c => {
-      const lower = c.toLowerCase();
-      if (!seen.has(lower)) {
-        seen.add(lower);
-        activeCityNames.push(c);
+      if (!citySet.has(c.toLowerCase())) {
+        citySet.add(c.toLowerCase());
+        combinedCities.push(c);
       }
     });
 
-    // Also preserve any custom city explicitly added in city manager,
-    // while pruning any empty legacy archival cities that have 0 spots in Field Guide
-    const legacyArchivalCities = new Set(['kyoto', 'tokyo', 'new york', 'amsterdam', 'sydney']);
-    storedCities.forEach(c => {
-      const lower = c.toLowerCase();
-      const hasSpots = spots.some(s => s.city && s.city.toLowerCase() === lower);
-      if (!seen.has(lower) && (hasSpots || !legacyArchivalCities.has(lower))) {
-        seen.add(lower);
-        activeCityNames.push(c);
-      }
-    });
-
-    cities = activeCityNames.length > 0 ? activeCityNames : ['Costa Mesa'];
+    combinedCities.sort((a, b) => a.localeCompare(b));
+    cities = combinedCities;
     saveStoredCities(cities);
     renderCityDropdowns();
 
@@ -520,8 +527,9 @@ function setupEventListeners() {
         return;
       }
       if (confirm(`Remove all ${emptyCities.length} empty destinations (with 0 spots) from your list?`)) {
+        emptyCities.forEach(c => deleteRemoteCity(c));
         cities = cities.filter(c => spots.some(s => s.city.toLowerCase() === c.toLowerCase()));
-        if (cities.length === 0) cities = ['Los Angeles'];
+        if (cities.length === 0) cities = ['Costa Mesa'];
         saveStoredCities(cities);
         if (!cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
           setActiveCity(cities[0] || 'all');
@@ -1653,6 +1661,7 @@ function renderCityManagerList() {
         }
         cities = cities.filter(c => c.toLowerCase() !== cityToRemove.toLowerCase());
         saveStoredCities(cities);
+        deleteRemoteCity(cityToRemove);
         if (activeCity.toLowerCase() === cityToRemove.toLowerCase()) {
           setActiveCity(cities[0] || 'all');
         } else {
@@ -1672,7 +1681,9 @@ function handleAddNewCity() {
 
   if (!cities.some(c => c.toLowerCase() === newCity.toLowerCase())) {
     cities.push(newCity);
+    cities.sort((a, b) => a.localeCompare(b));
     saveStoredCities(cities);
+    upsertRemoteCity(newCity);
     renderCityDropdowns();
     renderCityManagerList();
     input.value = '';

@@ -2,7 +2,8 @@
 
 const SUPABASE_URL = 'https://oaqzbymmhusbhvscfcrp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Y8hY9if-e5PdwcmCKALzsQ_bzUpYVHp';
-export const SPOTS_TABLE = 'field_guide_spots';
+export const SPOTS_TABLE = 'spots';
+export const CITIES_TABLE = 'field_guide_cities';
 
 let supabaseClient = null;
 
@@ -27,7 +28,7 @@ export async function fetchRemoteSpots() {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { data, error } = await sb.from(SPOTS_TABLE).select('*');
+      const { data, error } = await sb.from(SPOTS_TABLE).select('*').limit(1000);
       if (error) throw error;
       return (data || []).map(mapRowToSpot);
     } catch (e) {
@@ -37,7 +38,7 @@ export async function fetchRemoteSpots() {
 
   // REST fallback
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*&limit=1000`, {
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -49,6 +50,96 @@ export async function fetchRemoteSpots() {
   } catch (err) {
     console.warn('Remote fetch failed:', err);
     return null;
+  }
+}
+
+/**
+ * Fetch dedicated cities list from remote Supabase table
+ */
+export async function fetchRemoteCities() {
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      const { data, error } = await sb.from(CITIES_TABLE).select('name').order('name');
+      if (error) throw error;
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map(r => r.name);
+      }
+    } catch (e) {
+      console.warn('Supabase JS fetchRemoteCities failed, falling back to REST:', e);
+    }
+  }
+
+  // REST fallback
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}?select=name&order=name.asc`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return (data || []).map(r => r.name);
+    }
+  } catch (err) {
+    console.warn('REST fetchRemoteCities failed:', err);
+  }
+  return null;
+}
+
+/**
+ * Upsert a city into dedicated field_guide_cities table
+ */
+export async function upsertRemoteCity(cityName) {
+  if (!cityName) return false;
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      await sb.from(CITIES_TABLE).upsert({ name: cityName });
+      return true;
+    } catch (e) {}
+  }
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ name: cityName })
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Delete a city from dedicated field_guide_cities table
+ */
+export async function deleteRemoteCity(cityName) {
+  if (!cityName) return false;
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      await sb.from(CITIES_TABLE).delete().eq('name', cityName);
+      return true;
+    } catch (e) {}
+  }
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}?name=eq.${encodeURIComponent(cityName)}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    return true;
+  } catch (e) {
+    return false;
   }
 }
 

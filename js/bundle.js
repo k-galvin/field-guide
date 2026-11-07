@@ -8,9 +8,10 @@ const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 const DEFAULT_CITIES = [
-  'Costa Mesa', 'Newport Beach', 'Laguna Beach', 'San Diego', 'Joshua Tree',
-  'San Francisco', 'London', 'Copenhagen', 'Lisbon', 'Prague', 'Edinburgh', 'Vienna',
-  'Budapest', 'Stockholm', 'Mexico City', 'Los Angeles'
+  'Budapest', 'Copenhagen', 'Costa Mesa', 'Edinburgh', 'Encinitas',
+  'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Laguna Beach', 'Lisbon',
+  'London', 'Los Angeles', 'Mexico City', 'Newport Beach', 'Orange',
+  'Prague', 'San Diego', 'San Francisco', 'Santa Ana', 'Stockholm', 'Vienna'
 ];
 
 const KNOWN_CITY_META = {
@@ -1298,7 +1299,8 @@ function invalidateMapSize() {
 
 const SUPABASE_URL = 'https://oaqzbymmhusbhvscfcrp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Y8hY9if-e5PdwcmCKALzsQ_bzUpYVHp';
-const SPOTS_TABLE = 'field_guide_spots';
+const SPOTS_TABLE = 'spots';
+const CITIES_TABLE = 'field_guide_cities';
 
 let supabaseClient = null;
 
@@ -1323,7 +1325,7 @@ async function fetchRemoteSpots() {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { data, error } = await sb.from(SPOTS_TABLE).select('*');
+      const { data, error } = await sb.from(SPOTS_TABLE).select('*').limit(1000);
       if (error) throw error;
       return (data || []).map(mapRowToSpot);
     } catch (e) {
@@ -1333,7 +1335,7 @@ async function fetchRemoteSpots() {
 
   // REST fallback
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*&limit=1000`, {
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -1345,6 +1347,96 @@ async function fetchRemoteSpots() {
   } catch (err) {
     console.warn('Remote fetch failed:', err);
     return null;
+  }
+}
+
+/**
+ * Fetch dedicated cities list from remote Supabase table
+ */
+async function fetchRemoteCities() {
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      const { data, error } = await sb.from(CITIES_TABLE).select('name').order('name');
+      if (error) throw error;
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map(r => r.name);
+      }
+    } catch (e) {
+      console.warn('Supabase JS fetchRemoteCities failed, falling back to REST:', e);
+    }
+  }
+
+  // REST fallback
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}?select=name&order=name.asc`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return (data || []).map(r => r.name);
+    }
+  } catch (err) {
+    console.warn('REST fetchRemoteCities failed:', err);
+  }
+  return null;
+}
+
+/**
+ * Upsert a city into dedicated field_guide_cities table
+ */
+async function upsertRemoteCity(cityName) {
+  if (!cityName) return false;
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      await sb.from(CITIES_TABLE).upsert({ name: cityName });
+      return true;
+    } catch (e) {}
+  }
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ name: cityName })
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Delete a city from dedicated field_guide_cities table
+ */
+async function deleteRemoteCity(cityName) {
+  if (!cityName) return false;
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      await sb.from(CITIES_TABLE).delete().eq('name', cityName);
+      return true;
+    } catch (e) {}
+  }
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}?name=eq.${encodeURIComponent(cityName)}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    return true;
+  } catch (e) {
+    return false;
   }
 }
 
@@ -1934,12 +2026,23 @@ const mobileToggleMap = document.getElementById('mobile-toggle-map');
  */
 function init() {
   // Load stored data or default
-  cities = getStoredCities();
+  const storedCities = getStoredCities();
   const storedSpots = getStoredSpots();
   if (storedSpots && storedSpots.length > 0) {
     spots = storedSpots;
   } else {
     spots = [];
+  }
+
+  // Sanitize stored cities: only keep cities that are in DEFAULT_CITIES or currently have spots
+  const validDefaultSet = new Set(DEFAULT_CITIES.map(c => c.toLowerCase()));
+  const spotCitySet = new Set(spots.map(s => (s.city || '').toLowerCase()).filter(Boolean));
+  cities = storedCities.filter(c => {
+    const l = c.toLowerCase();
+    return validDefaultSet.has(l) || spotCitySet.has(l);
+  });
+  if (cities.length === 0) {
+    cities = [...DEFAULT_CITIES];
   }
 
   // Restore active city preference if available and valid in Field Guide
@@ -2035,33 +2138,25 @@ async function syncWithSupabase(manual = false) {
     spots = remote;
     saveStoredSpots(spots);
 
-    // 4. Clean & synchronize cities from field_guide_spots
+    // 4. Synchronize cities strictly from dedicated field_guide_cities and spots
+    const remoteCities = await fetchRemoteCities();
     const spotCityNames = [...new Set(spots.map(s => s.city).filter(Boolean))];
-    const storedCities = getStoredCities();
 
-    const activeCityNames = [];
-    const seen = new Set();
+    let combinedCities = (Array.isArray(remoteCities) && remoteCities.length > 0)
+      ? remoteCities
+      : [...DEFAULT_CITIES];
+
+    // Ensure any city present in spots is represented
+    const citySet = new Set(combinedCities.map(c => c.toLowerCase()));
     spotCityNames.forEach(c => {
-      const lower = c.toLowerCase();
-      if (!seen.has(lower)) {
-        seen.add(lower);
-        activeCityNames.push(c);
+      if (!citySet.has(c.toLowerCase())) {
+        citySet.add(c.toLowerCase());
+        combinedCities.push(c);
       }
     });
 
-    // Also preserve any custom city explicitly added in city manager,
-    // while pruning any empty legacy archival cities that have 0 spots in Field Guide
-    const legacyArchivalCities = new Set(['kyoto', 'tokyo', 'new york', 'amsterdam', 'sydney']);
-    storedCities.forEach(c => {
-      const lower = c.toLowerCase();
-      const hasSpots = spots.some(s => s.city && s.city.toLowerCase() === lower);
-      if (!seen.has(lower) && (hasSpots || !legacyArchivalCities.has(lower))) {
-        seen.add(lower);
-        activeCityNames.push(c);
-      }
-    });
-
-    cities = activeCityNames.length > 0 ? activeCityNames : ['Costa Mesa'];
+    combinedCities.sort((a, b) => a.localeCompare(b));
+    cities = combinedCities;
     saveStoredCities(cities);
     renderCityDropdowns();
 
@@ -2293,8 +2388,9 @@ function setupEventListeners() {
         return;
       }
       if (confirm(`Remove all ${emptyCities.length} empty destinations (with 0 spots) from your list?`)) {
+        emptyCities.forEach(c => deleteRemoteCity(c));
         cities = cities.filter(c => spots.some(s => s.city.toLowerCase() === c.toLowerCase()));
-        if (cities.length === 0) cities = ['Los Angeles'];
+        if (cities.length === 0) cities = ['Costa Mesa'];
         saveStoredCities(cities);
         if (!cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
           setActiveCity(cities[0] || 'all');
@@ -3426,6 +3522,7 @@ function renderCityManagerList() {
         }
         cities = cities.filter(c => c.toLowerCase() !== cityToRemove.toLowerCase());
         saveStoredCities(cities);
+        deleteRemoteCity(cityToRemove);
         if (activeCity.toLowerCase() === cityToRemove.toLowerCase()) {
           setActiveCity(cities[0] || 'all');
         } else {
@@ -3445,7 +3542,9 @@ function handleAddNewCity() {
 
   if (!cities.some(c => c.toLowerCase() === newCity.toLowerCase())) {
     cities.push(newCity);
+    cities.sort((a, b) => a.localeCompare(b));
     saveStoredCities(cities);
+    upsertRemoteCity(newCity);
     renderCityDropdowns();
     renderCityManagerList();
     input.value = '';
