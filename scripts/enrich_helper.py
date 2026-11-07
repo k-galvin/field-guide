@@ -8,7 +8,7 @@ SUPABASE_KEY = "sb_publishable_Y8hY9if-e5PdwcmCKALzsQ_bzUpYVHp"
 
 def get_spots():
     req = urllib.request.Request(
-        f"{SUPABASE_URL}/rest/v1/spots?select=*",
+        f"{SUPABASE_URL}/rest/v1/field_guide_spots?select=*",
         headers={
             "apikey": SUPABASE_KEY,
             "Authorization": f"Bearer {SUPABASE_KEY}"
@@ -19,7 +19,7 @@ def get_spots():
 
 def update_spot(spot_id, updates):
     body = json.dumps(updates).encode('utf-8')
-    url = f"{SUPABASE_URL}/rest/v1/spots?id=eq.{spot_id}"
+    url = f"{SUPABASE_URL}/rest/v1/field_guide_spots?id=eq.{spot_id}"
     req = urllib.request.Request(
         url,
         data=body,

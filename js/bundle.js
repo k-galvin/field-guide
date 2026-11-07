@@ -8,8 +8,9 @@ const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 const DEFAULT_CITIES = [
-  'Los Angeles', 'London', 'San Francisco', 'New York', 'Kyoto',
-  'Copenhagen', 'Mexico City', 'Lisbon', 'Tokyo'
+  'Costa Mesa', 'Newport Beach', 'Laguna Beach', 'San Diego', 'Joshua Tree',
+  'San Francisco', 'London', 'Copenhagen', 'Lisbon', 'Prague', 'Edinburgh', 'Vienna',
+  'Budapest', 'Stockholm', 'Mexico City', 'Los Angeles'
 ];
 
 const KNOWN_CITY_META = {
@@ -1215,6 +1216,7 @@ function invalidateMapSize() {
 
 const SUPABASE_URL = 'https://oaqzbymmhusbhvscfcrp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Y8hY9if-e5PdwcmCKALzsQ_bzUpYVHp';
+const SPOTS_TABLE = 'field_guide_spots';
 
 let supabaseClient = null;
 
@@ -1239,7 +1241,7 @@ async function fetchRemoteSpots() {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { data, error } = await sb.from('spots').select('*');
+      const { data, error } = await sb.from(SPOTS_TABLE).select('*');
       if (error) throw error;
       return (data || []).map(mapRowToSpot);
     } catch (e) {
@@ -1249,7 +1251,7 @@ async function fetchRemoteSpots() {
 
   // REST fallback
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots?select=*`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*`, {
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -1272,7 +1274,7 @@ async function upsertRemoteSpot(spot) {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { error } = await sb.from('spots').upsert(row);
+      const { error } = await sb.from(SPOTS_TABLE).upsert(row);
       if (error) throw error;
       return true;
     } catch (e) {
@@ -1281,7 +1283,7 @@ async function upsertRemoteSpot(spot) {
   }
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -1305,7 +1307,7 @@ async function deleteRemoteSpot(id) {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { error } = await sb.from('spots').delete().eq('id', id);
+      const { error } = await sb.from(SPOTS_TABLE).delete().eq('id', id);
       if (error) throw error;
       return true;
     } catch (e) {
@@ -1314,7 +1316,7 @@ async function deleteRemoteSpot(id) {
   }
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots?id=eq.${encodeURIComponent(id)}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?id=eq.${encodeURIComponent(id)}`, {
       method: 'DELETE',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -1339,9 +1341,9 @@ async function seedRemoteSpotsIfEmpty(localSpots) {
       const rows = localSpots.map(mapSpotToRow);
       const sb = getSupabase();
       if (sb) {
-        await sb.from('spots').upsert(rows);
+        await sb.from(SPOTS_TABLE).upsert(rows);
       } else {
-        await fetch(`${SUPABASE_URL}/rest/v1/spots`, {
+        await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
           method: 'POST',
           headers: {
             'apikey': SUPABASE_KEY,
@@ -1368,8 +1370,8 @@ function subscribeToRemoteChanges(callback) {
   if (!sb || !sb.channel) return null;
 
   try {
-    const channel = sb.channel('public:spots')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'spots' }, (payload) => {
+    const channel = sb.channel(`public:${SPOTS_TABLE}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: SPOTS_TABLE }, (payload) => {
         if (callback) callback(payload);
       })
       .subscribe();
@@ -1390,7 +1392,7 @@ async function pushSpotsToRemote(spotsArray) {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { error } = await sb.from('spots').upsert(rows);
+      const { error } = await sb.from(SPOTS_TABLE).upsert(rows);
       if (error) throw error;
       return true;
     } catch (e) {
@@ -1400,7 +1402,7 @@ async function pushSpotsToRemote(spotsArray) {
 
   // REST fallback
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -1942,21 +1944,41 @@ async function syncWithSupabase(manual = false) {
     spots = remote;
     saveStoredSpots(spots);
 
-    // 4. Auto-discover any imported cities
+    // 4. Clean & synchronize cities from field_guide_spots
+    const spotCityNames = [...new Set(spots.map(s => s.city).filter(Boolean))];
     const storedCities = getStoredCities();
-    const citySet = new Set(storedCities.map(c => c.toLowerCase()));
-    let newCityAdded = false;
-    spots.forEach(s => {
-      if (s.city && !citySet.has(s.city.toLowerCase())) {
-        storedCities.push(s.city);
-        citySet.add(s.city.toLowerCase());
-        newCityAdded = true;
+
+    const activeCityNames = [];
+    const seen = new Set();
+    spotCityNames.forEach(c => {
+      const lower = c.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        activeCityNames.push(c);
       }
     });
-    if (newCityAdded) {
-      saveStoredCities(storedCities);
-      cities = storedCities;
-      renderCityDropdowns();
+
+    // Also preserve any custom city explicitly added in city manager,
+    // while pruning any empty legacy archival cities that have 0 spots in Field Guide
+    const legacyArchivalCities = new Set(['kyoto', 'tokyo', 'new york', 'amsterdam', 'sydney']);
+    storedCities.forEach(c => {
+      const lower = c.toLowerCase();
+      const hasSpots = spots.some(s => s.city && s.city.toLowerCase() === lower);
+      if (!seen.has(lower) && (hasSpots || !legacyArchivalCities.has(lower))) {
+        seen.add(lower);
+        activeCityNames.push(c);
+      }
+    });
+
+    cities = activeCityNames.length > 0 ? activeCityNames : ['Costa Mesa'];
+    saveStoredCities(cities);
+    renderCityDropdowns();
+
+    // If activeCity is no longer in Field Guide's cities list, fallback gracefully
+    if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
+      activeCity = cities[0] || 'all';
+      localStorage.setItem('flaneur_active_city', activeCity);
+      updateCityTriggerButton();
     }
 
     applyFiltersAndRender();

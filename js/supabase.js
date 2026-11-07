@@ -2,6 +2,7 @@
 
 const SUPABASE_URL = 'https://oaqzbymmhusbhvscfcrp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Y8hY9if-e5PdwcmCKALzsQ_bzUpYVHp';
+export const SPOTS_TABLE = 'field_guide_spots';
 
 let supabaseClient = null;
 
@@ -26,7 +27,7 @@ export async function fetchRemoteSpots() {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { data, error } = await sb.from('spots').select('*');
+      const { data, error } = await sb.from(SPOTS_TABLE).select('*');
       if (error) throw error;
       return (data || []).map(mapRowToSpot);
     } catch (e) {
@@ -36,7 +37,7 @@ export async function fetchRemoteSpots() {
 
   // REST fallback
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots?select=*`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*`, {
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -59,7 +60,7 @@ export async function upsertRemoteSpot(spot) {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { error } = await sb.from('spots').upsert(row);
+      const { error } = await sb.from(SPOTS_TABLE).upsert(row);
       if (error) throw error;
       return true;
     } catch (e) {
@@ -68,7 +69,7 @@ export async function upsertRemoteSpot(spot) {
   }
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -92,7 +93,7 @@ export async function deleteRemoteSpot(id) {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { error } = await sb.from('spots').delete().eq('id', id);
+      const { error } = await sb.from(SPOTS_TABLE).delete().eq('id', id);
       if (error) throw error;
       return true;
     } catch (e) {
@@ -101,7 +102,7 @@ export async function deleteRemoteSpot(id) {
   }
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots?id=eq.${encodeURIComponent(id)}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?id=eq.${encodeURIComponent(id)}`, {
       method: 'DELETE',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -126,9 +127,9 @@ export async function seedRemoteSpotsIfEmpty(localSpots) {
       const rows = localSpots.map(mapSpotToRow);
       const sb = getSupabase();
       if (sb) {
-        await sb.from('spots').upsert(rows);
+        await sb.from(SPOTS_TABLE).upsert(rows);
       } else {
-        await fetch(`${SUPABASE_URL}/rest/v1/spots`, {
+        await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
           method: 'POST',
           headers: {
             'apikey': SUPABASE_KEY,
@@ -155,8 +156,8 @@ export function subscribeToRemoteChanges(callback) {
   if (!sb || !sb.channel) return null;
 
   try {
-    const channel = sb.channel('public:spots')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'spots' }, (payload) => {
+    const channel = sb.channel(`public:${SPOTS_TABLE}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: SPOTS_TABLE }, (payload) => {
         if (callback) callback(payload);
       })
       .subscribe();
@@ -177,7 +178,7 @@ export async function pushSpotsToRemote(spotsArray) {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { error } = await sb.from('spots').upsert(rows);
+      const { error } = await sb.from(SPOTS_TABLE).upsert(rows);
       if (error) throw error;
       return true;
     } catch (e) {
@@ -187,7 +188,7 @@ export async function pushSpotsToRemote(spotsArray) {
 
   // REST fallback
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/spots`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,

@@ -251,21 +251,41 @@ async function syncWithSupabase(manual = false) {
     spots = remote;
     saveStoredSpots(spots);
 
-    // 4. Auto-discover any imported cities
+    // 4. Clean & synchronize cities from field_guide_spots
+    const spotCityNames = [...new Set(spots.map(s => s.city).filter(Boolean))];
     const storedCities = getStoredCities();
-    const citySet = new Set(storedCities.map(c => c.toLowerCase()));
-    let newCityAdded = false;
-    spots.forEach(s => {
-      if (s.city && !citySet.has(s.city.toLowerCase())) {
-        storedCities.push(s.city);
-        citySet.add(s.city.toLowerCase());
-        newCityAdded = true;
+
+    const activeCityNames = [];
+    const seen = new Set();
+    spotCityNames.forEach(c => {
+      const lower = c.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        activeCityNames.push(c);
       }
     });
-    if (newCityAdded) {
-      saveStoredCities(storedCities);
-      cities = storedCities;
-      renderCityDropdowns();
+
+    // Also preserve any custom city explicitly added in city manager,
+    // while pruning any empty legacy archival cities that have 0 spots in Field Guide
+    const legacyArchivalCities = new Set(['kyoto', 'tokyo', 'new york', 'amsterdam', 'sydney']);
+    storedCities.forEach(c => {
+      const lower = c.toLowerCase();
+      const hasSpots = spots.some(s => s.city && s.city.toLowerCase() === lower);
+      if (!seen.has(lower) && (hasSpots || !legacyArchivalCities.has(lower))) {
+        seen.add(lower);
+        activeCityNames.push(c);
+      }
+    });
+
+    cities = activeCityNames.length > 0 ? activeCityNames : ['Costa Mesa'];
+    saveStoredCities(cities);
+    renderCityDropdowns();
+
+    // If activeCity is no longer in Field Guide's cities list, fallback gracefully
+    if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
+      activeCity = cities[0] || 'all';
+      localStorage.setItem('flaneur_active_city', activeCity);
+      updateCityTriggerButton();
     }
 
     applyFiltersAndRender();
