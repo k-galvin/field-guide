@@ -8,10 +8,12 @@ const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 const DEFAULT_CITIES = [
-  'Budapest', 'Copenhagen', 'Costa Mesa', 'Edinburgh', 'Encinitas',
-  'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Laguna Beach', 'Lisbon',
-  'London', 'Los Angeles', 'Mexico City', 'Newport Beach', 'Orange',
-  'Prague', 'San Diego', 'San Francisco', 'Santa Ana', 'Stockholm', 'Vienna'
+  'Amsterdam', 'Budapest', 'Copenhagen', 'Costa Mesa', 'Edinburgh',
+  'Encinitas', 'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Kyoto',
+  'Laguna Beach', 'Lisbon', 'London', 'Los Angeles', 'Melbourne',
+  'Mexico City', 'Montreal', 'Newport Beach', 'New York', 'Orange',
+  'Oslo', 'Paris', 'Prague', 'San Diego', 'San Francisco',
+  'Santa Ana', 'Stockholm', 'Sydney', 'Tokyo', 'Vienna'
 ];
 
 const KNOWN_CITY_META = {
@@ -90,7 +92,9 @@ const KNOWN_CITY_META = {
   'kyiv': { code: 'IEV', country: 'Ukraine' },
   'oxford': { code: 'OXF', country: 'UK' },
   'liverpool': { code: 'LPL', country: 'UK' },
-  'memphis': { code: 'MEM', country: 'USA' }
+  'memphis': { code: 'MEM', country: 'USA' },
+  'melbourne': { code: 'MEL', country: 'Australia' },
+  'sydney': { code: 'SYD', country: 'Australia' }
 };
 
 function getCityMeta(cityName) {
@@ -1046,7 +1050,16 @@ const KNOWN_CITY_COORDS = {
   'orange': [33.7879, -117.8531],
   'huntington beach': [33.6595, -117.9988],
   'helsinki': [60.1699, 24.9384],
-  'encinitas': [33.0370, -117.2920]
+  'encinitas': [33.0370, -117.2920],
+  'new york': [40.7128, -74.0060],
+  'paris': [48.8566, 2.3522],
+  'amsterdam': [52.3676, 4.9041],
+  'montreal': [45.5017, -73.5673],
+  'oslo': [59.9139, 10.7522],
+  'melbourne': [-37.8136, 144.9631],
+  'sydney': [-33.8688, 151.2093],
+  'kyoto': [35.0116, 135.7681],
+  'tokyo': [35.6762, 139.6503]
 };
 
 /**

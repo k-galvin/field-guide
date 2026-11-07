@@ -4,10 +4,12 @@ const STORAGE_KEY = 'flaneur_spots_v1';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 export const DEFAULT_CITIES = [
-  'Budapest', 'Copenhagen', 'Costa Mesa', 'Edinburgh', 'Encinitas',
-  'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Laguna Beach', 'Lisbon',
-  'London', 'Los Angeles', 'Mexico City', 'Newport Beach', 'Orange',
-  'Prague', 'San Diego', 'San Francisco', 'Santa Ana', 'Stockholm', 'Vienna'
+  'Amsterdam', 'Budapest', 'Copenhagen', 'Costa Mesa', 'Edinburgh',
+  'Encinitas', 'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Kyoto',
+  'Laguna Beach', 'Lisbon', 'London', 'Los Angeles', 'Melbourne',
+  'Mexico City', 'Montreal', 'Newport Beach', 'New York', 'Orange',
+  'Oslo', 'Paris', 'Prague', 'San Diego', 'San Francisco',
+  'Santa Ana', 'Stockholm', 'Sydney', 'Tokyo', 'Vienna'
 ];
 
 export const KNOWN_CITY_META = {
@@ -86,7 +88,9 @@ export const KNOWN_CITY_META = {
   'kyiv': { code: 'IEV', country: 'Ukraine' },
   'oxford': { code: 'OXF', country: 'UK' },
   'liverpool': { code: 'LPL', country: 'UK' },
-  'memphis': { code: 'MEM', country: 'USA' }
+  'memphis': { code: 'MEM', country: 'USA' },
+  'melbourne': { code: 'MEL', country: 'Australia' },
+  'sydney': { code: 'SYD', country: 'Australia' }
 };
 
 export function getCityMeta(cityName) {
