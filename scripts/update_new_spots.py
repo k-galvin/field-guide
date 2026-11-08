@@ -14,9 +14,9 @@ updates = [
         "lat": 33.787163,
         "lng": -117.853189,
         "hours": None,
-        "notes": "Curated showroom and design studio founded by Jeni Maus, showcasing an eclectic collection of vintage architectural props, mid-century seating, reclaimed tables, and European antiques.",
+        "notes": "Curated vintage clothing boutique in historic Old Towne Orange featuring hand-picked racks of retro apparel, vintage streetwear, and denim, alongside an eclectic selection of home decor and lifestyle goods.",
         "visit_date": "2026-11-05",
-        "photo_url": "https://annesage.com/wp-content/uploads/2017/08/JEM_1133.jpg",
+        "photo_url": "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&w=1200&q=85",
         "updated_at": datetime.now(timezone.utc).isoformat()
     },
     {
