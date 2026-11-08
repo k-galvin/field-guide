@@ -223,11 +223,14 @@ export function renderMapSpots(spots, activeSpotId = null) {
       </div>
     `;
 
-    popupContent.querySelector('.popup-btn-detail').addEventListener('click', () => {
-      if (onSpotSelectCallback) {
-        onSpotSelectCallback(spot);
-      }
-    });
+    const detailBtn = popupContent.querySelector('.popup-btn-detail');
+    if (detailBtn) {
+      detailBtn.addEventListener('click', () => {
+        if (onSpotSelectCallback) {
+          onSpotSelectCallback(spot);
+        }
+      });
+    }
 
     marker.bindPopup(popupContent, { maxWidth: 280, minWidth: 220 });
     marker.addTo(markersLayer);

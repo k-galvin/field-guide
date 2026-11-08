@@ -221,10 +221,8 @@ function init() {
   const sharedCity = urlParams.get('guide') || urlParams.get('city') || urlParams.get('share');
   if (sharedCity && sharedCity !== '1' && sharedCity !== 'true') {
     const decoded = decodeURIComponent(sharedCity).trim();
-    if (decoded.toLowerCase() === 'all' || cities.some(c => c.toLowerCase() === decoded.toLowerCase()) || spots.some(s => s.city.toLowerCase() === decoded.toLowerCase())) {
-      activeCity = decoded;
-      isReadOnlyGuide = true;
-    }
+    activeCity = decoded;
+    isReadOnlyGuide = true;
   } else if (urlParams.get('share') === '1' && urlParams.get('city')) {
     const decoded = decodeURIComponent(urlParams.get('city')).trim();
     activeCity = decoded;
@@ -349,8 +347,18 @@ async function syncWithSupabase(manual = false) {
     saveStoredCities(cities);
     renderCityDropdowns();
 
-    // If activeCity is no longer in Field Guide's cities list, fallback gracefully
-    if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
+    // If in read-only guide mode, keep the shared city and match its canonical casing
+    if (isReadOnlyGuide) {
+      const match = cities.find(c => c.toLowerCase() === activeCity.toLowerCase()) ||
+                    (spots.find(s => s.city && s.city.toLowerCase() === activeCity.toLowerCase()) || {}).city;
+      if (match) {
+        activeCity = match;
+      }
+      if (readonlyCityName) {
+        readonlyCityName.textContent = activeCity === 'all' ? 'All Destinations' : activeCity;
+      }
+    } else if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
+      // If activeCity is no longer in Field Guide's cities list, fallback gracefully
       activeCity = cities[0] || 'all';
       localStorage.setItem('flaneur_active_city', activeCity);
     }
@@ -954,33 +962,48 @@ function renderSpotCards(spotsToRender) {
       }
     });
 
-    // Toggle favorite
+    // Toggle favorite (disabled in read-only mode)
     const favBtn = card.querySelector('.card-fav-btn');
-    favBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleFavorite(spot.id);
-    });
+    if (favBtn) {
+      if (isReadOnlyGuide) {
+        favBtn.style.pointerEvents = 'none';
+        favBtn.style.cursor = 'default';
+      } else {
+        favBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleFavorite(spot.id);
+        });
+      }
+    }
 
-    // Toggle Status button
-    const toggleStatusBtn = card.querySelector('[data-action="toggle-status"]');
-    toggleStatusBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleSpotStatus(spot.id);
-    });
+    if (!isReadOnlyGuide) {
+      // Toggle Status button
+      const toggleStatusBtn = card.querySelector('[data-action="toggle-status"]');
+      if (toggleStatusBtn) {
+        toggleStatusBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleSpotStatus(spot.id);
+        });
+      }
 
-    // Edit button
-    const editBtn = card.querySelector('[data-action="edit"]');
-    editBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openEditSpotModal(spot);
-    });
+      // Edit button
+      const editBtn = card.querySelector('[data-action="edit"]');
+      if (editBtn) {
+        editBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openEditSpotModal(spot);
+        });
+      }
 
-    // Delete button
-    const deleteBtn = card.querySelector('[data-action="delete"]');
-    deleteBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      deleteSpot(spot.id);
-    });
+      // Delete button
+      const deleteBtn = card.querySelector('[data-action="delete"]');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteSpot(spot.id);
+        });
+      }
+    }
 
     spotsListContainer.appendChild(card);
   });
