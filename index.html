@@ -13,7 +13,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/leaflet.css">
-  <link rel="stylesheet" href="css/style.css?v=6">
+  <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 <body>
 
@@ -383,45 +383,45 @@
         <button type="button" class="modal-close-btn" data-close-modal="modal-cities">&times;</button>
       </div>
       <div class="modal-body atlas-modal-body">
-        <!-- Quick Jump Strip (Top Destinations & Current) -->
-        <div class="atlas-quick-strip" id="atlas-quick-strip">
-          <!-- Populated dynamically via JS -->
+        <!-- Atlas Search & Regional Macro Pills -->
+        <div class="atlas-search-section">
+          <div class="atlas-search-wrap">
+            <input type="text" id="atlas-search-input" class="atlas-search-input" placeholder="Search destination, country, or code (e.g. TYO, UK, Lisbon)..." autocomplete="off">
+          </div>
+          <div class="atlas-region-pills" id="atlas-region-pills">
+            <button type="button" class="atlas-pill active" data-region="all">All</button>
+            <button type="button" class="atlas-pill" data-region="americas">Americas</button>
+            <button type="button" class="atlas-pill" data-region="europe">Europe</button>
+            <button type="button" class="atlas-pill" data-region="asia_pacific">Asia & Pacific</button>
+          </div>
         </div>
 
-        <!-- Atlas Controls Toolbar -->
-        <div class="atlas-toolbar">
-          <div class="atlas-search-wrap">
-            <input type="text" id="atlas-search-input" class="atlas-search-input" placeholder="Search city, country, or 3-letter code (e.g. TYO, UK, Lisbon)..." autocomplete="off">
-          </div>
+        <!-- Sub-toolbar: Active Tabs & View Mode Switcher -->
+        <div class="atlas-sub-toolbar">
           <div class="atlas-filter-tabs">
             <button type="button" class="atlas-tab active" id="atlas-tab-active" data-tab="active">With Spots (<span id="atlas-active-count">0</span>)</button>
             <button type="button" class="atlas-tab" id="atlas-tab-all" data-tab="all">All Destinations (<span id="atlas-all-count">0</span>)</button>
           </div>
           <div class="atlas-view-toggle" role="group" aria-label="Atlas View Mode">
-            <button type="button" class="atlas-view-btn active" id="atlas-view-compact" title="Luggage tag compact grid">⊞ grid</button>
+            <button type="button" class="atlas-view-btn active" id="atlas-view-compact" title="Compact luggage tags">⊞ grid</button>
             <button type="button" class="atlas-view-btn" id="atlas-view-cards" title="Detailed cards">☰ cards</button>
           </div>
-        </div>
-
-        <!-- Regional Macro Filter Pills -->
-        <div class="atlas-region-pills" id="atlas-region-pills">
-          <button type="button" class="atlas-pill active" data-region="all">All Regions</button>
-          <button type="button" class="atlas-pill" data-region="americas">Americas</button>
-          <button type="button" class="atlas-pill" data-region="europe">Europe</button>
-          <button type="button" class="atlas-pill" data-region="asia_pacific">Asia & Pacific</button>
-        </div>
-
-        <!-- Add City Inline Bar -->
-        <div class="atlas-add-row">
-          <input type="text" id="new-city-input" class="form-input" placeholder="Add custom destination (e.g. Kyoto, Lisbon, Austin)...">
-          <button type="button" id="btn-add-new-city" class="btn btn-accent" style="white-space: nowrap;">+ Add Destination</button>
-          <button type="button" id="btn-prune-empty-cities" class="btn btn-outline" style="white-space: nowrap;" title="Remove all destinations with 0 spots">Prune Empty</button>
         </div>
 
         <!-- Atlas Cards Grid -->
         <div class="atlas-grid compact-view" id="cities-list-manage">
           <!-- Populated dynamically via JS -->
         </div>
+
+        <!-- Add Custom Destination (Subtle Collapsible at Bottom) -->
+        <details class="atlas-manage-destinations">
+          <summary class="atlas-manage-summary">+ Add Custom Destination / Manage</summary>
+          <div class="atlas-add-row" style="margin-top: 10px;">
+            <input type="text" id="new-city-input" class="form-input" placeholder="Add custom destination (e.g. Kyoto, Lisbon, Austin)...">
+            <button type="button" id="btn-add-new-city" class="btn btn-accent" style="white-space: nowrap;">+ Add Destination</button>
+            <button type="button" id="btn-prune-empty-cities" class="btn btn-outline" style="white-space: nowrap;" title="Remove destinations with 0 spots">Prune Empty</button>
+          </div>
+        </details>
       </div>
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
         <span class="atlas-footer-hint">Tap any destination to switch guide & center map.</span>
@@ -472,6 +472,6 @@
   <!-- Vendor & Application Scripts -->
   <script src="vendor/leaflet.js"></script>
   <script src="vendor/supabase.js"></script>
-  <script src="js/bundle.js?v=13"></script>
+  <script src="js/bundle.js?v=14"></script>
 </body>
 </html>

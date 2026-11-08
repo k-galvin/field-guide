@@ -1,6 +1,6 @@
 // Storage management for Archival Field Guide
 
-const STORAGE_KEY = 'flaneur_spots_v1';
+const STORAGE_KEY = 'flaneur_spots_v2';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 export const DEFAULT_CITIES = [

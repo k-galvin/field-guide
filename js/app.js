@@ -832,21 +832,19 @@ function applyFiltersAndRender() {
     return true;
   });
 
-  // Calculate distance if user location known
-  if (userCoords) {
-    filtered = filtered.map(s => {
-      const dist = calculateDistanceKm(userCoords.lat, userCoords.lng, s.lat, s.lng);
-      return { ...s, distanceKm: dist };
-    });
-
-    if (isNearMeSorted) {
-      filtered.sort((a, b) => a.distanceKm - b.distanceKm);
-      distanceSortIndicator.style.display = 'inline';
-    } else {
-      distanceSortIndicator.style.display = 'none';
-    }
+  // Deterministic sorting
+  if (userCoords && isNearMeSorted) {
+    filtered.sort((a, b) => a.distanceKm - b.distanceKm);
+    distanceSortIndicator.style.display = 'inline';
   } else {
     distanceSortIndicator.style.display = 'none';
+    filtered.sort((a, b) => {
+      // Starred / Priority spots first
+      if (a.favorite && !b.favorite) return -1;
+      if (!a.favorite && b.favorite) return 1;
+      // Then alphabetical by name
+      return (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
+    });
   }
 
   // Update spot count label
@@ -1660,45 +1658,6 @@ function renderCityDropdowns() {
   kmlTargetCity.innerHTML = cities.map(c => `<option value="${c}">${c}</option>`).join('');
 }
 
-function renderAtlasQuickStrip() {
-  if (!atlasQuickStrip) return;
-  // Sort top destinations by spot count
-  const topCities = cities
-    .map(c => ({
-      name: c,
-      count: spots.filter(s => s.city.toLowerCase() === c.toLowerCase()).length,
-      meta: getCityMeta(c)
-    }))
-    .filter(c => c.count > 0)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 7);
-
-  let html = `
-    <button type="button" class="atlas-quick-chip ${activeCity === 'all' ? 'active' : ''}" data-quick-city="all">
-      <span class="atlas-quick-chip-code">[ ALL ]</span> Global View (${spots.length})
-    </button>
-  `;
-
-  topCities.forEach(c => {
-    const isAct = activeCity.toLowerCase() === c.name.toLowerCase();
-    html += `
-      <button type="button" class="atlas-quick-chip ${isAct ? 'active' : ''}" data-quick-city="${escapeHtml(c.name)}">
-        <span class="atlas-quick-chip-code">[ ${c.meta.code} ]</span> ${escapeHtml(c.name)} (${c.count})
-      </button>
-    `;
-  });
-
-  atlasQuickStrip.innerHTML = html;
-
-  atlasQuickStrip.querySelectorAll('[data-quick-city]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = btn.getAttribute('data-quick-city');
-      setActiveCity(target);
-      closeModal(modalCities);
-    });
-  });
-}
-
 function openCityManagerModal() {
   atlasSearchQuery = '';
   if (atlasSearchInput) atlasSearchInput.value = '';
@@ -1712,8 +1671,6 @@ function openCityManagerModal() {
 function renderCityManagerList() {
   const listEl = document.getElementById('cities-list-manage');
   if (!listEl) return;
-
-  renderAtlasQuickStrip();
 
   // Build city statistics
   const cityStats = cities.map(cityName => {

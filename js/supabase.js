@@ -28,7 +28,7 @@ export async function fetchRemoteSpots() {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { data, error } = await sb.from(SPOTS_TABLE).select('*').limit(1000);
+      const { data, error } = await sb.from(SPOTS_TABLE).select('*').order('name', { ascending: true }).limit(1000);
       if (error) throw error;
       return (data || []).map(mapRowToSpot);
     } catch (e) {
@@ -38,7 +38,7 @@ export async function fetchRemoteSpots() {
 
   // REST fallback
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*&limit=1000`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*&order=name.asc&limit=1000`, {
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
