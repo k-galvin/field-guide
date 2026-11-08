@@ -32,7 +32,7 @@ assert.strictEqual(stats.legs.length, 2);
 assert(stats.totalDistanceKm > 0);
 console.log(`✓ Loop stats verified: total dist = ${stats.totalDistanceKm.toFixed(2)} km`);
 
-import { CATEGORIES, CATEGORY_MAP, normalizeSpotCategory, getCityMeta, DEFAULT_CITIES } from '../js/storage.js';
+import { CATEGORIES, CATEGORY_MAP, normalizeSpotCategory, getCityMeta, getCityRegion, DEFAULT_CITIES } from '../js/storage.js';
 import { mapOsmTagToCategory } from '../js/photon.js';
 
 // Test category split for theater/cinema vs books
@@ -73,5 +73,15 @@ assert.strictEqual(getCityMeta('Unknownville').code, 'UNK');
 assert(DEFAULT_CITIES.length >= 5, 'DEFAULT_CITIES should have starter destinations');
 assert.strictEqual(getCityMeta('Dessau').code, 'DES');
 console.log('✓ City Atlas metadata verified');
+
+console.log('Testing City Atlas regional classification...');
+assert.strictEqual(getCityRegion('Costa Mesa'), 'americas');
+assert.strictEqual(getCityRegion('New York'), 'americas');
+assert.strictEqual(getCityRegion('London'), 'europe');
+assert.strictEqual(getCityRegion('Paris'), 'europe');
+assert.strictEqual(getCityRegion('Tokyo'), 'asia_pacific');
+assert.strictEqual(getCityRegion('Melbourne'), 'asia_pacific');
+assert.strictEqual(getCityRegion('Unknownville'), 'other');
+console.log('✓ Regional macro-classification verified');
 
 console.log('All Day Loop algorithms verified successfully!');

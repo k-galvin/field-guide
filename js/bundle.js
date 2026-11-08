@@ -17,94 +17,99 @@ const DEFAULT_CITIES = [
 ];
 
 const KNOWN_CITY_META = {
-  'costa mesa': { code: 'SNA', country: 'California, USA' },
-  'newport beach': { code: 'NPB', country: 'California, USA' },
-  'laguna beach': { code: 'LGB', country: 'California, USA' },
-  'san diego': { code: 'SAN', country: 'California, USA' },
-  'joshua tree': { code: 'JTR', country: 'California, USA' },
-  'budapest': { code: 'BUD', country: 'Hungary' },
-  'santa ana': { code: 'SNA', country: 'California, USA' },
-  'orange': { code: 'ORA', country: 'California, USA' },
-  'huntington beach': { code: 'HB', country: 'California, USA' },
-  'encinitas': { code: 'ENC', country: 'California, USA' },
-  'tokyo': { code: 'TYO', country: 'Japan' },
-  'paris': { code: 'PAR', country: 'France' },
-  'los angeles': { code: 'LAX', country: 'USA' },
-  'copenhagen': { code: 'CPH', country: 'Denmark' },
-  'new york': { code: 'NYC', country: 'USA' },
-  'london': { code: 'LON', country: 'UK' },
-  'lisbon': { code: 'LIS', country: 'Portugal' },
-  'san francisco': { code: 'SFO', country: 'USA' },
-  'kyoto': { code: 'KYO', country: 'Japan' },
-  'berlin': { code: 'BER', country: 'Germany' },
-  'rome': { code: 'ROM', country: 'Italy' },
-  'milan': { code: 'MIL', country: 'Italy' },
-  'venice': { code: 'VCE', country: 'Italy' },
-  'mexico city': { code: 'CDMX', country: 'Mexico' },
-  'seoul': { code: 'SEL', country: 'South Korea' },
-  'amsterdam': { code: 'AMS', country: 'Netherlands' },
-  'vienna': { code: 'VIE', country: 'Austria' },
-  'barcelona': { code: 'BCN', country: 'Spain' },
-  'madrid': { code: 'MAD', country: 'Spain' },
-  'stockholm': { code: 'ARN', country: 'Sweden' },
-  'oslo': { code: 'OSL', country: 'Norway' },
-  'helsinki': { code: 'HEL', country: 'Finland' },
-  'porto': { code: 'OPO', country: 'Portugal' },
-  'prague': { code: 'PRG', country: 'Czech Republic' },
-  'dublin': { code: 'DUB', country: 'Ireland' },
-  'edinburgh': { code: 'EDI', country: 'UK' },
-  'rotterdam': { code: 'RTM', country: 'Netherlands' },
-  'dessau': { code: 'DES', country: 'Germany' },
-  'kobe': { code: 'UKB', country: 'Japan' },
-  'vancouver': { code: 'YVR', country: 'Canada' },
-  'toronto': { code: 'YYZ', country: 'Canada' },
-  'montreal': { code: 'YUL', country: 'Canada' },
-  'são paulo': { code: 'GRU', country: 'Brazil' },
-  'sao paulo': { code: 'GRU', country: 'Brazil' },
-  'buenos aires': { code: 'EZE', country: 'Argentina' },
-  'austin': { code: 'AUS', country: 'USA' },
-  'seattle': { code: 'SEA', country: 'USA' },
-  'nashville': { code: 'BNA', country: 'USA' },
-  'new orleans': { code: 'MSY', country: 'USA' },
-  'detroit': { code: 'DTW', country: 'USA' },
-  'philadelphia': { code: 'PHL', country: 'USA' },
-  'chicago': { code: 'ORD', country: 'USA' },
-  'miami': { code: 'MIA', country: 'USA' },
-  'marrakesh': { code: 'RAK', country: 'Morocco' },
-  'istanbul': { code: 'IST', country: 'Turkey' },
-  'bangkok': { code: 'BKK', country: 'Thailand' },
-  'hong kong': { code: 'HKG', country: 'Hong Kong' },
-  'mumbai': { code: 'BOM', country: 'India' },
-  'munich': { code: 'MUC', country: 'Germany' },
-  'hanoi': { code: 'HAN', country: 'Vietnam' },
-  'auckland': { code: 'AKL', country: 'New Zealand' },
-  'florence': { code: 'FLR', country: 'Italy' },
-  'geneva': { code: 'GVA', country: 'Switzerland' },
-  'lyon': { code: 'LYS', country: 'France' },
-  'manchester': { code: 'MAN', country: 'UK' },
-  'portland': { code: 'PDX', country: 'USA' },
-  'düsseldorf': { code: 'DUS', country: 'Germany' },
-  'dusseldorf': { code: 'DUS', country: 'Germany' },
-  'leipzig': { code: 'LEJ', country: 'Germany' },
-  'ikast': { code: 'IKA', country: 'Denmark' },
-  'antwerp': { code: 'ANR', country: 'Belgium' },
-  'lagos': { code: 'LOS', country: 'Nigeria' },
-  'kyiv': { code: 'IEV', country: 'Ukraine' },
-  'oxford': { code: 'OXF', country: 'UK' },
-  'liverpool': { code: 'LPL', country: 'UK' },
-  'memphis': { code: 'MEM', country: 'USA' },
-  'melbourne': { code: 'MEL', country: 'Australia' },
-  'sydney': { code: 'SYD', country: 'Australia' }
+  'costa mesa': { code: 'SNA', country: 'California, USA', region: 'americas' },
+  'newport beach': { code: 'NPB', country: 'California, USA', region: 'americas' },
+  'laguna beach': { code: 'LGB', country: 'California, USA', region: 'americas' },
+  'san diego': { code: 'SAN', country: 'California, USA', region: 'americas' },
+  'joshua tree': { code: 'JTR', country: 'California, USA', region: 'americas' },
+  'budapest': { code: 'BUD', country: 'Hungary', region: 'europe' },
+  'santa ana': { code: 'SNA', country: 'California, USA', region: 'americas' },
+  'orange': { code: 'ORA', country: 'California, USA', region: 'americas' },
+  'huntington beach': { code: 'HB', country: 'California, USA', region: 'americas' },
+  'encinitas': { code: 'ENC', country: 'California, USA', region: 'americas' },
+  'tokyo': { code: 'TYO', country: 'Japan', region: 'asia_pacific' },
+  'paris': { code: 'PAR', country: 'France', region: 'europe' },
+  'los angeles': { code: 'LAX', country: 'USA', region: 'americas' },
+  'copenhagen': { code: 'CPH', country: 'Denmark', region: 'europe' },
+  'new york': { code: 'NYC', country: 'USA', region: 'americas' },
+  'london': { code: 'LON', country: 'UK', region: 'europe' },
+  'lisbon': { code: 'LIS', country: 'Portugal', region: 'europe' },
+  'san francisco': { code: 'SFO', country: 'USA', region: 'americas' },
+  'kyoto': { code: 'KYO', country: 'Japan', region: 'asia_pacific' },
+  'berlin': { code: 'BER', country: 'Germany', region: 'europe' },
+  'rome': { code: 'ROM', country: 'Italy', region: 'europe' },
+  'milan': { code: 'MIL', country: 'Italy', region: 'europe' },
+  'venice': { code: 'VCE', country: 'Italy', region: 'europe' },
+  'mexico city': { code: 'CDMX', country: 'Mexico', region: 'americas' },
+  'seoul': { code: 'SEL', country: 'South Korea', region: 'asia_pacific' },
+  'amsterdam': { code: 'AMS', country: 'Netherlands', region: 'europe' },
+  'vienna': { code: 'VIE', country: 'Austria', region: 'europe' },
+  'barcelona': { code: 'BCN', country: 'Spain', region: 'europe' },
+  'madrid': { code: 'MAD', country: 'Spain', region: 'europe' },
+  'stockholm': { code: 'ARN', country: 'Sweden', region: 'europe' },
+  'oslo': { code: 'OSL', country: 'Norway', region: 'europe' },
+  'helsinki': { code: 'HEL', country: 'Finland', region: 'europe' },
+  'porto': { code: 'OPO', country: 'Portugal', region: 'europe' },
+  'prague': { code: 'PRG', country: 'Czech Republic', region: 'europe' },
+  'dublin': { code: 'DUB', country: 'Ireland', region: 'europe' },
+  'edinburgh': { code: 'EDI', country: 'UK', region: 'europe' },
+  'rotterdam': { code: 'RTM', country: 'Netherlands', region: 'europe' },
+  'dessau': { code: 'DES', country: 'Germany', region: 'europe' },
+  'kobe': { code: 'UKB', country: 'Japan', region: 'asia_pacific' },
+  'vancouver': { code: 'YVR', country: 'Canada', region: 'americas' },
+  'toronto': { code: 'YYZ', country: 'Canada', region: 'americas' },
+  'montreal': { code: 'YUL', country: 'Canada', region: 'americas' },
+  'são paulo': { code: 'GRU', country: 'Brazil', region: 'americas' },
+  'sao paulo': { code: 'GRU', country: 'Brazil', region: 'americas' },
+  'buenos aires': { code: 'EZE', country: 'Argentina', region: 'americas' },
+  'austin': { code: 'AUS', country: 'USA', region: 'americas' },
+  'seattle': { code: 'SEA', country: 'USA', region: 'americas' },
+  'nashville': { code: 'BNA', country: 'USA', region: 'americas' },
+  'new orleans': { code: 'MSY', country: 'USA', region: 'americas' },
+  'detroit': { code: 'DTW', country: 'USA', region: 'americas' },
+  'philadelphia': { code: 'PHL', country: 'USA', region: 'americas' },
+  'chicago': { code: 'ORD', country: 'USA', region: 'americas' },
+  'miami': { code: 'MIA', country: 'USA', region: 'americas' },
+  'marrakesh': { code: 'RAK', country: 'Morocco', region: 'europe' },
+  'istanbul': { code: 'IST', country: 'Turkey', region: 'europe' },
+  'bangkok': { code: 'BKK', country: 'Thailand', region: 'asia_pacific' },
+  'hong kong': { code: 'HKG', country: 'Hong Kong', region: 'asia_pacific' },
+  'mumbai': { code: 'BOM', country: 'India', region: 'asia_pacific' },
+  'munich': { code: 'MUC', country: 'Germany', region: 'europe' },
+  'hanoi': { code: 'HAN', country: 'Vietnam', region: 'asia_pacific' },
+  'auckland': { code: 'AKL', country: 'New Zealand', region: 'asia_pacific' },
+  'florence': { code: 'FLR', country: 'Italy', region: 'europe' },
+  'geneva': { code: 'GVA', country: 'Switzerland', region: 'europe' },
+  'lyon': { code: 'LYS', country: 'France', region: 'europe' },
+  'manchester': { code: 'MAN', country: 'UK', region: 'europe' },
+  'portland': { code: 'PDX', country: 'USA', region: 'americas' },
+  'düsseldorf': { code: 'DUS', country: 'Germany', region: 'europe' },
+  'dusseldorf': { code: 'DUS', country: 'Germany', region: 'europe' },
+  'leipzig': { code: 'LEJ', country: 'Germany', region: 'europe' },
+  'ikast': { code: 'IKA', country: 'Denmark', region: 'europe' },
+  'antwerp': { code: 'ANR', country: 'Belgium', region: 'europe' },
+  'lagos': { code: 'LOS', country: 'Nigeria', region: 'europe' },
+  'kyiv': { code: 'IEV', country: 'Ukraine', region: 'europe' },
+  'oxford': { code: 'OXF', country: 'UK', region: 'europe' },
+  'liverpool': { code: 'LPL', country: 'UK', region: 'europe' },
+  'memphis': { code: 'MEM', country: 'USA', region: 'americas' },
+  'melbourne': { code: 'MEL', country: 'Australia', region: 'asia_pacific' },
+  'sydney': { code: 'SYD', country: 'Australia', region: 'asia_pacific' }
 };
 
 function getCityMeta(cityName) {
-  if (!cityName) return { code: '---', country: 'Destination' };
+  if (!cityName) return { code: '---', country: 'Destination', region: 'other' };
   const lower = cityName.toLowerCase().trim();
   if (KNOWN_CITY_META[lower]) {
     return KNOWN_CITY_META[lower];
   }
   const code = cityName.replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase() || 'DST';
-  return { code, country: 'Destination' };
+  return { code, country: 'Destination', region: 'other' };
+}
+
+function getCityRegion(cityName) {
+  const meta = getCityMeta(cityName);
+  return meta.region || 'other';
 }
 
 const CATEGORIES = [
@@ -1073,7 +1078,7 @@ function centerCityOnMap(cityName, allSpots = []) {
     if (validSpots.length > 0) {
       try {
         const bounds = validSpots.map(s => [s.lat, s.lng]);
-        mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 13, animate: true });
+        mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: 12, animate: true });
         return;
       } catch (e) {
         // ignore
@@ -1089,14 +1094,27 @@ function centerCityOnMap(cityName, allSpots = []) {
   );
 
   if (citySpots.length === 1) {
-    mapInstance.setView([citySpots[0].lat, citySpots[0].lng], 14, { animate: true });
+    mapInstance.setView([citySpots[0].lat, citySpots[0].lng], 13, { animate: true });
     return;
   }
 
   if (citySpots.length > 1) {
     try {
+      const lats = citySpots.map(s => s.lat);
+      const lngs = citySpots.map(s => s.lng);
+      const latSpan = Math.max(...lats) - Math.min(...lats);
+      const lngSpan = Math.max(...lngs) - Math.min(...lngs);
+
+      // Prevent over-zooming on tightly clustered spots (Item 4)
+      let targetMaxZoom = 13;
+      if (latSpan > 0.35 || lngSpan > 0.35) {
+        targetMaxZoom = 11;
+      } else if (latSpan > 0.15 || lngSpan > 0.15) {
+        targetMaxZoom = 12;
+      }
+
       const bounds = citySpots.map(s => [s.lat, s.lng]);
-      mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15, animate: true });
+      mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: targetMaxZoom, animate: true });
       return;
     } catch (e) {
       // ignore
@@ -1111,17 +1129,21 @@ function centerCityOnMap(cityName, allSpots = []) {
 }
 
 /**
- * Initializes Leaflet map with CartoDB Positron tiles
+ * Initializes Leaflet map with CartoDB Positron tiles, world copy jump, and bounded polar constraints
  */
 function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 13) {
   if (mapInstance) {
     mapInstance.remove();
   }
 
-  // Base map container
+  // Base map container with worldCopyJump (Item 5) & polar constraints (Item 6)
   mapInstance = L.map(elementId, {
     zoomControl: false,
-    attributionControl: false
+    attributionControl: false,
+    worldCopyJump: true,
+    minZoom: 2,
+    maxBounds: [[-82, -Infinity], [84, Infinity]],
+    maxBoundsViscosity: 1.0
   }).setView(initialCenter, initialZoom);
 
   // Add custom zoom control in bottom right
@@ -1220,7 +1242,19 @@ function renderMapSpots(spots, activeSpotId = null) {
 
   if (bounds.length > 0 && !activeSpotId) {
     try {
-      mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+      const lats = bounds.map(b => b[0]);
+      const lngs = bounds.map(b => b[1]);
+      const latSpan = Math.max(...lats) - Math.min(...lats);
+      const lngSpan = Math.max(...lngs) - Math.min(...lngs);
+
+      let targetMaxZoom = 13;
+      if (latSpan > 0.35 || lngSpan > 0.35) {
+        targetMaxZoom = 11;
+      } else if (latSpan > 0.15 || lngSpan > 0.15) {
+        targetMaxZoom = 12;
+      }
+
+      mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: targetMaxZoom });
     } catch (e) {
       // ignore
     }
@@ -1300,9 +1334,16 @@ function clearLoopPolyline() {
   }
 }
 
-function invalidateMapSize() {
-  if (mapInstance) {
-    mapInstance.invalidateSize();
+function invalidateMapSize(delay = 0) {
+  if (!mapInstance) return;
+  if (delay > 0) {
+    setTimeout(() => {
+      if (mapInstance) mapInstance.invalidateSize();
+    }, delay);
+  } else {
+    requestAnimationFrame(() => {
+      if (mapInstance) mapInstance.invalidateSize();
+    });
   }
 }
 
@@ -1941,7 +1982,10 @@ let isNearMeSorted = false;
 let pendingKmlSpots = [];
 let editingSpotId = null;
 let atlasActiveTab = 'active'; // 'active' (with spots) | 'all'
+let atlasActiveRegion = 'all'; // 'all' | 'americas' | 'europe' | 'asia_pacific'
+let atlasViewMode = localStorage.getItem('flaneur_atlas_view') || 'compact'; // 'compact' | 'cards'
 let atlasSearchQuery = '';
+let isReadOnlyGuide = false;
 
 // DOM Elements
 const btnCityAtlasTrigger = document.getElementById('btn-city-atlas-trigger');
@@ -1958,6 +2002,22 @@ const atlasTabActive = document.getElementById('atlas-tab-active');
 const atlasTabAll = document.getElementById('atlas-tab-all');
 const atlasActiveCountEl = document.getElementById('atlas-active-count');
 const atlasAllCountEl = document.getElementById('atlas-all-count');
+const atlasQuickStrip = document.getElementById('atlas-quick-strip');
+const atlasRegionPills = document.querySelectorAll('.atlas-pill');
+const atlasViewCompact = document.getElementById('atlas-view-compact');
+const atlasViewCards = document.getElementById('atlas-view-cards');
+
+// Read-Only Banner & Share Guide
+const readonlyGuideBanner = document.getElementById('readonly-guide-banner');
+const readonlyCityName = document.getElementById('readonly-city-name');
+const btnShareGuide = document.getElementById('btn-share-guide');
+const modalShare = document.getElementById('modal-share');
+const shareUrlInput = document.getElementById('share-url-input');
+const btnCopyShareUrl = document.getElementById('btn-copy-share-url');
+const shareLinkToast = document.getElementById('share-link-toast');
+const shareTextPreview = document.getElementById('share-text-preview');
+const btnCopyShareText = document.getElementById('btn-copy-share-text');
+const shareTextToast = document.getElementById('share-text-toast');
 
 // View Mode and Photos
 const viewModeVisual = document.getElementById('view-mode-visual');
@@ -2070,6 +2130,29 @@ function init() {
     activeCity = 'Costa Mesa';
   }
 
+  // Check URL parameters for shareable read-only guide mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedCity = urlParams.get('guide') || urlParams.get('city') || urlParams.get('share');
+  if (sharedCity && sharedCity !== '1' && sharedCity !== 'true') {
+    const decoded = decodeURIComponent(sharedCity).trim();
+    if (decoded.toLowerCase() === 'all' || cities.some(c => c.toLowerCase() === decoded.toLowerCase()) || spots.some(s => s.city.toLowerCase() === decoded.toLowerCase())) {
+      activeCity = decoded;
+      isReadOnlyGuide = true;
+    }
+  } else if (urlParams.get('share') === '1' && urlParams.get('city')) {
+    const decoded = decodeURIComponent(urlParams.get('city')).trim();
+    activeCity = decoded;
+    isReadOnlyGuide = true;
+  }
+
+  if (isReadOnlyGuide) {
+    document.body.classList.add('readonly-mode');
+    if (readonlyGuideBanner && readonlyCityName) {
+      readonlyGuideBanner.style.display = 'flex';
+      readonlyCityName.textContent = activeCity === 'all' ? 'All Destinations' : activeCity;
+    }
+  }
+
   // Populate category chips with SVGs
   renderCategoryChips();
 
@@ -2089,14 +2172,18 @@ function init() {
   initMap('map', initialCenter, 13);
   centerCityOnMap(activeCity, spots);
 
-  // Set Map click handler to easily add spots
+  // Set Map click handler to easily add spots (if not read-only)
   setOnMapClickListener((lat, lng) => {
-    openAddSpotModalWithCoords(lat, lng);
+    if (!isReadOnlyGuide) {
+      openAddSpotModalWithCoords(lat, lng);
+    }
   });
 
   // Set Spot click handler from popup
   setOnSpotSelectListener((spot) => {
-    openEditSpotModal(spot);
+    if (!isReadOnlyGuide) {
+      openEditSpotModal(spot);
+    }
   });
 
   // Setup Event Listeners
@@ -2104,6 +2191,9 @@ function init() {
 
   // Initial Render
   applyFiltersAndRender();
+
+  // Ensure map layout is accurately calculated after initial viewport render
+  invalidateMapSize(250);
 
   // Initialize Supabase Cloud Sync (Phone <-> Laptop)
   initCloudSync();
@@ -2301,6 +2391,87 @@ function setupEventListeners() {
       atlasTabAll.classList.add('active');
       atlasTabActive.classList.remove('active');
       renderCityManagerList();
+    });
+  }
+
+  // Atlas View Mode Toggle (Luggage Tag Compact vs Cards)
+  if (atlasViewCompact && atlasViewCards) {
+    if (atlasViewMode === 'compact') {
+      atlasViewCompact.classList.add('active');
+      atlasViewCards.classList.remove('active');
+    } else {
+      atlasViewCards.classList.add('active');
+      atlasViewCompact.classList.remove('active');
+    }
+
+    atlasViewCompact.addEventListener('click', () => {
+      atlasViewMode = 'compact';
+      localStorage.setItem('flaneur_atlas_view', 'compact');
+      atlasViewCompact.classList.add('active');
+      atlasViewCards.classList.remove('active');
+      renderCityManagerList();
+    });
+
+    atlasViewCards.addEventListener('click', () => {
+      atlasViewMode = 'cards';
+      localStorage.setItem('flaneur_atlas_view', 'cards');
+      atlasViewCards.classList.add('active');
+      atlasViewCompact.classList.remove('active');
+      renderCityManagerList();
+    });
+  }
+
+  // Atlas Regional Macro Filter Pills
+  if (atlasRegionPills && atlasRegionPills.length > 0) {
+    atlasRegionPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        atlasActiveRegion = pill.getAttribute('data-region') || 'all';
+        atlasRegionPills.forEach(p => p.classList.toggle('active', p === pill));
+        renderCityManagerList();
+      });
+    });
+  }
+
+  // Share Guide Actions
+  if (btnShareGuide) {
+    btnShareGuide.addEventListener('click', openShareGuideModal);
+  }
+  if (btnCopyShareUrl) {
+    btnCopyShareUrl.addEventListener('click', () => {
+      if (shareUrlInput) {
+        shareUrlInput.select();
+        navigator.clipboard.writeText(shareUrlInput.value).then(() => {
+          if (shareLinkToast) {
+            shareLinkToast.style.display = 'block';
+            setTimeout(() => { if (shareLinkToast) shareLinkToast.style.display = 'none'; }, 3000);
+          }
+        }).catch(() => {
+          document.execCommand('copy');
+          if (shareLinkToast) {
+            shareLinkToast.style.display = 'block';
+            setTimeout(() => { if (shareLinkToast) shareLinkToast.style.display = 'none'; }, 3000);
+          }
+        });
+      }
+    });
+  }
+  if (btnCopyShareText) {
+    btnCopyShareText.addEventListener('click', () => {
+      if (shareTextPreview) {
+        shareTextPreview.select();
+        navigator.clipboard.writeText(shareTextPreview.value).then(() => {
+          if (shareTextToast) {
+            shareTextToast.style.display = 'block';
+            setTimeout(() => { if (shareTextToast) shareTextToast.style.display = 'none'; }, 3000);
+          }
+        }).catch(() => {
+          document.execCommand('copy');
+          if (shareTextToast) {
+            shareTextToast.style.display = 'block';
+            setTimeout(() => { if (shareTextToast) shareTextToast.style.display = 'none'; }, 3000);
+          }
+        });
+      }
     });
   }
 
@@ -2664,15 +2835,17 @@ function renderSpotCards(spotsToRender) {
 
         <div class="card-footer">
           <div class="card-actions-left">
-            <button type="button" class="btn-toggle-status" data-action="toggle-status">
-              ${spot.status === 'visited' ? 'to wishlist' : 'mark visited'}
-            </button>
-            <button type="button" class="btn-toggle-status" data-action="edit">
-              edit
-            </button>
-            <button type="button" class="btn-toggle-status btn-spot-delete" data-action="delete" title="Delete spot">
-              delete
-            </button>
+            ${!isReadOnlyGuide ? `
+              <button type="button" class="btn-toggle-status" data-action="toggle-status">
+                ${spot.status === 'visited' ? 'to wishlist' : 'mark visited'}
+              </button>
+              <button type="button" class="btn-toggle-status" data-action="edit">
+                edit
+              </button>
+              <button type="button" class="btn-toggle-status btn-spot-delete" data-action="delete" title="Delete spot">
+                delete
+              </button>
+            ` : ''}
           </div>
           <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="card-nav-link">
             directions ↗
@@ -3378,6 +3551,45 @@ function renderCityDropdowns() {
   kmlTargetCity.innerHTML = cities.map(c => `<option value="${c}">${c}</option>`).join('');
 }
 
+function renderAtlasQuickStrip() {
+  if (!atlasQuickStrip) return;
+  // Sort top destinations by spot count
+  const topCities = cities
+    .map(c => ({
+      name: c,
+      count: spots.filter(s => s.city.toLowerCase() === c.toLowerCase()).length,
+      meta: getCityMeta(c)
+    }))
+    .filter(c => c.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 7);
+
+  let html = `
+    <button type="button" class="atlas-quick-chip ${activeCity === 'all' ? 'active' : ''}" data-quick-city="all">
+      <span class="atlas-quick-chip-code">[ ALL ]</span> Global View (${spots.length})
+    </button>
+  `;
+
+  topCities.forEach(c => {
+    const isAct = activeCity.toLowerCase() === c.name.toLowerCase();
+    html += `
+      <button type="button" class="atlas-quick-chip ${isAct ? 'active' : ''}" data-quick-city="${escapeHtml(c.name)}">
+        <span class="atlas-quick-chip-code">[ ${c.meta.code} ]</span> ${escapeHtml(c.name)} (${c.count})
+      </button>
+    `;
+  });
+
+  atlasQuickStrip.innerHTML = html;
+
+  atlasQuickStrip.querySelectorAll('[data-quick-city]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-quick-city');
+      setActiveCity(target);
+      closeModal(modalCities);
+    });
+  });
+}
+
 function openCityManagerModal() {
   atlasSearchQuery = '';
   if (atlasSearchInput) atlasSearchInput.value = '';
@@ -3392,6 +3604,8 @@ function renderCityManagerList() {
   const listEl = document.getElementById('cities-list-manage');
   if (!listEl) return;
 
+  renderAtlasQuickStrip();
+
   // Build city statistics
   const cityStats = cities.map(cityName => {
     const citySpots = spots.filter(s => s.city.toLowerCase() === cityName.toLowerCase());
@@ -3401,6 +3615,7 @@ function renderCityManagerList() {
       name: cityName,
       code: meta.code,
       country: meta.country,
+      region: getCityRegion(cityName),
       totalSpots: citySpots.length,
       visitedCount: visitedCount,
       visitedPercent: citySpots.length > 0 ? Math.round((visitedCount / citySpots.length) * 100) : 0,
@@ -3417,6 +3632,11 @@ function renderCityManagerList() {
   let displayCities = cityStats;
   if (atlasActiveTab === 'active') {
     displayCities = displayCities.filter(c => c.totalSpots > 0 || c.isActive);
+  }
+
+  // Filter by region macro tab
+  if (atlasActiveRegion !== 'all') {
+    displayCities = displayCities.filter(c => c.region === atlasActiveRegion);
   }
 
   // Filter by search query
@@ -3438,71 +3658,108 @@ function renderCityManagerList() {
     return a.name.localeCompare(b.name);
   });
 
+  listEl.classList.toggle('compact-view', atlasViewMode === 'compact');
+
   if (displayCities.length === 0) {
     listEl.innerHTML = `
       <div style="grid-column: 1 / -1; padding: 2.5rem 1rem; text-align: center; color: var(--ink-secondary); font-family: var(--font-mono); font-size: 13px;">
-        No destinations found matching "${escapeHtml(atlasSearchQuery)}".
-        <div style="margin-top: 8px; color: var(--ink-muted);">Use the field above to add it to your atlas!</div>
+        No destinations found matching your filters.
+        <div style="margin-top: 8px; color: var(--ink-muted);">Try selecting another region or search query!</div>
       </div>
     `;
     return;
   }
 
-  listEl.innerHTML = `
-    <!-- "All Destinations" Card -->
-    ${!atlasSearchQuery ? `
-      <div class="atlas-card ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
-        <div class="atlas-card-header">
-          <span class="atlas-card-code">[ ALL ]</span>
-          ${activeCity === 'all' ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
-        </div>
-        <div class="atlas-card-body">
-          <h3 class="atlas-card-title">All Destinations</h3>
-          <span class="atlas-card-country">Global Field Guide</span>
-        </div>
-        <div class="atlas-card-footer">
-          <div class="atlas-card-stats">
-            <span class="atlas-spot-count"><strong>${spots.length}</strong> spots</span>
-            <span class="atlas-visited-count">${spots.filter(s => s.status === 'visited').length} visited</span>
+  if (atlasViewMode === 'compact') {
+    // Luggage Tag Compact Grid
+    listEl.innerHTML = `
+      ${(!atlasSearchQuery && atlasActiveRegion === 'all') ? `
+        <div class="atlas-luggage-tag ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
+          <div class="tag-code-block">[ ALL ]</div>
+          <div class="tag-body-block">
+            <div class="tag-city-title">All Destinations</div>
+            <div class="tag-country-subtitle">Global Field Guide</div>
           </div>
-          <div class="atlas-progress-bar">
-            <div class="atlas-progress-fill" style="width: ${spots.length > 0 ? Math.round((spots.filter(s => s.status === 'visited').length / spots.length) * 100) : 0}%"></div>
+          <div class="tag-badge-block">
+            <span class="tag-count-pill">${spots.length} spots</span>
           </div>
         </div>
-      </div>
-    ` : ''}
+      ` : ''}
 
-    ${displayCities.map(c => `
-      <div class="atlas-card ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
-        <div class="atlas-card-header">
-          <span class="atlas-card-code">[ ${c.code} ]</span>
-          <div class="atlas-card-badges">
-            ${c.isActive ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
-            ${!c.isActive || displayCities.length > 1 ? `
-              <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="${c.totalSpots > 0 ? `Delete city and its ${c.totalSpots} spots` : 'Remove city'}">×</button>
-            ` : ''}
+      ${displayCities.map(c => `
+        <div class="atlas-luggage-tag ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
+          <div class="tag-code-block">[ ${c.code} ]</div>
+          <div class="tag-body-block">
+            <div class="tag-city-title">${escapeHtml(c.name)}</div>
+            <div class="tag-country-subtitle">${escapeHtml(c.country)}</div>
           </div>
+          <div class="tag-badge-block">
+            <span class="tag-count-pill">${c.totalSpots} ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
+          </div>
+          ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
+            <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="Remove city" style="margin-left: 4px;">×</button>
+          ` : ''}
         </div>
-        <div class="atlas-card-body">
-          <h3 class="atlas-card-title">${escapeHtml(c.name)}</h3>
-          <span class="atlas-card-country">${escapeHtml(c.country)}</span>
-        </div>
-        <div class="atlas-card-footer">
-          ${c.totalSpots > 0 ? `
+      `).join('')}
+    `;
+  } else {
+    // Detailed Cards View
+    listEl.innerHTML = `
+      <!-- "All Destinations" Card -->
+      ${(!atlasSearchQuery && atlasActiveRegion === 'all') ? `
+        <div class="atlas-card ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
+          <div class="atlas-card-header">
+            <span class="atlas-card-code">[ ALL ]</span>
+            ${activeCity === 'all' ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
+          </div>
+          <div class="atlas-card-body">
+            <h3 class="atlas-card-title">All Destinations</h3>
+            <span class="atlas-card-country">Global Field Guide</span>
+          </div>
+          <div class="atlas-card-footer">
             <div class="atlas-card-stats">
-              <span class="atlas-spot-count"><strong>${c.totalSpots}</strong> ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
-              <span class="atlas-visited-count">${c.visitedCount} visited</span>
+              <span class="atlas-spot-count"><strong>${spots.length}</strong> spots</span>
+              <span class="atlas-visited-count">${spots.filter(s => s.status === 'visited').length} visited</span>
             </div>
             <div class="atlas-progress-bar">
-              <div class="atlas-progress-fill" style="width: ${c.visitedPercent}%"></div>
+              <div class="atlas-progress-fill" style="width: ${spots.length > 0 ? Math.round((spots.filter(s => s.status === 'visited').length / spots.length) * 100) : 0}%"></div>
             </div>
-          ` : `
-            <span class="atlas-empty-label">0 spots · wishlist index</span>
-          `}
+          </div>
         </div>
-      </div>
-    `).join('')}
-  `;
+      ` : ''}
+
+      ${displayCities.map(c => `
+        <div class="atlas-card ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
+          <div class="atlas-card-header">
+            <span class="atlas-card-code">[ ${c.code} ]</span>
+            <div class="atlas-card-badges">
+              ${c.isActive ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
+              ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
+                <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="${c.totalSpots > 0 ? `Delete city and its ${c.totalSpots} spots` : 'Remove city'}">×</button>
+              ` : ''}
+            </div>
+          </div>
+          <div class="atlas-card-body">
+            <h3 class="atlas-card-title">${escapeHtml(c.name)}</h3>
+            <span class="atlas-card-country">${escapeHtml(c.country)}</span>
+          </div>
+          <div class="atlas-card-footer">
+            ${c.totalSpots > 0 ? `
+              <div class="atlas-card-stats">
+                <span class="atlas-spot-count"><strong>${c.totalSpots}</strong> ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
+                <span class="atlas-visited-count">${c.visitedCount} visited</span>
+              </div>
+              <div class="atlas-progress-bar">
+                <div class="atlas-progress-fill" style="width: ${c.visitedPercent}%"></div>
+              </div>
+            ` : `
+              <span class="atlas-empty-label">0 spots · wishlist index</span>
+            `}
+          </div>
+        </div>
+      `).join('')}
+    `;
+  }
 
   // Attach card click handlers
   listEl.querySelectorAll('[data-select-city]').forEach(card => {
@@ -3546,6 +3803,60 @@ function renderCityManagerList() {
       }
     });
   });
+}
+
+function openShareGuideModal() {
+  const shareCity = activeCity === 'all' ? 'All Destinations' : activeCity;
+  const origin = window.location.origin + window.location.pathname;
+  const shareParam = activeCity === 'all' ? 'all' : encodeURIComponent(activeCity);
+  const shareUrl = `${origin}?guide=${shareParam}`;
+
+  if (shareUrlInput) {
+    shareUrlInput.value = shareUrl;
+  }
+
+  const modalTitle = document.getElementById('modal-share-title');
+  if (modalTitle) {
+    modalTitle.textContent = `Share ${shareCity} Field Guide`;
+  }
+
+  // Generate formatted text itinerary
+  const citySpots = activeCity === 'all'
+    ? spots
+    : spots.filter(s => s.city.toLowerCase() === activeCity.toLowerCase());
+
+  let textSummary = `ARCHIVAL FIELD GUIDE — ${shareCity.toUpperCase()}\n`;
+  textSummary += `${citySpots.length} Curated Spots · View Online: ${shareUrl}\n\n`;
+
+  // Group spots by category
+  const grouped = new Map();
+  citySpots.forEach(s => {
+    const cat = CATEGORY_MAP.get(s.category) || { label: 'spot' };
+    const label = cat.label.toUpperCase();
+    if (!grouped.has(label)) grouped.set(label, []);
+    grouped.get(label).push(s);
+  });
+
+  grouped.forEach((groupSpots, catTitle) => {
+    textSummary += `[ ${catTitle} ]\n`;
+    groupSpots.forEach(s => {
+      textSummary += `• ${s.name}`;
+      if (s.neighborhood) textSummary += ` — ${s.neighborhood}`;
+      textSummary += `\n`;
+      if (s.notes) textSummary += `  Notes: ${s.notes}\n`;
+      if (s.hours) textSummary += `  Hours: ${s.hours}\n`;
+      textSummary += `  Directions: ${generateSingleNavigationUrl(s.lat, s.lng)}\n\n`;
+    });
+  });
+
+  if (shareTextPreview) {
+    shareTextPreview.value = textSummary.trim();
+  }
+
+  if (shareLinkToast) shareLinkToast.style.display = 'none';
+  if (shareTextToast) shareTextToast.style.display = 'none';
+
+  openModal(modalShare);
 }
 
 function handleAddNewCity() {

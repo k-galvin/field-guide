@@ -6,13 +6,25 @@
   <title>Archival Field Guide — Day Loops & City Index</title>
   <meta name="description" content="Archival Field Guide — Personal city index, Google MyMaps KML consolidator, live proximity, and day loop walking sequencer.">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Field Guide">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#0a0a0c">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/leaflet.css">
-  <link rel="stylesheet" href="css/style.css?v=5">
+  <link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
+
+  <!-- Read-Only Curated Guide Banner (For Shared Friends Links) -->
+  <div id="readonly-guide-banner" class="readonly-guide-banner" style="display: none;">
+    <div class="readonly-banner-left">
+      <span class="readonly-compass-dot"></span>
+      <span class="readonly-banner-text">Curated Field Guide: <strong id="readonly-city-name">London</strong></span>
+    </div>
+    <a href="./" class="readonly-exit-link">Exit to Full Guide ↗</a>
+  </div>
 
   <!-- Top App Header -->
   <header class="app-header">
@@ -25,6 +37,9 @@
       <span id="sync-status" class="sync-indicator" title="Supabase Cloud Sync Status">
         <span class="sync-dot"></span> <span id="sync-status-text">synced</span>
       </span>
+      <button id="btn-share-guide" class="btn" title="Share this city guide with friends">
+        ↗ share
+      </button>
       <button id="btn-near-me" class="btn" title="Sort spots by walking distance from current location">
         near me
       </button>
@@ -368,6 +383,11 @@
         <button type="button" class="modal-close-btn" data-close-modal="modal-cities">&times;</button>
       </div>
       <div class="modal-body atlas-modal-body">
+        <!-- Quick Jump Strip (Top Destinations & Current) -->
+        <div class="atlas-quick-strip" id="atlas-quick-strip">
+          <!-- Populated dynamically via JS -->
+        </div>
+
         <!-- Atlas Controls Toolbar -->
         <div class="atlas-toolbar">
           <div class="atlas-search-wrap">
@@ -377,6 +397,18 @@
             <button type="button" class="atlas-tab active" id="atlas-tab-active" data-tab="active">With Spots (<span id="atlas-active-count">0</span>)</button>
             <button type="button" class="atlas-tab" id="atlas-tab-all" data-tab="all">All Destinations (<span id="atlas-all-count">0</span>)</button>
           </div>
+          <div class="atlas-view-toggle" role="group" aria-label="Atlas View Mode">
+            <button type="button" class="atlas-view-btn active" id="atlas-view-compact" title="Luggage tag compact grid">⊞ grid</button>
+            <button type="button" class="atlas-view-btn" id="atlas-view-cards" title="Detailed cards">☰ cards</button>
+          </div>
+        </div>
+
+        <!-- Regional Macro Filter Pills -->
+        <div class="atlas-region-pills" id="atlas-region-pills">
+          <button type="button" class="atlas-pill active" data-region="all">All Regions</button>
+          <button type="button" class="atlas-pill" data-region="americas">Americas</button>
+          <button type="button" class="atlas-pill" data-region="europe">Europe</button>
+          <button type="button" class="atlas-pill" data-region="asia_pacific">Asia & Pacific</button>
         </div>
 
         <!-- Add City Inline Bar -->
@@ -387,13 +419,52 @@
         </div>
 
         <!-- Atlas Cards Grid -->
-        <div class="atlas-grid" id="cities-list-manage">
+        <div class="atlas-grid compact-view" id="cities-list-manage">
           <!-- Populated dynamically via JS -->
         </div>
       </div>
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <span class="atlas-footer-hint">Tap any card to switch guide & center map.</span>
+        <span class="atlas-footer-hint">Tap any destination to switch guide & center map.</span>
         <button type="button" class="btn" data-close-modal="modal-cities">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Share City Guide (Read-Only Curated View for Friends) -->
+  <div class="modal-overlay" id="modal-share" role="dialog" aria-modal="true" aria-labelledby="modal-share-title">
+    <div class="modal-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <div>
+          <div class="atlas-modal-overline">CURATED DESTINATION GUIDE</div>
+          <h2 class="modal-title" id="modal-share-title">Share City Guide</h2>
+        </div>
+        <button type="button" class="modal-close-btn" data-close-modal="modal-share">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="share-modal-desc">
+          Send your curated city guide to friends. They will get an elegant, read-only view of your spots, notes, and directions with all adding/editing locked.
+        </p>
+
+        <div class="share-section">
+          <label class="share-section-title" for="share-url-input">Direct Web Link (Read-Only View)</label>
+          <div class="share-link-group">
+            <input type="text" id="share-url-input" class="share-link-input" readonly>
+            <button type="button" id="btn-copy-share-url" class="btn btn-accent" style="white-space: nowrap;">Copy Link</button>
+          </div>
+          <div id="share-link-toast" class="share-toast">✓ Link copied to clipboard!</div>
+        </div>
+
+        <div class="share-section">
+          <label class="share-section-title" for="share-text-preview">Text Itinerary (For WhatsApp / iMessage / Notes)</label>
+          <textarea id="share-text-preview" class="share-textarea" readonly></textarea>
+          <div style="margin-top: 8px; display: flex; justify-content: flex-end;">
+            <button type="button" id="btn-copy-share-text" class="btn" style="white-space: nowrap;">Copy Text Itinerary</button>
+          </div>
+          <div id="share-text-toast" class="share-toast">✓ Text itinerary copied to clipboard!</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-close-modal="modal-share">Done</button>
       </div>
     </div>
   </div>
@@ -401,6 +472,6 @@
   <!-- Vendor & Application Scripts -->
   <script src="vendor/leaflet.js"></script>
   <script src="vendor/supabase.js"></script>
-  <script src="js/bundle.js?v=11"></script>
+  <script src="js/bundle.js?v=12"></script>
 </body>
 </html>

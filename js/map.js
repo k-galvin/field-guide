@@ -77,7 +77,7 @@ export function centerCityOnMap(cityName, allSpots = []) {
     if (validSpots.length > 0) {
       try {
         const bounds = validSpots.map(s => [s.lat, s.lng]);
-        mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 13, animate: true });
+        mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: 12, animate: true });
         return;
       } catch (e) {
         // ignore
@@ -93,14 +93,27 @@ export function centerCityOnMap(cityName, allSpots = []) {
   );
 
   if (citySpots.length === 1) {
-    mapInstance.setView([citySpots[0].lat, citySpots[0].lng], 14, { animate: true });
+    mapInstance.setView([citySpots[0].lat, citySpots[0].lng], 13, { animate: true });
     return;
   }
 
   if (citySpots.length > 1) {
     try {
+      const lats = citySpots.map(s => s.lat);
+      const lngs = citySpots.map(s => s.lng);
+      const latSpan = Math.max(...lats) - Math.min(...lats);
+      const lngSpan = Math.max(...lngs) - Math.min(...lngs);
+
+      // Prevent over-zooming on tightly clustered spots (Item 4)
+      let targetMaxZoom = 13;
+      if (latSpan > 0.35 || lngSpan > 0.35) {
+        targetMaxZoom = 11;
+      } else if (latSpan > 0.15 || lngSpan > 0.15) {
+        targetMaxZoom = 12;
+      }
+
       const bounds = citySpots.map(s => [s.lat, s.lng]);
-      mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15, animate: true });
+      mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: targetMaxZoom, animate: true });
       return;
     } catch (e) {
       // ignore
@@ -115,17 +128,21 @@ export function centerCityOnMap(cityName, allSpots = []) {
 }
 
 /**
- * Initializes Leaflet map with CartoDB Positron tiles
+ * Initializes Leaflet map with CartoDB Positron tiles, world copy jump, and bounded polar constraints
  */
 export function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 13) {
   if (mapInstance) {
     mapInstance.remove();
   }
 
-  // Base map container
+  // Base map container with worldCopyJump (Item 5) & polar constraints (Item 6)
   mapInstance = L.map(elementId, {
     zoomControl: false,
-    attributionControl: false
+    attributionControl: false,
+    worldCopyJump: true,
+    minZoom: 2,
+    maxBounds: [[-82, -Infinity], [84, Infinity]],
+    maxBoundsViscosity: 1.0
   }).setView(initialCenter, initialZoom);
 
   // Add custom zoom control in bottom right
@@ -224,7 +241,19 @@ export function renderMapSpots(spots, activeSpotId = null) {
 
   if (bounds.length > 0 && !activeSpotId) {
     try {
-      mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+      const lats = bounds.map(b => b[0]);
+      const lngs = bounds.map(b => b[1]);
+      const latSpan = Math.max(...lats) - Math.min(...lats);
+      const lngSpan = Math.max(...lngs) - Math.min(...lngs);
+
+      let targetMaxZoom = 13;
+      if (latSpan > 0.35 || lngSpan > 0.35) {
+        targetMaxZoom = 11;
+      } else if (latSpan > 0.15 || lngSpan > 0.15) {
+        targetMaxZoom = 12;
+      }
+
+      mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: targetMaxZoom });
     } catch (e) {
       // ignore
     }
@@ -304,8 +333,15 @@ export function clearLoopPolyline() {
   }
 }
 
-export function invalidateMapSize() {
-  if (mapInstance) {
-    mapInstance.invalidateSize();
+export function invalidateMapSize(delay = 0) {
+  if (!mapInstance) return;
+  if (delay > 0) {
+    setTimeout(() => {
+      if (mapInstance) mapInstance.invalidateSize();
+    }, delay);
+  } else {
+    requestAnimationFrame(() => {
+      if (mapInstance) mapInstance.invalidateSize();
+    });
   }
 }
