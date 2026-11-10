@@ -8,14 +8,20 @@ export const DEFAULT_CITIES = [
   'Encinitas', 'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Kyoto',
   'Laguna Beach', 'Lisbon', 'London', 'Los Angeles', 'Melbourne',
   'Mexico City', 'Montreal', 'Newport Beach', 'New York', 'Orange',
-  'Oslo', 'Paris', 'Prague', 'San Diego', 'San Francisco',
+  'Orange County', 'Oslo', 'Paris', 'Prague', 'San Diego', 'San Francisco',
   'Santa Ana', 'Stockholm', 'Sydney', 'Tokyo', 'Vienna'
 ];
 
 export const KNOWN_CITY_META = {
+  'orange county': { code: 'OC', country: 'California, USA', region: 'americas' },
   'costa mesa': { code: 'SNA', country: 'California, USA', region: 'americas' },
   'newport beach': { code: 'NPB', country: 'California, USA', region: 'americas' },
   'laguna beach': { code: 'LGB', country: 'California, USA', region: 'americas' },
+  'irvine': { code: 'IRV', country: 'California, USA', region: 'americas' },
+  'anaheim': { code: 'ANA', country: 'California, USA', region: 'americas' },
+  'garden grove': { code: 'GG', country: 'California, USA', region: 'americas' },
+  'fountain valley': { code: 'FV', country: 'California, USA', region: 'americas' },
+  'dana point': { code: 'DP', country: 'California, USA', region: 'americas' },
   'san diego': { code: 'SAN', country: 'California, USA', region: 'americas' },
   'joshua tree': { code: 'JTR', country: 'California, USA', region: 'americas' },
   'budapest': { code: 'BUD', country: 'Hungary', region: 'europe' },
@@ -255,12 +261,23 @@ export function saveStoredCities(cities) {
   }
 }
 
+function sortSpotsDeterministically(spotsList) {
+  if (!Array.isArray(spotsList)) return [];
+  return [...spotsList].sort((a, b) => {
+    if (a.favorite && !b.favorite) return -1;
+    if (!a.favorite && b.favorite) return 1;
+    return (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
+  });
+}
+
 export function getStoredSpots() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.map(normalizeSpotCategory) : null;
+    if (!Array.isArray(parsed)) return null;
+    const normalized = parsed.map(normalizeSpotCategory);
+    return sortSpotsDeterministically(normalized);
   } catch (e) {
     console.error('Failed to parse stored spots', e);
     return null;
@@ -269,7 +286,17 @@ export function getStoredSpots() {
 
 export function saveStoredSpots(spots) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(spots));
+    if (!Array.isArray(spots)) return;
+    const sorted = sortSpotsDeterministically(spots);
+    // Sanitize any massive data URLs to safeguard localStorage quota
+    const sanitized = sorted.map(s => {
+      if (s.photoUrl && s.photoUrl.startsWith('data:image') && s.photoUrl.length > 5000) {
+        const { photoUrl, ...rest } = s;
+        return rest;
+      }
+      return s;
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
   } catch (e) {
     console.error('Failed to save spots to localStorage', e);
   }

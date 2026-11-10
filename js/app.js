@@ -858,14 +858,12 @@ function applyFiltersAndRender() {
 }
 
 /**
- * Render Spot Cards in Feed
+ * Render Spot Cards in Feed (with smooth DOM reconciliation to prevent reload flash)
  */
 function renderSpotCards(spotsToRender) {
-  spotsListContainer.innerHTML = '';
-
   if (spotsToRender.length === 0) {
     spotsListContainer.innerHTML = `
-      <div style="text-align: center; padding: 40px 20px; color: var(--ink-muted);">
+      <div class="empty-spots-notice" style="text-align: center; padding: 40px 20px; color: var(--ink-muted);">
         <p style="font-family: var(--font-serif); font-size: 1.1rem; margin-bottom: 6px;">No spots found</p>
         <p style="font-size: 0.8rem;">Try clearing your filters or add a new spot using the button above.</p>
       </div>
@@ -873,16 +871,58 @@ function renderSpotCards(spotsToRender) {
     return;
   }
 
-  spotsToRender.forEach(spot => {
-    const card = document.createElement('article');
-    card.className = 'spot-card';
-    card.dataset.id = spot.id;
+  // Remove empty-state notice if present
+  const emptyNotice = spotsListContainer.querySelector('.empty-spots-notice');
+  if (emptyNotice) emptyNotice.remove();
 
+  // Index existing cards in DOM by their data-id
+  const existingCards = new Map();
+  spotsListContainer.querySelectorAll('.spot-card').forEach(card => {
+    if (card.dataset.id) {
+      existingCards.set(card.dataset.id, card);
+    }
+  });
+
+  const nextIds = new Set(spotsToRender.map(s => s.id));
+
+  // Remove cards that are no longer in spotsToRender
+  existingCards.forEach((card, id) => {
+    if (!nextIds.has(id)) {
+      card.remove();
+      existingCards.delete(id);
+    }
+  });
+
+  // Reconcile and append cards in deterministic order
+  spotsToRender.forEach(spot => {
     const cat = CATEGORY_MAP.get(spot.category) || { label: 'spot', code: '·', iconSvg: '' };
     const navUrl = generateSingleNavigationUrl(spot.lat, spot.lng);
     const distBadge = spot.distanceKm !== undefined
       ? `<span class="badge badge-distance">${formatDistanceAndWalk(spot.distanceKm)}</span>`
       : '';
+
+    const locationLabel = spot.neighborhood
+      ? `${escapeHtml(spot.neighborhood)} · ${escapeHtml(spot.city)}`
+      : escapeHtml(spot.city);
+
+    // Fingerprint of all visual content to prevent unnecessary re-renders
+    const fingerprint = `${spot.photoUrl || ''}|${spot.name}|${spot.notes || ''}|${spot.status}|${spot.favorite ? 1 : 0}|${locationLabel}|${spot.hours || ''}|${distBadge}`;
+
+    let card = existingCards.get(spot.id);
+
+    if (card && card.dataset.fingerprint === fingerprint) {
+      // Content has not changed at all — just maintain sequence in DOM without resetting images or layout
+      spotsListContainer.appendChild(card);
+      return;
+    }
+
+    if (!card) {
+      card = document.createElement('article');
+      card.className = 'spot-card';
+      card.dataset.id = spot.id;
+    }
+
+    card.dataset.fingerprint = fingerprint;
 
     const mediaHtml = spot.photoUrl ? `
       <div class="card-media">
@@ -893,10 +933,6 @@ function renderSpotCards(spotsToRender) {
         </span>
       </div>
     ` : '';
-
-    const locationLabel = spot.neighborhood
-      ? `${escapeHtml(spot.neighborhood)} · ${escapeHtml(spot.city)}`
-      : escapeHtml(spot.city);
 
     card.innerHTML = `
       ${mediaHtml}
@@ -947,7 +983,7 @@ function renderSpotCards(spotsToRender) {
     `;
 
     // Click on card body to focus map
-    card.addEventListener('click', (e) => {
+    card.onclick = (e) => {
       if (e.target.closest('button') || e.target.closest('a')) return;
       document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
       card.classList.add('active-spot');
@@ -955,10 +991,10 @@ function renderSpotCards(spotsToRender) {
       renderMapSpots(spotsToRender, spot.id);
 
       // On mobile screens, automatically switch to map view when a card is selected
-      if (window.innerWidth <= 820) {
+      if (window.innerWidth <= 820 && mobileToggleMap) {
         mobileToggleMap.click();
       }
-    });
+    };
 
     // Toggle favorite (disabled in read-only mode)
     const favBtn = card.querySelector('.card-fav-btn');
@@ -967,10 +1003,10 @@ function renderSpotCards(spotsToRender) {
         favBtn.style.pointerEvents = 'none';
         favBtn.style.cursor = 'default';
       } else {
-        favBtn.addEventListener('click', (e) => {
+        favBtn.onclick = (e) => {
           e.stopPropagation();
           toggleFavorite(spot.id);
-        });
+        };
       }
     }
 
@@ -978,28 +1014,28 @@ function renderSpotCards(spotsToRender) {
       // Toggle Status button
       const toggleStatusBtn = card.querySelector('[data-action="toggle-status"]');
       if (toggleStatusBtn) {
-        toggleStatusBtn.addEventListener('click', (e) => {
+        toggleStatusBtn.onclick = (e) => {
           e.stopPropagation();
           toggleSpotStatus(spot.id);
-        });
+        };
       }
 
       // Edit button
       const editBtn = card.querySelector('[data-action="edit"]');
       if (editBtn) {
-        editBtn.addEventListener('click', (e) => {
+        editBtn.onclick = (e) => {
           e.stopPropagation();
           openEditSpotModal(spot);
-        });
+        };
       }
 
       // Delete button
       const deleteBtn = card.querySelector('[data-action="delete"]');
       if (deleteBtn) {
-        deleteBtn.addEventListener('click', (e) => {
+        deleteBtn.onclick = (e) => {
           e.stopPropagation();
           deleteSpot(spot.id);
-        });
+        };
       }
     }
 
@@ -1741,7 +1777,7 @@ function renderCityManagerList() {
     listEl.innerHTML = `
       ${(!atlasSearchQuery && atlasActiveRegion === 'all') ? `
         <div class="atlas-luggage-tag ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
-          <div class="tag-code-block">[ ALL ]</div>
+          <div class="tag-code-block">ALL</div>
           <div class="tag-body-block">
             <div class="tag-city-title">All Destinations</div>
             <div class="tag-country-subtitle">Global Field Guide</div>
@@ -1754,7 +1790,7 @@ function renderCityManagerList() {
 
       ${displayCities.map(c => `
         <div class="atlas-luggage-tag ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
-          <div class="tag-code-block">[ ${c.code} ]</div>
+          <div class="tag-code-block">${c.code}</div>
           <div class="tag-body-block">
             <div class="tag-city-title">${escapeHtml(c.name)}</div>
             <div class="tag-country-subtitle">${escapeHtml(c.country)}</div>
@@ -1763,7 +1799,7 @@ function renderCityManagerList() {
             <span class="tag-count-pill">${c.totalSpots} ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
           </div>
           ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
-            <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="Remove city" style="margin-left: 4px;">×</button>
+            <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="Remove city">×</button>
           ` : ''}
         </div>
       `).join('')}

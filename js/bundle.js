@@ -12,14 +12,20 @@ const DEFAULT_CITIES = [
   'Encinitas', 'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Kyoto',
   'Laguna Beach', 'Lisbon', 'London', 'Los Angeles', 'Melbourne',
   'Mexico City', 'Montreal', 'Newport Beach', 'New York', 'Orange',
-  'Oslo', 'Paris', 'Prague', 'San Diego', 'San Francisco',
+  'Orange County', 'Oslo', 'Paris', 'Prague', 'San Diego', 'San Francisco',
   'Santa Ana', 'Stockholm', 'Sydney', 'Tokyo', 'Vienna'
 ];
 
 const KNOWN_CITY_META = {
+  'orange county': { code: 'OC', country: 'California, USA', region: 'americas' },
   'costa mesa': { code: 'SNA', country: 'California, USA', region: 'americas' },
   'newport beach': { code: 'NPB', country: 'California, USA', region: 'americas' },
   'laguna beach': { code: 'LGB', country: 'California, USA', region: 'americas' },
+  'irvine': { code: 'IRV', country: 'California, USA', region: 'americas' },
+  'anaheim': { code: 'ANA', country: 'California, USA', region: 'americas' },
+  'garden grove': { code: 'GG', country: 'California, USA', region: 'americas' },
+  'fountain valley': { code: 'FV', country: 'California, USA', region: 'americas' },
+  'dana point': { code: 'DP', country: 'California, USA', region: 'americas' },
   'san diego': { code: 'SAN', country: 'California, USA', region: 'americas' },
   'joshua tree': { code: 'JTR', country: 'California, USA', region: 'americas' },
   'budapest': { code: 'BUD', country: 'Hungary', region: 'europe' },
@@ -259,12 +265,23 @@ function saveStoredCities(cities) {
   }
 }
 
+function sortSpotsDeterministically(spotsList) {
+  if (!Array.isArray(spotsList)) return [];
+  return [...spotsList].sort((a, b) => {
+    if (a.favorite && !b.favorite) return -1;
+    if (!a.favorite && b.favorite) return 1;
+    return (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
+  });
+}
+
 function getStoredSpots() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.map(normalizeSpotCategory) : null;
+    if (!Array.isArray(parsed)) return null;
+    const normalized = parsed.map(normalizeSpotCategory);
+    return sortSpotsDeterministically(normalized);
   } catch (e) {
     console.error('Failed to parse stored spots', e);
     return null;
@@ -273,7 +290,17 @@ function getStoredSpots() {
 
 function saveStoredSpots(spots) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(spots));
+    if (!Array.isArray(spots)) return;
+    const sorted = sortSpotsDeterministically(spots);
+    // Sanitize any massive data URLs to safeguard localStorage quota
+    const sanitized = sorted.map(s => {
+      if (s.photoUrl && s.photoUrl.startsWith('data:image') && s.photoUrl.length > 5000) {
+        const { photoUrl, ...rest } = s;
+        return rest;
+      }
+      return s;
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
   } catch (e) {
     console.error('Failed to save spots to localStorage', e);
   }
@@ -2775,14 +2802,12 @@ function applyFiltersAndRender() {
 }
 
 /**
- * Render Spot Cards in Feed
+ * Render Spot Cards in Feed (with smooth DOM reconciliation to prevent reload flash)
  */
 function renderSpotCards(spotsToRender) {
-  spotsListContainer.innerHTML = '';
-
   if (spotsToRender.length === 0) {
     spotsListContainer.innerHTML = `
-      <div style="text-align: center; padding: 40px 20px; color: var(--ink-muted);">
+      <div class="empty-spots-notice" style="text-align: center; padding: 40px 20px; color: var(--ink-muted);">
         <p style="font-family: var(--font-serif); font-size: 1.1rem; margin-bottom: 6px;">No spots found</p>
         <p style="font-size: 0.8rem;">Try clearing your filters or add a new spot using the button above.</p>
       </div>
@@ -2790,16 +2815,58 @@ function renderSpotCards(spotsToRender) {
     return;
   }
 
-  spotsToRender.forEach(spot => {
-    const card = document.createElement('article');
-    card.className = 'spot-card';
-    card.dataset.id = spot.id;
+  // Remove empty-state notice if present
+  const emptyNotice = spotsListContainer.querySelector('.empty-spots-notice');
+  if (emptyNotice) emptyNotice.remove();
 
+  // Index existing cards in DOM by their data-id
+  const existingCards = new Map();
+  spotsListContainer.querySelectorAll('.spot-card').forEach(card => {
+    if (card.dataset.id) {
+      existingCards.set(card.dataset.id, card);
+    }
+  });
+
+  const nextIds = new Set(spotsToRender.map(s => s.id));
+
+  // Remove cards that are no longer in spotsToRender
+  existingCards.forEach((card, id) => {
+    if (!nextIds.has(id)) {
+      card.remove();
+      existingCards.delete(id);
+    }
+  });
+
+  // Reconcile and append cards in deterministic order
+  spotsToRender.forEach(spot => {
     const cat = CATEGORY_MAP.get(spot.category) || { label: 'spot', code: '·', iconSvg: '' };
     const navUrl = generateSingleNavigationUrl(spot.lat, spot.lng);
     const distBadge = spot.distanceKm !== undefined
       ? `<span class="badge badge-distance">${formatDistanceAndWalk(spot.distanceKm)}</span>`
       : '';
+
+    const locationLabel = spot.neighborhood
+      ? `${escapeHtml(spot.neighborhood)} · ${escapeHtml(spot.city)}`
+      : escapeHtml(spot.city);
+
+    // Fingerprint of all visual content to prevent unnecessary re-renders
+    const fingerprint = `${spot.photoUrl || ''}|${spot.name}|${spot.notes || ''}|${spot.status}|${spot.favorite ? 1 : 0}|${locationLabel}|${spot.hours || ''}|${distBadge}`;
+
+    let card = existingCards.get(spot.id);
+
+    if (card && card.dataset.fingerprint === fingerprint) {
+      // Content has not changed at all — just maintain sequence in DOM without resetting images or layout
+      spotsListContainer.appendChild(card);
+      return;
+    }
+
+    if (!card) {
+      card = document.createElement('article');
+      card.className = 'spot-card';
+      card.dataset.id = spot.id;
+    }
+
+    card.dataset.fingerprint = fingerprint;
 
     const mediaHtml = spot.photoUrl ? `
       <div class="card-media">
@@ -2810,10 +2877,6 @@ function renderSpotCards(spotsToRender) {
         </span>
       </div>
     ` : '';
-
-    const locationLabel = spot.neighborhood
-      ? `${escapeHtml(spot.neighborhood)} · ${escapeHtml(spot.city)}`
-      : escapeHtml(spot.city);
 
     card.innerHTML = `
       ${mediaHtml}
@@ -2864,7 +2927,7 @@ function renderSpotCards(spotsToRender) {
     `;
 
     // Click on card body to focus map
-    card.addEventListener('click', (e) => {
+    card.onclick = (e) => {
       if (e.target.closest('button') || e.target.closest('a')) return;
       document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
       card.classList.add('active-spot');
@@ -2872,10 +2935,10 @@ function renderSpotCards(spotsToRender) {
       renderMapSpots(spotsToRender, spot.id);
 
       // On mobile screens, automatically switch to map view when a card is selected
-      if (window.innerWidth <= 820) {
+      if (window.innerWidth <= 820 && mobileToggleMap) {
         mobileToggleMap.click();
       }
-    });
+    };
 
     // Toggle favorite (disabled in read-only mode)
     const favBtn = card.querySelector('.card-fav-btn');
@@ -2884,10 +2947,10 @@ function renderSpotCards(spotsToRender) {
         favBtn.style.pointerEvents = 'none';
         favBtn.style.cursor = 'default';
       } else {
-        favBtn.addEventListener('click', (e) => {
+        favBtn.onclick = (e) => {
           e.stopPropagation();
           toggleFavorite(spot.id);
-        });
+        };
       }
     }
 
@@ -2895,28 +2958,28 @@ function renderSpotCards(spotsToRender) {
       // Toggle Status button
       const toggleStatusBtn = card.querySelector('[data-action="toggle-status"]');
       if (toggleStatusBtn) {
-        toggleStatusBtn.addEventListener('click', (e) => {
+        toggleStatusBtn.onclick = (e) => {
           e.stopPropagation();
           toggleSpotStatus(spot.id);
-        });
+        };
       }
 
       // Edit button
       const editBtn = card.querySelector('[data-action="edit"]');
       if (editBtn) {
-        editBtn.addEventListener('click', (e) => {
+        editBtn.onclick = (e) => {
           e.stopPropagation();
           openEditSpotModal(spot);
-        });
+        };
       }
 
       // Delete button
       const deleteBtn = card.querySelector('[data-action="delete"]');
       if (deleteBtn) {
-        deleteBtn.addEventListener('click', (e) => {
+        deleteBtn.onclick = (e) => {
           e.stopPropagation();
           deleteSpot(spot.id);
-        });
+        };
       }
     }
 
@@ -3658,7 +3721,7 @@ function renderCityManagerList() {
     listEl.innerHTML = `
       ${(!atlasSearchQuery && atlasActiveRegion === 'all') ? `
         <div class="atlas-luggage-tag ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
-          <div class="tag-code-block">[ ALL ]</div>
+          <div class="tag-code-block">ALL</div>
           <div class="tag-body-block">
             <div class="tag-city-title">All Destinations</div>
             <div class="tag-country-subtitle">Global Field Guide</div>
@@ -3671,7 +3734,7 @@ function renderCityManagerList() {
 
       ${displayCities.map(c => `
         <div class="atlas-luggage-tag ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
-          <div class="tag-code-block">[ ${c.code} ]</div>
+          <div class="tag-code-block">${c.code}</div>
           <div class="tag-body-block">
             <div class="tag-city-title">${escapeHtml(c.name)}</div>
             <div class="tag-country-subtitle">${escapeHtml(c.country)}</div>
@@ -3680,7 +3743,7 @@ function renderCityManagerList() {
             <span class="tag-count-pill">${c.totalSpots} ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
           </div>
           ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
-            <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="Remove city" style="margin-left: 4px;">×</button>
+            <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="Remove city">×</button>
           ` : ''}
         </div>
       `).join('')}
