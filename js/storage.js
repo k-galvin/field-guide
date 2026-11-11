@@ -6,24 +6,29 @@ const CITIES_KEY = 'flaneur_cities_v1';
 export const DEFAULT_CITIES = [
   'Amsterdam', 'Budapest', 'Copenhagen', 'Costa Mesa', 'Edinburgh',
   'Encinitas', 'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Kyoto',
-  'Laguna Beach', 'Lisbon', 'London', 'Los Angeles', 'Melbourne',
+  'Laguna Beach', 'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Melbourne',
   'Mexico City', 'Montreal', 'Newport Beach', 'New York', 'Orange',
   'Orange County', 'Oslo', 'Paris', 'Prague', 'San Diego', 'San Francisco',
   'Santa Ana', 'Stockholm', 'Sydney', 'Tokyo', 'Vienna'
 ];
 
 export const KNOWN_CITY_META = {
-  'orange county': { code: 'OC', country: 'California, USA', region: 'americas' },
-  'costa mesa': { code: 'SNA', country: 'California, USA', region: 'americas' },
-  'newport beach': { code: 'NPB', country: 'California, USA', region: 'americas' },
-  'laguna beach': { code: 'LGB', country: 'California, USA', region: 'americas' },
-  'irvine': { code: 'IRV', country: 'California, USA', region: 'americas' },
-  'anaheim': { code: 'ANA', country: 'California, USA', region: 'americas' },
-  'garden grove': { code: 'GG', country: 'California, USA', region: 'americas' },
-  'fountain valley': { code: 'FV', country: 'California, USA', region: 'americas' },
-  'dana point': { code: 'DP', country: 'California, USA', region: 'americas' },
-  'san diego': { code: 'SAN', country: 'California, USA', region: 'americas' },
-  'joshua tree': { code: 'JTR', country: 'California, USA', region: 'americas' },
+  'orange county': { code: 'OC', country: 'California, USA', region: 'americas', type: 'county' },
+  'loire valley': { code: 'LOI', country: 'France', region: 'europe', type: 'area' },
+  'costa mesa': { code: 'SNA', country: 'California, USA', region: 'americas', type: 'city' },
+  'newport beach': { code: 'NPB', country: 'California, USA', region: 'americas', type: 'city' },
+  'laguna beach': { code: 'LGB', country: 'California, USA', region: 'americas', type: 'city' },
+  'irvine': { code: 'IRV', country: 'California, USA', region: 'americas', type: 'city' },
+  'anaheim': { code: 'ANA', country: 'California, USA', region: 'americas', type: 'city' },
+  'garden grove': { code: 'GG', country: 'California, USA', region: 'americas', type: 'city' },
+  'fountain valley': { code: 'FV', country: 'California, USA', region: 'americas', type: 'city' },
+  'dana point': { code: 'DP', country: 'California, USA', region: 'americas', type: 'city' },
+  'san diego': { code: 'SAN', country: 'California, USA', region: 'americas', type: 'city' },
+  'joshua tree': { code: 'JTR', country: 'California, USA', region: 'americas', type: 'area' },
+  'napa valley': { code: 'NAP', country: 'California, USA', region: 'americas', type: 'area' },
+  'cotswolds': { code: 'COT', country: 'UK', region: 'europe', type: 'area' },
+  'hudson valley': { code: 'HUD', country: 'New York, USA', region: 'americas', type: 'area' },
+  'tuscany': { code: 'TUS', country: 'Italy', region: 'europe', type: 'area' },
   'budapest': { code: 'BUD', country: 'Hungary', region: 'europe' },
   'santa ana': { code: 'SNA', country: 'California, USA', region: 'americas' },
   'orange': { code: 'ORA', country: 'California, USA', region: 'americas' },
@@ -99,18 +104,102 @@ export const KNOWN_CITY_META = {
   'sydney': { code: 'SYD', country: 'Australia', region: 'asia_pacific' }
 };
 
-export function getCityMeta(cityName) {
-  if (!cityName) return { code: '---', country: 'Destination', region: 'other' };
-  const lower = cityName.toLowerCase().trim();
-  if (KNOWN_CITY_META[lower]) {
-    return KNOWN_CITY_META[lower];
+export const DESTINATION_TYPES = {
+  CITY: 'city',
+  COUNTY: 'county',
+  AREA: 'area'
+};
+
+export const DESTINATION_TYPE_LABELS = {
+  city: 'City',
+  county: 'County',
+  area: 'Area'
+};
+
+const DESTINATION_TYPES_KEY = 'flaneur_destination_types_v1';
+
+export function getCustomDestinationTypes() {
+  try {
+    const raw = localStorage.getItem(DESTINATION_TYPES_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw) || {};
+  } catch (e) {
+    return {};
   }
+}
+
+export function saveDestinationType(destinationName, type) {
+  if (!destinationName || !type) return;
+  try {
+    const types = getCustomDestinationTypes();
+    types[destinationName.toLowerCase().trim()] = type;
+    localStorage.setItem(DESTINATION_TYPES_KEY, JSON.stringify(types));
+  } catch (e) {
+    console.error('Failed to save destination type', e);
+  }
+}
+
+export function detectDestinationType(name) {
+  if (!name) return 'city';
+  const lower = name.toLowerCase().trim();
+  const customTypes = getCustomDestinationTypes();
+  if (customTypes[lower]) {
+    return customTypes[lower];
+  }
+  if (KNOWN_CITY_META[lower] && KNOWN_CITY_META[lower].type) {
+    return KNOWN_CITY_META[lower].type;
+  }
+  if (/\bcounty\b/i.test(lower)) {
+    return 'county';
+  }
+  if (/\b(valley|area|region|coast|desert|islands?|hills|district|cotswolds)\b/i.test(lower)) {
+    return 'area';
+  }
+  return 'city';
+}
+
+export function getDestinationMeta(cityName) {
+  if (!cityName) {
+    return {
+      code: '---',
+      country: 'Destination',
+      region: 'other',
+      type: 'city',
+      typeLabel: 'City'
+    };
+  }
+  const lower = cityName.toLowerCase().trim();
+  const customTypes = getCustomDestinationTypes();
+  const detectedType = customTypes[lower] || detectDestinationType(cityName);
+
+  if (KNOWN_CITY_META[lower]) {
+    const meta = KNOWN_CITY_META[lower];
+    const type = customTypes[lower] || meta.type || detectedType;
+    return {
+      code: meta.code,
+      country: meta.country,
+      region: meta.region || 'other',
+      type: type,
+      typeLabel: DESTINATION_TYPE_LABELS[type] || 'Destination'
+    };
+  }
+
   const code = cityName.replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase() || 'DST';
-  return { code, country: 'Destination', region: 'other' };
+  return {
+    code,
+    country: 'Destination',
+    region: 'other',
+    type: detectedType,
+    typeLabel: DESTINATION_TYPE_LABELS[detectedType] || 'Destination'
+  };
+}
+
+export function getCityMeta(cityName) {
+  return getDestinationMeta(cityName);
 }
 
 export function getCityRegion(cityName) {
-  const meta = getCityMeta(cityName);
+  const meta = getDestinationMeta(cityName);
   return meta.region || 'other';
 }
 

@@ -32,7 +32,17 @@ assert.strictEqual(stats.legs.length, 2);
 assert(stats.totalDistanceKm > 0);
 console.log(`✓ Loop stats verified: total dist = ${stats.totalDistanceKm.toFixed(2)} km`);
 
-import { CATEGORIES, CATEGORY_MAP, normalizeSpotCategory, getCityMeta, getCityRegion, DEFAULT_CITIES } from '../js/storage.js';
+import {
+  CATEGORIES,
+  CATEGORY_MAP,
+  normalizeSpotCategory,
+  getCityMeta,
+  getCityRegion,
+  getDestinationMeta,
+  detectDestinationType,
+  DESTINATION_TYPES,
+  DEFAULT_CITIES
+} from '../js/storage.js';
 import { mapOsmTagToCategory } from '../js/photon.js';
 
 // Test category split for theater/cinema vs books
@@ -84,4 +94,35 @@ assert.strictEqual(getCityRegion('Melbourne'), 'asia_pacific');
 assert.strictEqual(getCityRegion('Unknownville'), 'other');
 console.log('✓ Regional macro-classification verified');
 
-console.log('All Day Loop algorithms verified successfully!');
+console.log('Testing Destination classifications (City vs County vs Area)...');
+const ocMeta = getDestinationMeta('Orange County');
+assert.strictEqual(ocMeta.type, 'county');
+assert.strictEqual(ocMeta.typeLabel, 'County');
+assert.strictEqual(ocMeta.code, 'OC');
+console.log('✓ Orange County classified as County (OC)');
+
+const loireMeta = getDestinationMeta('Loire Valley');
+assert.strictEqual(loireMeta.type, 'area');
+assert.strictEqual(loireMeta.typeLabel, 'Area');
+assert.strictEqual(loireMeta.code, 'LOI');
+console.log('✓ Loire Valley classified as Area (LOI)');
+
+const parisMeta = getDestinationMeta('Paris');
+assert.strictEqual(parisMeta.type, 'city');
+assert.strictEqual(parisMeta.typeLabel, 'City');
+assert.strictEqual(parisMeta.code, 'PAR');
+console.log('✓ Paris classified as City (PAR)');
+
+const joshuaMeta = getDestinationMeta('Joshua Tree');
+assert.strictEqual(joshuaMeta.type, 'area');
+assert.strictEqual(joshuaMeta.typeLabel, 'Area');
+console.log('✓ Joshua Tree classified as Area');
+
+// Test heuristic detection
+assert.strictEqual(detectDestinationType('Marin County'), 'county');
+assert.strictEqual(detectDestinationType('Napa Valley'), 'area');
+assert.strictEqual(detectDestinationType('Amalfi Coast'), 'area');
+assert.strictEqual(detectDestinationType('Heidelberg'), 'city');
+console.log('✓ Heuristic destination type detection verified');
+
+console.log('All Day Loop algorithms & Destination Atlas verified successfully!');

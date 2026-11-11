@@ -34,6 +34,8 @@ function createMarkerIcon(category, isFavorite, isVisited) {
 }
 
 export const KNOWN_CITY_COORDS = {
+  'orange county': [33.7175, -117.8311],
+  'loire valley': [47.3941, 0.6848],
   'costa mesa': [33.6411, -117.9187],
   'newport beach': [33.6189, -117.9289],
   'laguna beach': [33.5427, -117.7854],

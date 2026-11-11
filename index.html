@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Archival Field Guide — Day Loops & City Index</title>
-  <meta name="description" content="Archival Field Guide — Personal city index, Google MyMaps KML consolidator, live proximity, and day loop walking sequencer.">
+  <title>Archival Field Guide — Day Loops & Destination Index</title>
+  <meta name="description" content="Archival Field Guide — Personal destination index for cities, counties, and areas, Google MyMaps KML consolidator, live proximity, and day loop walking sequencer.">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Field Guide">
-  <meta name="theme-color" content="#0047ab">
+  <meta name="theme-color" content="#ffffff">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=2">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png?v=2">
   <link rel="manifest" href="manifest.json?v=2">
   <link rel="stylesheet" href="css/leaflet.css">
-  <link rel="stylesheet" href="css/style.css?v=9">
+  <link rel="stylesheet" href="css/style.css?v=10">
 </head>
 <body>
 
@@ -37,7 +37,7 @@
       <span id="sync-status" class="sync-indicator" title="Supabase Cloud Sync Status">
         <span class="sync-dot"></span> <span id="sync-status-text">synced</span>
       </span>
-      <button id="btn-share-guide" class="btn" title="Share this city guide with friends">
+      <button id="btn-share-guide" class="btn" title="Share curated guide with friends">
         ↗ share
       </button>
       <button id="btn-near-me" class="btn" title="Sort spots by walking distance from current location">
@@ -67,7 +67,7 @@
       <!-- Search & City Select -->
       <section class="filter-section">
         <div class="city-row">
-          <button type="button" id="btn-city-atlas-trigger" class="city-atlas-trigger" aria-label="Open City Atlas" title="Open City Atlas & Destination Index">
+          <button type="button" id="btn-city-atlas-trigger" class="city-atlas-trigger" aria-label="Open Atlas & Destination Index" title="Open Atlas & Destination Index (Cities, Counties, Areas)">
             <div class="city-trigger-left">
               <span class="city-trigger-code" id="active-city-code">SNA</span>
               <span class="city-trigger-name" id="active-city-name">Costa Mesa</span>
@@ -80,7 +80,7 @@
           <select id="city-select" class="city-select" style="display: none;" aria-hidden="true">
             <!-- Backwards compatibility for scripts -->
           </select>
-          <button id="btn-manage-cities" class="btn city-atlas-btn-add" title="Open Atlas / Add City">
+          <button id="btn-manage-cities" class="btn city-atlas-btn-add" title="Open Atlas / Add Destination">
             +
           </button>
         </div>
@@ -175,12 +175,12 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="spot-city">City *</label>
+              <label class="form-label" for="spot-city">Destination (City, County, Area) *</label>
               <select id="spot-city" class="form-select" required></select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="spot-neighborhood">Neighborhood / Pocket</label>
-              <input type="text" id="spot-neighborhood" class="form-input" placeholder="e.g. Nishi-Ogikubo, Le Marais">
+              <label class="form-label" for="spot-neighborhood">Neighborhood / Town / Pocket</label>
+              <input type="text" id="spot-neighborhood" class="form-input" placeholder="e.g. Newport Beach, Amboise, Le Marais">
             </div>
           </div>
 
@@ -294,7 +294,7 @@
         </p>
 
         <div class="form-group">
-          <label class="form-label" for="kml-target-city">Assign to City Guide</label>
+          <label class="form-label" for="kml-target-city">Assign to Destination Guide (City, County, Area)</label>
           <select id="kml-target-city" class="form-select"></select>
         </div>
 
@@ -372,13 +372,13 @@
     </div>
   </div>
 
-  <!-- Modal: City Atlas & Destination Index -->
+  <!-- Modal: Atlas & Destination Index (Cities, Counties, Areas) -->
   <div class="modal-overlay" id="modal-cities" role="dialog" aria-modal="true" aria-labelledby="modal-cities-title">
     <div class="modal-card modal-card-atlas">
       <div class="modal-header">
         <div>
           <div class="atlas-modal-overline">ARCHIVAL FIELD GUIDE</div>
-          <h2 class="modal-title" id="modal-cities-title">City Atlas & Index</h2>
+          <h2 class="modal-title" id="modal-cities-title">Atlas & Destination Index</h2>
         </div>
         <button type="button" class="modal-close-btn" data-close-modal="modal-cities">&times;</button>
       </div>
@@ -386,13 +386,19 @@
         <!-- Atlas Search & Regional Macro Pills -->
         <div class="atlas-search-section">
           <div class="atlas-search-wrap">
-            <input type="text" id="atlas-search-input" class="atlas-search-input" placeholder="Search destination, country, or code (e.g. TYO, UK, Lisbon)..." autocomplete="off">
+            <input type="text" id="atlas-search-input" class="atlas-search-input" placeholder="Search destination, country, or code (e.g. OC, Loire, Paris, TYO)..." autocomplete="off">
           </div>
           <div class="atlas-region-pills" id="atlas-region-pills">
             <button type="button" class="atlas-pill active" data-region="all">All</button>
             <button type="button" class="atlas-pill" data-region="americas">Americas</button>
             <button type="button" class="atlas-pill" data-region="europe">Europe</button>
             <button type="button" class="atlas-pill" data-region="asia_pacific">Asia & Pacific</button>
+          </div>
+          <div class="atlas-type-pills" id="atlas-type-pills">
+            <button type="button" class="atlas-type-pill active" data-type="all">All Types</button>
+            <button type="button" class="atlas-type-pill" data-type="city">Cities</button>
+            <button type="button" class="atlas-type-pill" data-type="county">Counties</button>
+            <button type="button" class="atlas-type-pill" data-type="area">General Areas</button>
           </div>
         </div>
 
@@ -417,7 +423,13 @@
         <details class="atlas-manage-destinations">
           <summary class="atlas-manage-summary">+ Add Custom Destination / Manage</summary>
           <div class="atlas-add-row" style="margin-top: 10px;">
-            <input type="text" id="new-city-input" class="form-input" placeholder="Add custom destination (e.g. Kyoto, Lisbon, Austin)...">
+            <input type="text" id="new-city-input" class="form-input" placeholder="Add destination (e.g. Loire Valley, Orange County, Kyoto)...">
+            <select id="new-city-type" class="form-select" style="max-width: 140px; font-size: 11px; padding: 4px 8px;" title="Destination Classification">
+              <option value="auto">Auto-Detect</option>
+              <option value="city">City</option>
+              <option value="county">County</option>
+              <option value="area">General Area</option>
+            </select>
             <button type="button" id="btn-add-new-city" class="btn btn-accent" style="white-space: nowrap;">+ Add Destination</button>
             <button type="button" id="btn-prune-empty-cities" class="btn btn-outline" style="white-space: nowrap;" title="Remove destinations with 0 spots">Prune Empty</button>
           </div>
@@ -430,19 +442,19 @@
     </div>
   </div>
 
-  <!-- Modal: Share City Guide (Read-Only Curated View for Friends) -->
+  <!-- Modal: Share Curated Guide (Read-Only Curated View for Friends) -->
   <div class="modal-overlay" id="modal-share" role="dialog" aria-modal="true" aria-labelledby="modal-share-title">
     <div class="modal-card" style="max-width: 560px;">
       <div class="modal-header">
         <div>
-          <div class="atlas-modal-overline">CURATED DESTINATION GUIDE</div>
-          <h2 class="modal-title" id="modal-share-title">Share City Guide</h2>
+          <div class="atlas-modal-overline">CURATED FIELD GUIDE</div>
+          <h2 class="modal-title" id="modal-share-title">Share Field Guide</h2>
         </div>
         <button type="button" class="modal-close-btn" data-close-modal="modal-share">&times;</button>
       </div>
       <div class="modal-body">
         <p class="share-modal-desc">
-          Send your curated city guide to friends. They will get an elegant, read-only view of your spots, notes, and directions with all adding/editing locked.
+          Send your curated field guide to friends. They will get an elegant, read-only view of your spots, notes, and directions with all adding/editing locked.
         </p>
 
         <div class="share-section">
@@ -472,6 +484,6 @@
   <!-- Vendor & Application Scripts -->
   <script src="vendor/leaflet.js"></script>
   <script src="vendor/supabase.js"></script>
-  <script src="js/bundle.js?v=15"></script>
+  <script src="js/bundle.js?v=16"></script>
 </body>
 </html>

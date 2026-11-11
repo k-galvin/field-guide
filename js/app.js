@@ -11,6 +11,10 @@ import {
   normalizeSpotCategory,
   getCityMeta,
   getCityRegion,
+  getDestinationMeta,
+  detectDestinationType,
+  saveDestinationType,
+  getCustomDestinationTypes,
   DEFAULT_CITIES
 } from './storage.js';
 import { SAMPLE_SPOTS } from './sample-data.js';
@@ -69,6 +73,7 @@ let pendingKmlSpots = [];
 let editingSpotId = null;
 let atlasActiveTab = 'active'; // 'active' (with spots) | 'all'
 let atlasActiveRegion = 'all'; // 'all' | 'americas' | 'europe' | 'asia_pacific'
+let atlasActiveType = 'all'; // 'all' | 'city' | 'county' | 'area'
 let atlasViewMode = localStorage.getItem('flaneur_atlas_view') || 'compact'; // 'compact' | 'cards'
 let atlasSearchQuery = '';
 let isReadOnlyGuide = false;
@@ -521,6 +526,18 @@ function setupEventListeners() {
       pill.addEventListener('click', () => {
         atlasActiveRegion = pill.getAttribute('data-region') || 'all';
         atlasRegionPills.forEach(p => p.classList.toggle('active', p === pill));
+        renderCityManagerList();
+      });
+    });
+  }
+
+  // Atlas Destination Type Filter Pills (All Types | Cities | Counties | Areas)
+  const atlasTypePills = document.querySelectorAll('.atlas-type-pill');
+  if (atlasTypePills && atlasTypePills.length > 0) {
+    atlasTypePills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        atlasActiveType = pill.getAttribute('data-type') || 'all';
+        atlasTypePills.forEach(p => p.classList.toggle('active', p === pill));
         renderCityManagerList();
       });
     });
@@ -1679,19 +1696,31 @@ function renderCityDropdowns() {
   // Main city selector (kept in DOM for script compat)
   if (citySelect) {
     citySelect.innerHTML = `
-      <option value="all">All Cities</option>
-      ${cities.map(c => `<option value="${c}" ${c.toLowerCase() === activeCity.toLowerCase() ? 'selected' : ''}>${c}</option>`).join('')}
+      <option value="all">All Destinations</option>
+      ${cities.map(c => {
+        const meta = getCityMeta(c);
+        const typeNote = meta.type !== 'city' ? ` (${meta.typeLabel})` : '';
+        return `<option value="${c}" ${c.toLowerCase() === activeCity.toLowerCase() ? 'selected' : ''}>${c}${typeNote}</option>`;
+      }).join('')}
     `;
   }
 
   // Update trigger button
   updateCityTriggerButton();
 
-  // Spot modal city select
-  spotCitySelect.innerHTML = cities.map(c => `<option value="${c}">${c}</option>`).join('');
+  // Spot modal destination select
+  spotCitySelect.innerHTML = cities.map(c => {
+    const meta = getCityMeta(c);
+    const typeNote = meta.type !== 'city' ? ` (${meta.typeLabel})` : '';
+    return `<option value="${c}">${c}${typeNote}</option>`;
+  }).join('');
 
-  // KML target city select
-  kmlTargetCity.innerHTML = cities.map(c => `<option value="${c}">${c}</option>`).join('');
+  // KML target destination select
+  kmlTargetCity.innerHTML = cities.map(c => {
+    const meta = getCityMeta(c);
+    const typeNote = meta.type !== 'city' ? ` (${meta.typeLabel})` : '';
+    return `<option value="${c}">${c}${typeNote}</option>`;
+  }).join('');
 }
 
 function openCityManagerModal() {
@@ -1718,6 +1747,8 @@ function renderCityManagerList() {
       code: meta.code,
       country: meta.country,
       region: getCityRegion(cityName),
+      type: meta.type || 'city',
+      typeLabel: meta.typeLabel || 'City',
       totalSpots: citySpots.length,
       visitedCount: visitedCount,
       visitedPercent: citySpots.length > 0 ? Math.round((visitedCount / citySpots.length) * 100) : 0,
@@ -1741,13 +1772,19 @@ function renderCityManagerList() {
     displayCities = displayCities.filter(c => c.region === atlasActiveRegion);
   }
 
+  // Filter by destination type (all | city | county | area)
+  if (atlasActiveType !== 'all') {
+    displayCities = displayCities.filter(c => c.type === atlasActiveType);
+  }
+
   // Filter by search query
   if (atlasSearchQuery) {
     displayCities = displayCities.filter(c => {
       return (
         c.name.toLowerCase().includes(atlasSearchQuery) ||
         c.country.toLowerCase().includes(atlasSearchQuery) ||
-        c.code.toLowerCase().includes(atlasSearchQuery)
+        c.code.toLowerCase().includes(atlasSearchQuery) ||
+        c.typeLabel.toLowerCase().includes(atlasSearchQuery)
       );
     });
   }
@@ -1766,7 +1803,7 @@ function renderCityManagerList() {
     listEl.innerHTML = `
       <div style="grid-column: 1 / -1; padding: 2.5rem 1rem; text-align: center; color: var(--ink-secondary); font-family: var(--font-mono); font-size: 13px;">
         No destinations found matching your filters.
-        <div style="margin-top: 8px; color: var(--ink-muted);">Try selecting another region or search query!</div>
+        <div style="margin-top: 8px; color: var(--ink-muted);">Try selecting another category, region or search query!</div>
       </div>
     `;
     return;
@@ -1775,9 +1812,12 @@ function renderCityManagerList() {
   if (atlasViewMode === 'compact') {
     // Luggage Tag Compact Grid
     listEl.innerHTML = `
-      ${(!atlasSearchQuery && atlasActiveRegion === 'all') ? `
+      ${(!atlasSearchQuery && atlasActiveRegion === 'all' && atlasActiveType === 'all') ? `
         <div class="atlas-luggage-tag ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
-          <div class="tag-code-block">ALL</div>
+          <div class="tag-code-block">
+            <span class="tag-code-text">ALL</span>
+            <span class="tag-type-pill tag-type-city">GLOBAL</span>
+          </div>
           <div class="tag-body-block">
             <div class="tag-city-title">All Destinations</div>
             <div class="tag-country-subtitle">Global Field Guide</div>
@@ -1790,16 +1830,19 @@ function renderCityManagerList() {
 
       ${displayCities.map(c => `
         <div class="atlas-luggage-tag ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
-          <div class="tag-code-block">${c.code}</div>
+          <div class="tag-code-block">
+            <span class="tag-code-text">${c.code}</span>
+            <span class="tag-type-pill tag-type-${c.type}">${c.type.toUpperCase()}</span>
+          </div>
           <div class="tag-body-block">
             <div class="tag-city-title">${escapeHtml(c.name)}</div>
-            <div class="tag-country-subtitle">${escapeHtml(c.country)}</div>
+            <div class="tag-country-subtitle">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}</div>
           </div>
           <div class="tag-badge-block">
             <span class="tag-count-pill">${c.totalSpots} ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
           </div>
           ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
-            <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="Remove city">×</button>
+            <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="Remove ${c.typeLabel.toLowerCase()}">×</button>
           ` : ''}
         </div>
       `).join('')}
@@ -1808,10 +1851,13 @@ function renderCityManagerList() {
     // Detailed Cards View
     listEl.innerHTML = `
       <!-- "All Destinations" Card -->
-      ${(!atlasSearchQuery && atlasActiveRegion === 'all') ? `
+      ${(!atlasSearchQuery && atlasActiveRegion === 'all' && atlasActiveType === 'all') ? `
         <div class="atlas-card ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
           <div class="atlas-card-header">
-            <span class="atlas-card-code">[ ALL ]</span>
+            <div class="atlas-code-type-wrap">
+              <span class="atlas-card-code">[ ALL ]</span>
+              <span class="tag-type-pill tag-type-city">GLOBAL</span>
+            </div>
             ${activeCity === 'all' ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
           </div>
           <div class="atlas-card-body">
@@ -1833,17 +1879,20 @@ function renderCityManagerList() {
       ${displayCities.map(c => `
         <div class="atlas-card ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
           <div class="atlas-card-header">
-            <span class="atlas-card-code">[ ${c.code} ]</span>
+            <div class="atlas-code-type-wrap">
+              <span class="atlas-card-code">[ ${c.code} ]</span>
+              <span class="tag-type-pill tag-type-${c.type}">${c.type.toUpperCase()}</span>
+            </div>
             <div class="atlas-card-badges">
               ${c.isActive ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
               ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
-                <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="${c.totalSpots > 0 ? `Delete city and its ${c.totalSpots} spots` : 'Remove city'}">×</button>
+                <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="${c.totalSpots > 0 ? `Delete ${c.typeLabel.toLowerCase()} and its ${c.totalSpots} spots` : `Remove ${c.typeLabel.toLowerCase()}`}">×</button>
               ` : ''}
             </div>
           </div>
           <div class="atlas-card-body">
             <h3 class="atlas-card-title">${escapeHtml(c.name)}</h3>
-            <span class="atlas-card-country">${escapeHtml(c.country)}</span>
+            <span class="atlas-card-country">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}</span>
           </div>
           <div class="atlas-card-footer">
             ${c.totalSpots > 0 ? `
@@ -1917,9 +1966,12 @@ function openShareGuideModal() {
     shareUrlInput.value = shareUrl;
   }
 
+  const meta = getCityMeta(activeCity);
+  const typeDescriptor = activeCity === 'all' ? '' : ` (${meta.typeLabel} Itinerary)`;
+
   const modalTitle = document.getElementById('modal-share-title');
   if (modalTitle) {
-    modalTitle.textContent = `Share ${shareCity} Field Guide`;
+    modalTitle.textContent = `Share ${shareCity} ${meta.typeLabel || 'Field'} Guide`;
   }
 
   // Generate formatted text itinerary
@@ -1927,7 +1979,7 @@ function openShareGuideModal() {
     ? spots
     : spots.filter(s => s.city.toLowerCase() === activeCity.toLowerCase());
 
-  let textSummary = `ARCHIVAL FIELD GUIDE — ${shareCity.toUpperCase()}\n`;
+  let textSummary = `ARCHIVAL FIELD GUIDE — ${shareCity.toUpperCase()}${typeDescriptor.toUpperCase()}\n`;
   textSummary += `${citySpots.length} Curated Spots · View Online: ${shareUrl}\n\n`;
 
   // Group spots by category
@@ -1963,8 +2015,14 @@ function openShareGuideModal() {
 
 function handleAddNewCity() {
   const input = document.getElementById('new-city-input');
+  const typeSelect = document.getElementById('new-city-type');
   const newCity = input.value.trim();
   if (!newCity) return;
+
+  const chosenType = typeSelect ? typeSelect.value : 'auto';
+  if (chosenType && chosenType !== 'auto') {
+    saveDestinationType(newCity, chosenType);
+  }
 
   if (!cities.some(c => c.toLowerCase() === newCity.toLowerCase())) {
     cities.push(newCity);
@@ -1974,7 +2032,10 @@ function handleAddNewCity() {
     renderCityDropdowns();
     renderCityManagerList();
     input.value = '';
-    // Automatically switch to the newly created city
+    // Automatically switch to the newly created destination
+    setActiveCity(newCity);
+    closeModal(modalCities);
+  } else {
     setActiveCity(newCity);
     closeModal(modalCities);
   }
