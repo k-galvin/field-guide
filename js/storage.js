@@ -4,17 +4,40 @@ const STORAGE_KEY = 'flaneur_spots_v2';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 export const DEFAULT_CITIES = [
-  'Amsterdam', 'Budapest', 'Copenhagen', 'Costa Mesa', 'Edinburgh',
-  'Encinitas', 'Helsinki', 'Huntington Beach', 'Joshua Tree', 'Kyoto',
-  'Laguna Beach', 'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Melbourne',
-  'Mexico City', 'Montreal', 'Newport Beach', 'New York', 'Orange',
-  'Orange County', 'Oslo', 'Paris', 'Prague', 'San Diego', 'San Francisco',
-  'Santa Ana', 'Stockholm', 'Sydney', 'Tokyo', 'Vienna'
+  'Amsterdam', 'Avignon', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
+  'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
+  'English Countryside', 'Florence', 'Giverny', 'Helsinki', 'Huntington Beach',
+  'Iceland', 'Irish Countryside', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
+  'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Melbourne', 'Mexico City',
+  'Montreal', 'Newport Beach', 'New York', 'Nice', 'Orange', 'Orange County',
+  'Oslo', 'Paris', 'Phoenix', 'Portland', 'Prague', 'Quebec City', 'Rome',
+  'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
+  'Seattle', 'Stockholm', 'Sydney', 'Tokyo', 'Vancouver', 'Venice', 'Vienna'
 ];
 
 export const KNOWN_CITY_META = {
   'orange county': { code: 'OC', country: 'California, USA', region: 'americas', type: 'county' },
   'loire valley': { code: 'LOI', country: 'France', region: 'europe', type: 'area' },
+  'english countryside': { code: 'ENG', country: 'United Kingdom', region: 'europe', type: 'area' },
+  'scottish countryside': { code: 'SCO', country: 'Scotland, UK', region: 'europe', type: 'area' },
+  'irish countryside': { code: 'IRE', country: 'Ireland', region: 'europe', type: 'area' },
+  'iceland': { code: 'ICE', country: 'Iceland', region: 'europe', type: 'area' },
+  'giverny': { code: 'GIV', country: 'France', region: 'europe', type: 'area' },
+  'boston': { code: 'BOS', country: 'Massachusetts, USA', region: 'americas', type: 'city' },
+  'barcelona': { code: 'BCN', country: 'Spain', region: 'europe', type: 'city' },
+  'seattle': { code: 'SEA', country: 'Washington, USA', region: 'americas', type: 'city' },
+  'portland': { code: 'PDX', country: 'Oregon, USA', region: 'americas', type: 'city' },
+  'santa fe': { code: 'SAF', country: 'New Mexico, USA', region: 'americas', type: 'city' },
+  'phoenix': { code: 'PHX', country: 'Arizona, USA', region: 'americas', type: 'city' },
+  'chicago': { code: 'ORD', country: 'Illinois, USA', region: 'americas', type: 'city' },
+  'vancouver': { code: 'YVR', country: 'Canada', region: 'americas', type: 'city' },
+  'quebec city': { code: 'YQB', country: 'Canada', region: 'americas', type: 'city' },
+  'avignon': { code: 'AVN', country: 'France', region: 'europe', type: 'city' },
+  'nice': { code: 'NCE', country: 'France', region: 'europe', type: 'city' },
+  'rome': { code: 'ROM', country: 'Italy', region: 'europe', type: 'city' },
+  'venice': { code: 'VCE', country: 'Italy', region: 'europe', type: 'city' },
+  'florence': { code: 'FLR', country: 'Italy', region: 'europe', type: 'city' },
+  'dublin': { code: 'DUB', country: 'Ireland', region: 'europe', type: 'city' },
   'costa mesa': { code: 'SNA', country: 'California, USA', region: 'americas', type: 'city' },
   'newport beach': { code: 'NPB', country: 'California, USA', region: 'americas', type: 'city' },
   'laguna beach': { code: 'LGB', country: 'California, USA', region: 'americas', type: 'city' },
