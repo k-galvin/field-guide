@@ -53,7 +53,6 @@ export const KNOWN_CITY_COORDS = {
   'chicago': [41.8781, -87.6298],
   'vancouver': [49.2827, -123.1207],
   'quebec city': [46.8139, -71.2080],
-  'avignon': [43.9493, 4.8055],
   'nice': [43.7102, 7.2620],
   'rome': [41.9028, 12.4964],
   'venice': [45.4408, 12.3155],

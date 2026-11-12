@@ -4,7 +4,7 @@ const STORAGE_KEY = 'flaneur_spots_v2';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 export const DEFAULT_CITIES = [
-  'Amsterdam', 'Avignon', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
+  'Amsterdam', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
   'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
   'English Countryside', 'Florence', 'French Countryside', 'Helsinki', 'Huntington Beach',
   'Iceland', 'Irish Countryside', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
@@ -31,7 +31,6 @@ export const KNOWN_CITY_META = {
   'chicago': { code: 'ORD', country: 'Illinois, USA', region: 'americas', type: 'city' },
   'vancouver': { code: 'YVR', country: 'Canada', region: 'americas', type: 'city' },
   'quebec city': { code: 'YQB', country: 'Canada', region: 'americas', type: 'city' },
-  'avignon': { code: 'AVN', country: 'France', region: 'europe', type: 'city' },
   'nice': { code: 'NCE', country: 'France', region: 'europe', type: 'city' },
   'rome': { code: 'ROM', country: 'Italy', region: 'europe', type: 'city' },
   'venice': { code: 'VCE', country: 'Italy', region: 'europe', type: 'city' },

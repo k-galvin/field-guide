@@ -246,8 +246,8 @@ function init() {
     savedActiveCity = 'Orange County';
     localStorage.setItem('flaneur_active_city', 'Orange County');
   }
-  // Auto-migrate legacy 'Giverny', 'Loire Valley', and 'Normandy' to 'French Countryside'
-  if (savedActiveCity && ['giverny', 'loire valley', 'normandy'].includes(savedActiveCity.toLowerCase())) {
+  // Auto-migrate legacy 'Giverny', 'Loire Valley', 'Normandy', and 'Avignon' to 'French Countryside'
+  if (savedActiveCity && ['giverny', 'loire valley', 'normandy', 'avignon'].includes(savedActiveCity.toLowerCase())) {
     savedActiveCity = 'French Countryside';
     localStorage.setItem('flaneur_active_city', 'French Countryside');
   }
@@ -413,7 +413,7 @@ async function syncWithSupabase(manual = false) {
     } else if (activeCity.toLowerCase() === 'costa mesa') {
       activeCity = 'Orange County';
       localStorage.setItem('flaneur_active_city', activeCity);
-    } else if (['giverny', 'loire valley', 'normandy'].includes(activeCity.toLowerCase())) {
+    } else if (['giverny', 'loire valley', 'normandy', 'avignon'].includes(activeCity.toLowerCase())) {
       activeCity = 'French Countryside';
       localStorage.setItem('flaneur_active_city', activeCity);
     } else if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {

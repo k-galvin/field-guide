@@ -8,7 +8,7 @@ const STORAGE_KEY = 'flaneur_spots_v2';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 const DEFAULT_CITIES = [
-  'Amsterdam', 'Avignon', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
+  'Amsterdam', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
   'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
   'English Countryside', 'Florence', 'French Countryside', 'Helsinki', 'Huntington Beach',
   'Iceland', 'Irish Countryside', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
@@ -35,7 +35,6 @@ const KNOWN_CITY_META = {
   'chicago': { code: 'ORD', country: 'Illinois, USA', region: 'americas', type: 'city' },
   'vancouver': { code: 'YVR', country: 'Canada', region: 'americas', type: 'city' },
   'quebec city': { code: 'YQB', country: 'Canada', region: 'americas', type: 'city' },
-  'avignon': { code: 'AVN', country: 'France', region: 'europe', type: 'city' },
   'nice': { code: 'NCE', country: 'France', region: 'europe', type: 'city' },
   'rome': { code: 'ROM', country: 'Italy', region: 'europe', type: 'city' },
   'venice': { code: 'VCE', country: 'Italy', region: 'europe', type: 'city' },
@@ -1202,6 +1201,70 @@ const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Mus%C3%A9e_des_impressionnismes_Giverny_01.jpg/1280px-Mus%C3%A9e_des_impressionnismes_Giverny_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
   },
+  {
+    id: 'spot-1794432728258-41131',
+    name: 'Café Tulipe Specialty Coffee',
+    city: 'French Countryside',
+    neighborhood: 'Place du Change, Avignon',
+    category: 'matcha_coffee',
+    status: 'wishlist',
+    favorite: false,
+    lat: 43.9482,
+    lng: 4.8066,
+    daysOpen: 'Daily',
+    hours: 'Wed-Sun 09:00 - 17:00',
+    notes: 'Chic specialty coffee roaster and brunch haven tucked in the heart of the ramparts, serving precise flat whites, matcha, and seasonal tartines under stone arches.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Avignon_-_Place_du_Clo%C3%AEtre-Saint-Pierre_-_View_South_02.jpg/1280px-Avignon_-_Place_du_Clo%C3%AEtre-Saint-Pierre_-_View_South_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  {
+    id: 'spot-1794432728255-18062',
+    name: 'Collection Lambert',
+    city: 'French Countryside',
+    neighborhood: 'Hôtel de Caumont, Avignon',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 43.9442,
+    lng: 4.8051,
+    daysOpen: 'Daily',
+    hours: 'Tue-Sun 11:00 - 18:00, Mon Closed',
+    notes: 'World-class contemporary art museum housed within two aristocratic 18th-century mansions, displaying works by Cy Twombly, Basquiat, Sol LeWitt, and Christian Boltanski.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_Caumont_2.JPG/1280px-Hotel_Caumont_2.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  {
+    id: 'spot-1794432728252-63521',
+    name: 'Palais des Papes',
+    city: 'French Countryside',
+    neighborhood: 'Centre Historique, Avignon',
+    category: 'museums_art',
+    status: 'visited',
+    favorite: true,
+    lat: 43.9507,
+    lng: 4.8075,
+    daysOpen: 'Daily',
+    hours: 'Daily 09:00 - 19:00',
+    notes: 'The largest Gothic palace in the world and seat of Western Christianity during the 14th century, featuring colossal stone halls, papal bedchambers, and Matteo Giovannetti\'s frescoes.',
+    visitDate: '2026-11-12',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Avignon_Palais_des_Papes_2013.jpg/1280px-Avignon_Palais_des_Papes_2013.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  {
+    id: 'spot-1794432728261-55366',
+    name: 'Pont Saint-Bénézet (Pont d\'Avignon)',
+    city: 'French Countryside',
+    neighborhood: 'Rhône Riverfront, Avignon',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: false,
+    lat: 43.9538,
+    lng: 4.8048,
+    daysOpen: 'Daily',
+    hours: 'Daily 09:00 - 19:00',
+    notes: 'Historic 12th-century medieval bridge projecting out halfway over the Rhône river toward Villeneuve-lès-Avignon, immortalized in the French nursery song.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/%22Sur_le_Pont_d%27Avignon_on_y_danse%22_is_the_famous_song%2C_but_now_we_see_only_many_tourist_just_standing_there_-_panoramio.jpg/1280px-%22Sur_le_Pont_d%27Avignon_on_y_danse%22_is_the_famous_song%2C_but_now_we_see_only_many_tourist_just_standing_there_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
   // --- IRISH COUNTRYSIDE ---
   {
     id: 'irish-countryside-tearaght-island',
@@ -1667,7 +1730,6 @@ const KNOWN_CITY_COORDS = {
   'chicago': [41.8781, -87.6298],
   'vancouver': [49.2827, -123.1207],
   'quebec city': [46.8139, -71.2080],
-  'avignon': [43.9493, 4.8055],
   'nice': [43.7102, 7.2620],
   'rome': [41.9028, 12.4964],
   'venice': [45.4408, 12.3155],
@@ -2845,8 +2907,8 @@ function init() {
     savedActiveCity = 'Orange County';
     localStorage.setItem('flaneur_active_city', 'Orange County');
   }
-  // Auto-migrate legacy 'Giverny', 'Loire Valley', and 'Normandy' to 'French Countryside'
-  if (savedActiveCity && ['giverny', 'loire valley', 'normandy'].includes(savedActiveCity.toLowerCase())) {
+  // Auto-migrate legacy 'Giverny', 'Loire Valley', 'Normandy', and 'Avignon' to 'French Countryside'
+  if (savedActiveCity && ['giverny', 'loire valley', 'normandy', 'avignon'].includes(savedActiveCity.toLowerCase())) {
     savedActiveCity = 'French Countryside';
     localStorage.setItem('flaneur_active_city', 'French Countryside');
   }
@@ -3012,7 +3074,7 @@ async function syncWithSupabase(manual = false) {
     } else if (activeCity.toLowerCase() === 'costa mesa') {
       activeCity = 'Orange County';
       localStorage.setItem('flaneur_active_city', activeCity);
-    } else if (['giverny', 'loire valley', 'normandy'].includes(activeCity.toLowerCase())) {
+    } else if (['giverny', 'loire valley', 'normandy', 'avignon'].includes(activeCity.toLowerCase())) {
       activeCity = 'French Countryside';
       localStorage.setItem('flaneur_active_city', activeCity);
     } else if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
