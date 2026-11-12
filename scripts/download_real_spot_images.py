@@ -69,7 +69,25 @@ REAL_SPOT_PHOTOS = {
     "spot-marin-mill-valley-library": "https://upload.wikimedia.org/wikipedia/commons/5/52/Mill_Valley_Public_Library%2C_exterior_%28May_2024%29.jpg",
 
     # 20. Marin County Civic Center (Marin) - Frank Lloyd Wright's actual Marin County Civic Center with blue arches
-    "spot-marin-civic-center": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Marin_County_Civic_Center_%282026%29-L1001193.jpg"
+    "spot-marin-civic-center": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Marin_County_Civic_Center_%282026%29-L1001193.jpg",
+
+    # 21. 21_21 DESIGN SIGHT (Tokyo) - Tadao Ando & Issey Miyake's actual folded-steel roof design museum in Tokyo Midtown
+    "tokyo-6": "https://upload.wikimedia.org/wikipedia/commons/7/71/21_21_DESIGN_SIGHT_2018-1.jpg",
+
+    # 22. Musée de l'Orangerie (Paris) - The actual iconic curved Water Lilies (Nymphéas) oval room in Musée de l'Orangerie
+    "paris-musee-de-lorangerie": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Mus%C3%A9e_de_L%27Orangerie_Water_Lilies_Room.jpg",
+
+    # 23. Ferry Building (San Francisco) - The actual Embarcadero clock tower Beaux-Arts facade
+    "sf-ferry-building": "https://upload.wikimedia.org/wikipedia/commons/0/0c/San_Francisco_Ferry_Building_%28cropped%29.jpg",
+
+    # 24. The Colosseum (Rome) - The actual exterior travertine arches of the Flavian Amphitheatre
+    "rome-colosseum": "https://upload.wikimedia.org/wikipedia/commons/1/10/Rome_Colosseum_exterior_1.jpg",
+
+    # 25. The Pantheon (Rome) - The actual portico and rotunda exterior in Piazza della Rotonda
+    "rome-pantheon": "https://upload.wikimedia.org/wikipedia/commons/5/56/Pantheon_%28Rome%29_-_Exterior_01.jpg",
+
+    # 26. Ponte Vecchio (Florence) - Authentic daytime documentary view of Ponte Vecchio over the Arno River by Diego Delso
+    "florence-ponte-vecchio": "https://upload.wikimedia.org/wikipedia/commons/2/20/Ponte_Vecchio_sobre_el_r%C3%ADo_Arno%2C_Florencia%2C_Italia%2C_2022-09-19%2C_DD_02.jpg"
 }
 
 def download_and_optimize():
@@ -119,32 +137,31 @@ def update_supabase():
     SUPABASE_KEY = "sb_publishable_Y8hY9if-e5PdwcmCKALzsQ_bzUpYVHp"
     print("Updating Supabase spots table with real photo paths...")
 
-    updates = []
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+    }
+
+    updated_count = 0
     for spot_id in REAL_SPOT_PHOTOS.keys():
         local_path = f"images/spots/{spot_id}.jpg"
-        updates.append({
-            "id": spot_id,
+        url = f"{SUPABASE_URL}/rest/v1/spots?id=eq.{spot_id}"
+        body = json.dumps({
             "photo_url": local_path,
             "updated_at": datetime.now(timezone.utc).isoformat()
-        })
+        }).encode("utf-8")
 
-    req = urllib.request.Request(
-        f"{SUPABASE_URL}/rest/v1/spots",
-        data=json.dumps(updates).encode("utf-8"),
-        headers={
-            "apikey": SUPABASE_KEY,
-            "Authorization": f"Bearer {SUPABASE_KEY}",
-            "Content-Type": "application/json",
-            "Prefer": "resolution=merge-duplicates"
-        },
-        method="POST"
-    )
+        req = urllib.request.Request(url, data=body, headers=headers, method="PATCH")
+        try:
+            with urllib.request.urlopen(req) as resp:
+                if resp.status in (200, 204):
+                    updated_count += 1
+        except Exception as e:
+            print(f"Failed to update {spot_id}: {e}")
 
-    try:
-        with urllib.request.urlopen(req) as resp:
-            print("Supabase photo_url update status:", resp.status)
-    except Exception as e:
-        print("Failed to update Supabase:", e)
+    print(f"Supabase update complete: {updated_count}/{len(REAL_SPOT_PHOTOS)} spots updated.")
 
 if __name__ == "__main__":
     download_and_optimize()

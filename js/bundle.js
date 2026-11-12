@@ -10,13 +10,13 @@ const CITIES_KEY = 'flaneur_cities_v1';
 const DEFAULT_CITIES = [
   'Amsterdam', 'Banff', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
   'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
-  'English Countryside', 'Florence', 'French Countryside', 'Grand Canyon', 'Helsinki', 'Huntington Beach',
-  'Iceland', 'Irish Countryside', 'Italian Countryside', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
-  'Lisbon', 'London', 'Los Angeles', 'Marin', 'Melbourne', 'Mexico City',
-  'Monterey', 'Montreal', 'Newport Beach', 'New York', 'Nice', 'Ojai', 'Orange', 'Orange County',
-  'Oslo', 'Palm Springs', 'Paris', 'Phoenix', 'Porto', 'Portland', 'Prague', 'Quebec City', 'Rome',
+  'English Countryside', 'Florence', 'Grand Canyon', 'Helsinki', 'Huntington Beach',
+  'Iceland', 'Irish Countryside', 'Italian Riviera', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
+  'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Marin', 'Melbourne', 'Mexico City',
+  'Monterey', 'Montreal', 'Newport Beach', 'New York', 'Nice', 'Normandy', 'Ojai', 'Orange', 'Orange County',
+  'Oslo', 'Palm Springs', 'Paris', 'Phoenix', 'Porto', 'Portland', 'Prague', 'Provence', 'Quebec City', 'Rome',
   'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
-  'Seattle', 'Sedona', 'South Bay Area', 'Stockholm', 'Sydney', 'Tokyo', 'Vancouver', 'Venice', 'Vienna'
+  'Seattle', 'Sedona', 'South Bay Area', 'Stockholm', 'Sydney', 'Tokyo', 'Tuscany', 'Vancouver', 'Venice', 'Versailles', 'Vienna'
 ];
 
 const KNOWN_CITY_META = {
@@ -81,18 +81,22 @@ const KNOWN_CITY_META = {
 
   // Europe - France
   'paris': { code: 'PAR', country: 'France', region: 'europe', type: 'city' },
-  'french countryside': { code: 'FRA', country: 'France', region: 'europe', type: 'area' },
   'nice': { code: 'NCE', country: 'France', region: 'europe', type: 'city' },
   'lyon': { code: 'LYS', country: 'France', region: 'europe', type: 'city' },
+  'provence': { code: 'PRV', country: 'France', region: 'europe', type: 'area' },
+  'loire valley': { code: 'LOI', country: 'France', region: 'europe', type: 'area' },
+  'normandy': { code: 'NRM', country: 'France', region: 'europe', type: 'area' },
+  'versailles': { code: 'VER', country: 'France', region: 'europe', type: 'city' },
+  'french countryside': { code: 'FRA', country: 'France', region: 'europe', type: 'area' },
 
   // Europe - Italy
   'rome': { code: 'ROM', country: 'Italy', region: 'europe', type: 'city' },
   'florence': { code: 'FLR', country: 'Italy', region: 'europe', type: 'city' },
   'venice': { code: 'VCE', country: 'Italy', region: 'europe', type: 'city' },
   'milan': { code: 'MIL', country: 'Italy', region: 'europe', type: 'city' },
-  'italian countryside': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
-  'italian riviera': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
   'tuscany': { code: 'TUS', country: 'Italy', region: 'europe', type: 'area' },
+  'italian riviera': { code: 'RIV', country: 'Italy', region: 'europe', type: 'area' },
+  'italian countryside': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
 
   // Europe - United Kingdom
   'london': { code: 'LON', country: 'United Kingdom', region: 'europe', type: 'city' },
@@ -689,7 +693,7 @@ const SAMPLE_SPOTS = [
     hours: '10:00 - 19:00',
     notes: 'Subterranean design museum conceived by Issey Miyake and Tadao Ando. Clean concrete angles with thoughtful material exhibitions.',
     visitDate: '2025-04-13',
-    photoUrl: 'https://images.unsplash.com/photo-1541123437800-1bb1317badc2?auto=format&fit=crop&w=800&q=80'
+    photoUrl: 'images/spots/tokyo-6.jpg'
   },
   {
     id: 'tokyo-7',
@@ -1183,7 +1187,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728164-06986',
     name: 'Boulangerie Pâtisserie Bigot',
-    city: 'French Countryside',
+    city: 'Loire Valley',
     neighborhood: 'Amboise',
     category: 'pastry_bakery',
     status: 'wishlist',
@@ -1199,7 +1203,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728158-82508',
     name: 'Château de Chambord',
-    city: 'French Countryside',
+    city: 'Loire Valley',
     neighborhood: 'Chambord',
     category: 'parks_nature',
     status: 'wishlist',
@@ -1215,7 +1219,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728155-07260',
     name: 'Château de Chenonceau',
-    city: 'French Countryside',
+    city: 'Loire Valley',
     neighborhood: 'Chenonceaux',
     category: 'parks_nature',
     status: 'visited',
@@ -1231,7 +1235,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'loire-valley-villandry',
     name: 'Château de Villandry',
-    city: 'French Countryside',
+    city: 'Loire Valley',
     neighborhood: 'Villandry, Indre-et-Loire',
     category: 'parks_nature',
     status: 'wishlist',
@@ -1247,7 +1251,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728276-62974',
     name: 'Claude Monet\'s House & Water Lilies Gardens',
-    city: 'French Countryside',
+    city: 'Normandy',
     neighborhood: 'Giverny',
     category: 'parks_nature',
     status: 'visited',
@@ -1263,7 +1267,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728161-69906',
     name: 'Domaine de Chaumont-sur-Loire',
-    city: 'French Countryside',
+    city: 'Loire Valley',
     neighborhood: 'Chaumont-sur-Loire',
     category: 'museums_art',
     status: 'visited',
@@ -1279,7 +1283,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728282-57507',
     name: 'Hôtel Baudy (Historic Impressionist Inn)',
-    city: 'French Countryside',
+    city: 'Normandy',
     neighborhood: 'Giverny',
     category: 'food_dining',
     status: 'wishlist',
@@ -1295,7 +1299,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'normandy-mont-saint-michel',
     name: 'Mont-Saint-Michel',
-    city: 'French Countryside',
+    city: 'Normandy',
     neighborhood: 'Manche, Normandy',
     category: 'museums_art',
     status: 'wishlist',
@@ -1311,7 +1315,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'normandy-bayeux-museum',
     name: 'Musée de la Tapisserie de Bayeux',
-    city: 'French Countryside',
+    city: 'Normandy',
     neighborhood: 'Centre Guillaume le Conquérant, Bayeux',
     category: 'museums_art',
     status: 'wishlist',
@@ -1327,7 +1331,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728279-31993',
     name: 'Musée des Impressionnismes Giverny',
-    city: 'French Countryside',
+    city: 'Normandy',
     neighborhood: 'Rue Claude Monet',
     category: 'museums_art',
     status: 'wishlist',
@@ -1343,7 +1347,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728258-41131',
     name: 'Café Tulipe Specialty Coffee',
-    city: 'French Countryside',
+    city: 'Provence',
     neighborhood: 'Place du Change, Avignon',
     category: 'matcha_coffee',
     status: 'wishlist',
@@ -1359,7 +1363,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728255-18062',
     name: 'Collection Lambert',
-    city: 'French Countryside',
+    city: 'Provence',
     neighborhood: 'Hôtel de Caumont, Avignon',
     category: 'museums_art',
     status: 'wishlist',
@@ -1375,7 +1379,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728252-63521',
     name: 'Palais des Papes',
-    city: 'French Countryside',
+    city: 'Provence',
     neighborhood: 'Centre Historique, Avignon',
     category: 'museums_art',
     status: 'visited',
@@ -1391,7 +1395,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'spot-1794432728261-55366',
     name: 'Pont Saint-Bénézet (Pont d\'Avignon)',
-    city: 'French Countryside',
+    city: 'Provence',
     neighborhood: 'Rhône Riverfront, Avignon',
     category: 'parks_nature',
     status: 'wishlist',
@@ -1539,7 +1543,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'paris-le-moulin-de-la-galette',
     name: 'Le Moulin de la Galette',
-    city: 'French Countryside',
+    city: 'Normandy',
     neighborhood: '38 Rue de Nesmond, Bayeux, Normandy',
     category: 'food_dining',
     status: 'wishlist',
@@ -1556,7 +1560,7 @@ const SAMPLE_SPOTS = [
   {
     id: 'french-countryside-chateau-amboise',
     name: "Château d'Amboise",
-    city: 'French Countryside',
+    city: 'Loire Valley',
     neighborhood: 'Amboise, Indre-et-Loire',
     category: 'museums_art',
     status: 'wishlist',
@@ -1916,7 +1920,7 @@ const SAMPLE_SPOTS = [
   {
     id: "tuscany-siena-cathedral",
     name: "Siena Cathedral (Duomo di Santa Maria Assunta)",
-    city: "Italian Countryside",
+    city: "Tuscany",
     neighborhood: "Piazza del Duomo, Siena",
     category: "museums_art",
     status: 'wishlist',
@@ -1932,7 +1936,7 @@ const SAMPLE_SPOTS = [
   {
     id: "tuscany-palazzo-pubblico-siena",
     name: "Palazzo Pubblico & Piazza del Campo",
-    city: "Italian Countryside",
+    city: "Tuscany",
     neighborhood: "Piazza del Campo, Siena",
     category: "museums_art",
     status: 'wishlist',
@@ -1948,7 +1952,7 @@ const SAMPLE_SPOTS = [
   {
     id: "tuscany-guinigi-tower",
     name: "Guinigi Tower (Torre Guinigi)",
-    city: "Italian Countryside",
+    city: "Tuscany",
     neighborhood: "Lucca",
     category: "museums_art",
     status: 'wishlist',
@@ -1964,7 +1968,7 @@ const SAMPLE_SPOTS = [
   {
     id: "tuscany-mura-di-lucca",
     name: "Mura di Lucca (Walls of Lucca)",
-    city: "Italian Countryside",
+    city: "Tuscany",
     neighborhood: "Lucca",
     category: "parks_nature",
     status: 'wishlist',
@@ -2029,7 +2033,7 @@ const SAMPLE_SPOTS = [
   {
     id: "italian-riviera-chiesa-san-giorgio",
     name: "Chiesa di San Giorgio",
-    city: "Italian Countryside",
+    city: "Italian Riviera",
     neighborhood: "Salita San Giorgio, Portofino",
     category: "museums_art",
     status: 'wishlist',
@@ -2045,7 +2049,7 @@ const SAMPLE_SPOTS = [
   {
     id: "italian-riviera-castello-brown",
     name: "Castello Brown",
-    city: "Italian Countryside",
+    city: "Italian Riviera",
     neighborhood: "Via alla Penisola, Portofino",
     category: "museums_art",
     status: 'wishlist',
@@ -2061,7 +2065,7 @@ const SAMPLE_SPOTS = [
   {
     id: "italian-riviera-villa-durazzo",
     name: "Villa Durazzo",
-    city: "Italian Countryside",
+    city: "Italian Riviera",
     neighborhood: "Santa Margherita Ligure",
     category: "parks_nature",
     status: 'wishlist',
@@ -2074,11 +2078,11 @@ const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: "images/spots/italian-riviera-villa-durazzo.jpg"
   },
-  // --- FRENCH COUNTRYSIDE (VERSAILLES) ---,
+  // --- VERSAILLES ---,
   {
     id: "paris-palace-of-versailles",
     name: "Palace of Versailles (Ch\u00e2teau de Versailles)",
-    city: "French Countryside",
+    city: "Versailles",
     neighborhood: "Versailles, \u00cele-de-France",
     category: "museums_art",
     status: 'wishlist',
@@ -2094,7 +2098,7 @@ const SAMPLE_SPOTS = [
   {
     id: "paris-petit-trianon",
     name: "Petit Trianon & Queen's Hamlet",
-    city: "French Countryside",
+    city: "Versailles",
     neighborhood: "Versailles, \u00cele-de-France",
     category: "museums_art",
     status: 'wishlist',
@@ -2110,7 +2114,7 @@ const SAMPLE_SPOTS = [
   {
     id: "paris-airelles-versailles",
     name: "Airelles Ch\u00e2teau de Versailles, Le Grand Contr\u00f4le",
-    city: "French Countryside",
+    city: "Versailles",
     neighborhood: "12 Rue de l'Ind\u00e9pendance Am\u00e9ricaine, Versailles",
     category: "hotels_stays",
     status: 'wishlist',
@@ -2144,7 +2148,7 @@ const SAMPLE_SPOTS = [
   {
     id: "french-countryside-gordes",
     name: "Gordes Village & Viewpoint",
-    city: "French Countryside",
+    city: "Provence",
     neighborhood: "Vaucluse, Provence",
     category: "parks_nature",
     status: 'wishlist',
@@ -3139,7 +3143,7 @@ const SAMPLE_SPOTS = [
     hours: '09:00 - 18:00 (Closed Tue)',
     notes: 'Intimate impressionist sanctuary in the western corner of the Tuileries Garden, renowned for its two custom oval galleries housing Claude Monet’s monumental Water Lilies (Nymphéas) cycle.',
     visitDate: '2025-05-18',
-    photoUrl: 'https://images.unsplash.com/photo-1574169208507-84376144848b?auto=format&fit=crop&w=1200&q=80'
+    photoUrl: 'images/spots/paris-musee-de-lorangerie.jpg'
   },
   {
     id: 'sf-ferry-building',
@@ -3155,7 +3159,7 @@ const SAMPLE_SPOTS = [
     hours: '07:00 - 20:00',
     notes: 'Historic 1898 Beaux-Arts waterfront ferry terminal with an iconic 245-foot clock tower. World-class food hall housing Acme Bread, Blue Bottle Coffee, Hog Island Oyster Co., and California artisan purveyors.',
     visitDate: '2025-06-20',
-    photoUrl: 'https://images.unsplash.com/photo-1506146332389-18140dc7b2fb?auto=format&fit=crop&w=1200&q=80'
+    photoUrl: 'images/spots/sf-ferry-building.jpg'
   },
   {
     id: 'rome-colosseum',
@@ -3171,7 +3175,7 @@ const SAMPLE_SPOTS = [
     hours: '09:00 - 19:15',
     notes: 'The monumental Flavian Amphitheatre completed in 80 AD, the largest amphitheater of the ancient world. Grand travertine exterior arches, subterranean hypogeum staging chambers, and tiered arena standing adjacent to the Roman Forum.',
     visitDate: '2025-05-22',
-    photoUrl: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80'
+    photoUrl: 'images/spots/rome-colosseum.jpg'
   },
   {
     id: 'rome-pantheon',
@@ -3187,7 +3191,7 @@ const SAMPLE_SPOTS = [
     hours: '09:00 - 19:00',
     notes: 'Remarkably preserved ancient Roman temple commissioned by Marcus Agrippa and rebuilt by Hadrian c. 126 AD. Famed for its monumental unreinforced concrete dome with a 9-meter open oculus and the tomb of Raphael.',
     visitDate: '2025-05-22',
-    photoUrl: 'https://images.unsplash.com/photo-1555992828-ca4dbe41d294?auto=format&fit=crop&w=1200&q=80'
+    photoUrl: 'images/spots/rome-pantheon.jpg'
   },
   {
     id: 'florence-ponte-vecchio',
@@ -3203,7 +3207,7 @@ const SAMPLE_SPOTS = [
     hours: 'Open 24 hours',
     notes: "Iconic 1345 medieval stone segmental arch bridge spanning the Arno River. Packed with traditional goldsmiths and jewelers, connecting the Uffizi Gallery to Palazzo Pitti beneath Vasari's elevated corridor.",
     visitDate: '2025-05-24',
-    photoUrl: 'https://images.unsplash.com/photo-1543429776-2782fc8e1acd?auto=format&fit=crop&w=1200&q=80'
+    photoUrl: 'images/spots/florence-ponte-vecchio.jpg'
   },
 ];
 
@@ -4725,15 +4729,19 @@ function init() {
     savedActiveCity = 'Orange County';
     localStorage.setItem('flaneur_active_city', 'Orange County');
   }
-  // Auto-migrate legacy 'Giverny', 'Loire Valley', 'Normandy', and 'Avignon' to 'French Countryside'
-  if (savedActiveCity && ['giverny', 'loire valley', 'normandy', 'avignon'].includes(savedActiveCity.toLowerCase())) {
-    savedActiveCity = 'French Countryside';
-    localStorage.setItem('flaneur_active_city', 'French Countryside');
+  // Auto-migrate legacy 'French Countryside', 'Avignon', 'Giverny' to specific regions
+  if (savedActiveCity && ['french countryside', 'avignon'].includes(savedActiveCity.toLowerCase())) {
+    savedActiveCity = 'Provence';
+    localStorage.setItem('flaneur_active_city', 'Provence');
   }
-  // Auto-migrate legacy 'Tuscany' and 'Italian Riviera' to 'Italian Countryside'
-  if (savedActiveCity && ['tuscany', 'italian riviera'].includes(savedActiveCity.toLowerCase())) {
-    savedActiveCity = 'Italian Countryside';
-    localStorage.setItem('flaneur_active_city', 'Italian Countryside');
+  if (savedActiveCity && savedActiveCity.toLowerCase() === 'giverny') {
+    savedActiveCity = 'Normandy';
+    localStorage.setItem('flaneur_active_city', 'Normandy');
+  }
+  // Auto-migrate legacy 'Italian Countryside' to 'Tuscany'
+  if (savedActiveCity && savedActiveCity.toLowerCase() === 'italian countryside') {
+    savedActiveCity = 'Tuscany';
+    localStorage.setItem('flaneur_active_city', 'Tuscany');
   }
 
   if (savedActiveCity && (savedActiveCity === 'all' || cities.some(c => c.toLowerCase() === savedActiveCity.toLowerCase()))) {
@@ -4897,11 +4905,14 @@ async function syncWithSupabase(manual = false) {
     } else if (activeCity.toLowerCase() === 'costa mesa') {
       activeCity = 'Orange County';
       localStorage.setItem('flaneur_active_city', activeCity);
-    } else if (['giverny', 'loire valley', 'normandy', 'avignon'].includes(activeCity.toLowerCase())) {
-      activeCity = 'French Countryside';
+    } else if (['french countryside', 'avignon'].includes(activeCity.toLowerCase())) {
+      activeCity = 'Provence';
       localStorage.setItem('flaneur_active_city', activeCity);
-    } else if (['tuscany', 'italian riviera'].includes(activeCity.toLowerCase())) {
-      activeCity = 'Italian Countryside';
+    } else if (activeCity.toLowerCase() === 'giverny') {
+      activeCity = 'Normandy';
+      localStorage.setItem('flaneur_active_city', activeCity);
+    } else if (activeCity.toLowerCase() === 'italian countryside') {
+      activeCity = 'Tuscany';
       localStorage.setItem('flaneur_active_city', activeCity);
     } else if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
       // If activeCity is no longer in Field Guide's cities list, fallback safely to Orange County

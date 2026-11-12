@@ -120,17 +120,38 @@ assert.strictEqual(ocMeta.typeLabel, 'County');
 assert.strictEqual(ocMeta.code, 'OC');
 console.log('✓ Orange County classified as County (OC)');
 
-const frenchMeta = getDestinationMeta('French Countryside');
-assert.strictEqual(frenchMeta.type, 'area');
-assert.strictEqual(frenchMeta.typeLabel, 'Area');
-assert.strictEqual(frenchMeta.code, 'FRA');
-console.log('✓ French Countryside classified as Area (FRA)');
+const provenceMeta = getDestinationMeta('Provence');
+assert.strictEqual(provenceMeta.type, 'area');
+assert.strictEqual(provenceMeta.typeLabel, 'Area');
+assert.strictEqual(provenceMeta.code, 'PRV');
+assert.strictEqual(provenceMeta.country, 'France');
+console.log('✓ Provence classified as Area (PRV)');
 
-const italianCountryMeta = getDestinationMeta('Italian Countryside');
-assert.strictEqual(italianCountryMeta.type, 'area');
-assert.strictEqual(italianCountryMeta.typeLabel, 'Area');
-assert.strictEqual(italianCountryMeta.code, 'ITA');
-console.log('✓ Italian Countryside classified as Area (ITA)');
+const tuscanyMeta = getDestinationMeta('Tuscany');
+assert.strictEqual(tuscanyMeta.type, 'area');
+assert.strictEqual(tuscanyMeta.typeLabel, 'Area');
+assert.strictEqual(tuscanyMeta.code, 'TUS');
+assert.strictEqual(tuscanyMeta.country, 'Italy');
+console.log('✓ Tuscany classified as Area (TUS)');
+
+const rivieraMeta = getDestinationMeta('Italian Riviera');
+assert.strictEqual(rivieraMeta.type, 'area');
+assert.strictEqual(rivieraMeta.country, 'Italy');
+console.log('✓ Italian Riviera classified as Area');
+
+const normandyMeta = getDestinationMeta('Normandy');
+assert.strictEqual(normandyMeta.type, 'area');
+assert.strictEqual(normandyMeta.country, 'France');
+console.log('✓ Normandy classified as Area');
+
+const loireMeta = getDestinationMeta('Loire Valley');
+assert.strictEqual(loireMeta.type, 'area');
+assert.strictEqual(loireMeta.country, 'France');
+console.log('✓ Loire Valley classified as Area');
+
+const versaillesMeta = getDestinationMeta('Versailles');
+assert.strictEqual(versaillesMeta.country, 'France');
+console.log('✓ Versailles classified as City');
 
 const parisMeta = getDestinationMeta('Paris');
 assert.strictEqual(parisMeta.type, 'city');
@@ -190,10 +211,25 @@ DEFAULT_CITIES.forEach(c => {
   assert(meta.country !== 'USA' && meta.country !== 'United States', `${c} should specify state or country, not generic USA`);
   assert(div !== 'USA' && div !== 'United States', `${c} division should specify state or country, not generic USA`);
 });
+
+// Verify French and Italian Countryside are replaced by specific regions
+assert(!DEFAULT_CITIES.includes('French Countryside'), 'French Countryside should not be in DEFAULT_CITIES');
+assert(!DEFAULT_CITIES.includes('Italian Countryside'), 'Italian Countryside should not be in DEFAULT_CITIES');
+assert(DEFAULT_CITIES.includes('Provence'), 'Provence should be in DEFAULT_CITIES');
+assert(DEFAULT_CITIES.includes('Tuscany'), 'Tuscany should be in DEFAULT_CITIES');
+assert(DEFAULT_CITIES.includes('Italian Riviera'), 'Italian Riviera should be in DEFAULT_CITIES');
+assert(DEFAULT_CITIES.includes('Loire Valley'), 'Loire Valley should be in DEFAULT_CITIES');
+assert(DEFAULT_CITIES.includes('Normandy'), 'Normandy should be in DEFAULT_CITIES');
+assert(DEFAULT_CITIES.includes('Versailles'), 'Versailles should be in DEFAULT_CITIES');
 console.log('✓ Atlas divisions by State (Americas) and Country verified for all destinations');
 
 console.log('Testing newly added destinations & spots...');
 import { SAMPLE_SPOTS } from '../js/sample-data.js';
+
+// Verify no spots remain in French or Italian Countryside
+assert(!SAMPLE_SPOTS.some(s => s.city.toLowerCase() === 'french countryside'), 'No spots should remain in French Countryside');
+assert(!SAMPLE_SPOTS.some(s => s.city.toLowerCase() === 'italian countryside'), 'No spots should remain in Italian Countryside');
+console.log('✓ All French and Italian countryside spots migrated to specific regions (Provence, Tuscany, etc.)');
 
 const expectedNewSpots = [
   { name: 'Taos', city: 'Santa Fe' },

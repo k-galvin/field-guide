@@ -6,13 +6,13 @@ const CITIES_KEY = 'flaneur_cities_v1';
 export const DEFAULT_CITIES = [
   'Amsterdam', 'Banff', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
   'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
-  'English Countryside', 'Florence', 'French Countryside', 'Grand Canyon', 'Helsinki', 'Huntington Beach',
-  'Iceland', 'Irish Countryside', 'Italian Countryside', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
-  'Lisbon', 'London', 'Los Angeles', 'Marin', 'Melbourne', 'Mexico City',
-  'Monterey', 'Montreal', 'Newport Beach', 'New York', 'Nice', 'Ojai', 'Orange', 'Orange County',
-  'Oslo', 'Palm Springs', 'Paris', 'Phoenix', 'Porto', 'Portland', 'Prague', 'Quebec City', 'Rome',
+  'English Countryside', 'Florence', 'Grand Canyon', 'Helsinki', 'Huntington Beach',
+  'Iceland', 'Irish Countryside', 'Italian Riviera', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
+  'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Marin', 'Melbourne', 'Mexico City',
+  'Monterey', 'Montreal', 'Newport Beach', 'New York', 'Nice', 'Normandy', 'Ojai', 'Orange', 'Orange County',
+  'Oslo', 'Palm Springs', 'Paris', 'Phoenix', 'Porto', 'Portland', 'Prague', 'Provence', 'Quebec City', 'Rome',
   'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
-  'Seattle', 'Sedona', 'South Bay Area', 'Stockholm', 'Sydney', 'Tokyo', 'Vancouver', 'Venice', 'Vienna'
+  'Seattle', 'Sedona', 'South Bay Area', 'Stockholm', 'Sydney', 'Tokyo', 'Tuscany', 'Vancouver', 'Venice', 'Versailles', 'Vienna'
 ];
 
 export const KNOWN_CITY_META = {
@@ -77,18 +77,22 @@ export const KNOWN_CITY_META = {
 
   // Europe - France
   'paris': { code: 'PAR', country: 'France', region: 'europe', type: 'city' },
-  'french countryside': { code: 'FRA', country: 'France', region: 'europe', type: 'area' },
   'nice': { code: 'NCE', country: 'France', region: 'europe', type: 'city' },
   'lyon': { code: 'LYS', country: 'France', region: 'europe', type: 'city' },
+  'provence': { code: 'PRV', country: 'France', region: 'europe', type: 'area' },
+  'loire valley': { code: 'LOI', country: 'France', region: 'europe', type: 'area' },
+  'normandy': { code: 'NRM', country: 'France', region: 'europe', type: 'area' },
+  'versailles': { code: 'VER', country: 'France', region: 'europe', type: 'city' },
+  'french countryside': { code: 'FRA', country: 'France', region: 'europe', type: 'area' },
 
   // Europe - Italy
   'rome': { code: 'ROM', country: 'Italy', region: 'europe', type: 'city' },
   'florence': { code: 'FLR', country: 'Italy', region: 'europe', type: 'city' },
   'venice': { code: 'VCE', country: 'Italy', region: 'europe', type: 'city' },
   'milan': { code: 'MIL', country: 'Italy', region: 'europe', type: 'city' },
-  'italian countryside': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
-  'italian riviera': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
   'tuscany': { code: 'TUS', country: 'Italy', region: 'europe', type: 'area' },
+  'italian riviera': { code: 'RIV', country: 'Italy', region: 'europe', type: 'area' },
+  'italian countryside': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
 
   // Europe - United Kingdom
   'london': { code: 'LON', country: 'United Kingdom', region: 'europe', type: 'city' },
