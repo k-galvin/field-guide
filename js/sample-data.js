@@ -942,20 +942,20 @@ export const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: 'images/spots/english-countryside-lamb-house.jpg'
   },
-  // --- PARIS ---
+  // --- FRENCH COUNTRYSIDE (BAYEUX) ---
   {
     id: 'paris-le-moulin-de-la-galette',
     name: 'Le Moulin de la Galette',
-    city: 'Paris',
-    neighborhood: 'Montmartre, 18e Arrondissement',
+    city: 'French Countryside',
+    neighborhood: '38 Rue de Nesmond, Bayeux, Normandy',
     category: 'food_wine',
     status: 'wishlist',
     favorite: true,
-    lat: 48.887651,
-    lng: 2.336297,
-    daysOpen: 'Daily',
-    hours: '12:00 - 23:00',
-    notes: "Historic 17th-century wooden windmill and celebrated Montmartre guinguette immortalized in Renoir's 1876 masterpiece and paintings by Van Gogh. Now an atmospheric bistro on Rue Lepic serving refined seasonal French cuisine and wine in a romantic garden courtyard.",
+    lat: 49.274073,
+    lng: -0.700740,
+    daysOpen: 'Tue - Sun',
+    hours: 'Tue - Sun 12:00 - 14:00, 19:00 - 21:30 (Closed Mon)',
+    notes: 'Charming crêperie and restaurant housed in a historic 17th-century converted watermill with a functioning paddle wheel along the Aure River in Bayeux, just steps from the Bayeux Tapestry Museum. Celebrated for its riverside terrace, traditional Norman buckwheat galettes, sweet crêpes, and artisanal local cider.',
     visitDate: '',
     photoUrl: 'images/spots/paris-le-moulin-de-la-galette.jpg'
   },
@@ -1481,12 +1481,12 @@ export const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: "images/spots/italian-riviera-villa-durazzo.jpg"
   },
-  // --- PARIS ---,
+  // --- FRENCH COUNTRYSIDE (VERSAILLES) ---,
   {
     id: "paris-palace-of-versailles",
     name: "Palace of Versailles (Ch\u00e2teau de Versailles)",
-    city: "Paris",
-    neighborhood: "Versailles",
+    city: "French Countryside",
+    neighborhood: "Versailles, \u00cele-de-France",
     category: "museums_art",
     status: 'wishlist',
     favorite: true,
@@ -1501,8 +1501,8 @@ export const SAMPLE_SPOTS = [
   {
     id: "paris-petit-trianon",
     name: "Petit Trianon & Queen's Hamlet",
-    city: "Paris",
-    neighborhood: "Versailles",
+    city: "French Countryside",
+    neighborhood: "Versailles, \u00cele-de-France",
     category: "museums_art",
     status: 'wishlist',
     favorite: true,
@@ -1517,7 +1517,7 @@ export const SAMPLE_SPOTS = [
   {
     id: "paris-airelles-versailles",
     name: "Airelles Ch\u00e2teau de Versailles, Le Grand Contr\u00f4le",
-    city: "Paris",
+    city: "French Countryside",
     neighborhood: "12 Rue de l'Ind\u00e9pendance Am\u00e9ricaine, Versailles",
     category: "hotels_stays",
     status: 'wishlist',
@@ -1526,10 +1526,11 @@ export const SAMPLE_SPOTS = [
     lng: 2.12285,
     daysOpen: "Daily",
     hours: "24 hours",
-    notes: "Ultra-luxury 14-key hotel occupying Jules Hardouin-Mansart\u2019s 1681 building within the gates of the Palace of Versailles, featuring Alain Ducasse dining and private after-hours palace access.",
+    notes: "Ultra-luxury 14-key hotel occupying Jules Hardouin-Mansart\u2019s 1681 building within the gates of the Palace of Versailles, featuring Alain Ducasse dining, restored 18th-century salons, and private after-hours access to the Hall of Mirrors.",
     visitDate: '',
     photoUrl: "images/spots/paris-airelles-versailles.jpg"
   },
+  // --- PARIS ---,
   {
     id: "paris-tuileries-garden",
     name: "Tuileries Garden (Jardin des Tuileries)",
