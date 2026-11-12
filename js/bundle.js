@@ -1412,6 +1412,106 @@ const SAMPLE_SPOTS = [
     notes: "Historic 17th-century wooden windmill and celebrated Montmartre guinguette immortalized in Renoir's 1876 masterpiece and paintings by Van Gogh. Now an atmospheric bistro on Rue Lepic serving refined seasonal French cuisine and wine in a romantic garden courtyard.",
     visitDate: '',
     photoUrl: 'images/spots/paris-le-moulin-de-la-galette.jpg'
+  },
+  // --- FRENCH COUNTRYSIDE (ADDITIONAL) ---
+  {
+    id: 'french-countryside-chateau-amboise',
+    name: "Château d'Amboise",
+    city: 'French Countryside',
+    neighborhood: 'Amboise, Indre-et-Loire',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 47.413629,
+    lng: 0.985972,
+    daysOpen: 'Daily',
+    hours: '09:00 - 18:30',
+    notes: 'Spectacular royal château perched high on a promontory overlooking the Loire River. Former royal residence of Charles VIII and Francis I, and final resting place of Leonardo da Vinci inside the Chapel of Saint-Hubert.',
+    visitDate: '',
+    photoUrl: 'images/spots/french-countryside-chateau-amboise.jpg'
+  },
+  // --- ENGLISH COUNTRYSIDE (ADDITIONAL) ---
+  {
+    id: 'english-countryside-hundred-acre-wood',
+    name: 'Hundred Acre Wood (Ashdown Forest)',
+    city: 'English Countryside',
+    neighborhood: 'Ashdown Forest, East Sussex',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 51.076162,
+    lng: 0.077580,
+    daysOpen: 'Daily',
+    hours: 'Dawn to dusk',
+    notes: 'The enchanting real-life setting that inspired A.A. Milne’s Winnie-the-Pooh stories. Nestled within Ashdown Forest’s ancient heathland, visitors can stroll to the original wooden Poohsticks Bridge, Galleon’s Lap, and Pooh Corner in nearby Hartfield.',
+    visitDate: '',
+    photoUrl: 'images/spots/english-countryside-hundred-acre-wood.jpg'
+  },
+  // --- AMSTERDAM ---
+  {
+    id: 'amsterdam-winkel-43',
+    name: 'Winkel 43',
+    city: 'Amsterdam',
+    neighborhood: 'Jordaan / Noordermarkt',
+    category: 'pastry_bakery',
+    status: 'wishlist',
+    favorite: true,
+    lat: 52.379084,
+    lng: 4.886234,
+    daysOpen: 'Daily',
+    hours: '08:00 - 01:00 (Sun/Mon from 09:00)',
+    notes: 'World-renowned Jordaan corner café and Dutch institution celebrated for baking Amsterdam’s finest deep-dish apple pie (appeltaart), served warm with cinnamon spiced apples and billowing homemade whipped cream (slagroom).',
+    visitDate: '',
+    photoUrl: 'images/spots/amsterdam-winkel-43.jpg'
+  },
+  {
+    id: 'amsterdam-van-gogh-museum',
+    name: 'Van Gogh Museum',
+    city: 'Amsterdam',
+    neighborhood: 'Museumplein',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 52.358367,
+    lng: 4.881090,
+    daysOpen: 'Daily',
+    hours: '09:00 - 18:00',
+    notes: 'Dedicated to the life and extraordinary works of Vincent van Gogh. Houses the world’s largest collection of his paintings, drawings, and letters, including Sunflowers, The Bedroom, Almond Blossom, and iconic self-portraits.',
+    visitDate: '',
+    photoUrl: 'images/spots/amsterdam-van-gogh-museum.jpg'
+  },
+  // --- ICELAND ---
+  {
+    id: 'iceland-280-bakari',
+    name: '280 Bakarí',
+    city: 'Iceland',
+    neighborhood: 'Klapparstígur, Downtown Reykjavík',
+    category: 'pastry_bakery',
+    status: 'wishlist',
+    favorite: true,
+    lat: 64.144800,
+    lng: -21.929736,
+    daysOpen: 'Wed - Sun',
+    hours: '08:00 - 16:00 (Closed Mon-Tue)',
+    notes: 'Artisanal downtown Reykjavík sourdough bakery named after the 280°C temperature at which their signature loaves are baked. Celebrated for open-view ovens, cardamom buns, Swedish gifflar, twice-baked almond croissants, and specialty filter coffee.',
+    visitDate: '',
+    photoUrl: 'images/spots/iceland-280-bakari.jpg'
+  },
+  {
+    id: 'iceland-sky-lagoon',
+    name: 'Sky Lagoon',
+    city: 'Iceland',
+    neighborhood: 'Kársnes Harbour, Kópavogur',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 64.116465,
+    lng: -21.946435,
+    daysOpen: 'Daily',
+    hours: 'Daily 10:00 - 22:00',
+    notes: 'Geothermal oceanfront sanctuary with a dramatic 70-meter infinity edge blending directly into the North Atlantic. Features traditional turf-house architecture, a swim-up bar, and the signature 7-Step Ritual with panoramic ocean-view sauna.',
+    visitDate: '',
+    photoUrl: 'images/spots/iceland-sky-lagoon.jpg'
   }
 ];
 
