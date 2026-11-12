@@ -11,12 +11,12 @@ const DEFAULT_CITIES = [
   'Amsterdam', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
   'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
   'English Countryside', 'Florence', 'French Countryside', 'Helsinki', 'Huntington Beach',
-  'Iceland', 'Irish Countryside', 'Italian Riviera', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
+  'Iceland', 'Irish Countryside', 'Italian Countryside', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
   'Lisbon', 'London', 'Los Angeles', 'Melbourne', 'Mexico City',
   'Montreal', 'Newport Beach', 'New York', 'Nice', 'Orange', 'Orange County',
   'Oslo', 'Paris', 'Phoenix', 'Porto', 'Portland', 'Prague', 'Quebec City', 'Rome',
   'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
-  'Seattle', 'Stockholm', 'Sydney', 'Tokyo', 'Tuscany', 'Vancouver', 'Venice', 'Vienna'
+  'Seattle', 'Stockholm', 'Sydney', 'Tokyo', 'Vancouver', 'Venice', 'Vienna'
 ];
 
 const KNOWN_CITY_META = {
@@ -25,7 +25,9 @@ const KNOWN_CITY_META = {
   'english countryside': { code: 'ENG', country: 'United Kingdom', region: 'europe', type: 'area' },
   'scottish countryside': { code: 'SCO', country: 'Scotland, UK', region: 'europe', type: 'area' },
   'irish countryside': { code: 'IRE', country: 'Ireland', region: 'europe', type: 'area' },
-  'italian riviera': { code: 'ITR', country: 'Italy', region: 'europe', type: 'area' },
+  'italian countryside': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
+  'italian riviera': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
+  'tuscany': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
   'iceland': { code: 'ICE', country: 'Iceland', region: 'europe', type: 'area' },
   'boston': { code: 'BOS', country: 'Massachusetts, USA', region: 'americas', type: 'city' },
   'barcelona': { code: 'BCN', country: 'Spain', region: 'europe', type: 'city' },
@@ -178,7 +180,7 @@ function detectDestinationType(name) {
   if (/\bcounty\b/i.test(lower)) {
     return 'county';
   }
-  if (/\b(valley|area|region|coast|desert|islands?|hills|district|cotswolds)\b/i.test(lower)) {
+  if (/\b(valley|area|region|coast|desert|islands?|hills|district|cotswolds|countryside)\b/i.test(lower)) {
     return 'area';
   }
   return 'city';
@@ -1774,11 +1776,11 @@ const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: "images/spots/florence-galleria-accademia.jpg"
   },
-  // --- TUSCANY ---,
+  // --- ITALIAN COUNTRYSIDE ---,
   {
     id: "tuscany-siena-cathedral",
     name: "Siena Cathedral (Duomo di Santa Maria Assunta)",
-    city: "Tuscany",
+    city: "Italian Countryside",
     neighborhood: "Piazza del Duomo, Siena",
     category: "museums_art",
     status: 'wishlist',
@@ -1794,7 +1796,7 @@ const SAMPLE_SPOTS = [
   {
     id: "tuscany-palazzo-pubblico-siena",
     name: "Palazzo Pubblico & Piazza del Campo",
-    city: "Tuscany",
+    city: "Italian Countryside",
     neighborhood: "Piazza del Campo, Siena",
     category: "museums_art",
     status: 'wishlist',
@@ -1810,7 +1812,7 @@ const SAMPLE_SPOTS = [
   {
     id: "tuscany-guinigi-tower",
     name: "Guinigi Tower (Torre Guinigi)",
-    city: "Tuscany",
+    city: "Italian Countryside",
     neighborhood: "Lucca",
     category: "museums_art",
     status: 'wishlist',
@@ -1826,7 +1828,7 @@ const SAMPLE_SPOTS = [
   {
     id: "tuscany-mura-di-lucca",
     name: "Mura di Lucca (Walls of Lucca)",
-    city: "Tuscany",
+    city: "Italian Countryside",
     neighborhood: "Lucca",
     category: "parks_nature",
     status: 'wishlist',
@@ -1888,11 +1890,10 @@ const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: "images/spots/venice-hotel-danieli.jpg"
   },
-  // --- ITALIAN RIVIERA ---,
   {
     id: "italian-riviera-chiesa-san-giorgio",
     name: "Chiesa di San Giorgio",
-    city: "Italian Riviera",
+    city: "Italian Countryside",
     neighborhood: "Salita San Giorgio, Portofino",
     category: "museums_art",
     status: 'wishlist',
@@ -1908,7 +1909,7 @@ const SAMPLE_SPOTS = [
   {
     id: "italian-riviera-castello-brown",
     name: "Castello Brown",
-    city: "Italian Riviera",
+    city: "Italian Countryside",
     neighborhood: "Via alla Penisola, Portofino",
     category: "museums_art",
     status: 'wishlist',
@@ -1924,7 +1925,7 @@ const SAMPLE_SPOTS = [
   {
     id: "italian-riviera-villa-durazzo",
     name: "Villa Durazzo",
-    city: "Italian Riviera",
+    city: "Italian Countryside",
     neighborhood: "Santa Margherita Ligure",
     category: "parks_nature",
     status: 'wishlist',
@@ -3828,6 +3829,11 @@ function init() {
     savedActiveCity = 'French Countryside';
     localStorage.setItem('flaneur_active_city', 'French Countryside');
   }
+  // Auto-migrate legacy 'Tuscany' and 'Italian Riviera' to 'Italian Countryside'
+  if (savedActiveCity && ['tuscany', 'italian riviera'].includes(savedActiveCity.toLowerCase())) {
+    savedActiveCity = 'Italian Countryside';
+    localStorage.setItem('flaneur_active_city', 'Italian Countryside');
+  }
 
   if (savedActiveCity && (savedActiveCity === 'all' || cities.some(c => c.toLowerCase() === savedActiveCity.toLowerCase()))) {
     activeCity = savedActiveCity;
@@ -3992,6 +3998,9 @@ async function syncWithSupabase(manual = false) {
       localStorage.setItem('flaneur_active_city', activeCity);
     } else if (['giverny', 'loire valley', 'normandy', 'avignon'].includes(activeCity.toLowerCase())) {
       activeCity = 'French Countryside';
+      localStorage.setItem('flaneur_active_city', activeCity);
+    } else if (['tuscany', 'italian riviera'].includes(activeCity.toLowerCase())) {
+      activeCity = 'Italian Countryside';
       localStorage.setItem('flaneur_active_city', activeCity);
     } else if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
       // If activeCity is no longer in Field Guide's cities list, fallback safely to Orange County

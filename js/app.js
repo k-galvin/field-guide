@@ -251,6 +251,11 @@ function init() {
     savedActiveCity = 'French Countryside';
     localStorage.setItem('flaneur_active_city', 'French Countryside');
   }
+  // Auto-migrate legacy 'Tuscany' and 'Italian Riviera' to 'Italian Countryside'
+  if (savedActiveCity && ['tuscany', 'italian riviera'].includes(savedActiveCity.toLowerCase())) {
+    savedActiveCity = 'Italian Countryside';
+    localStorage.setItem('flaneur_active_city', 'Italian Countryside');
+  }
 
   if (savedActiveCity && (savedActiveCity === 'all' || cities.some(c => c.toLowerCase() === savedActiveCity.toLowerCase()))) {
     activeCity = savedActiveCity;
@@ -415,6 +420,9 @@ async function syncWithSupabase(manual = false) {
       localStorage.setItem('flaneur_active_city', activeCity);
     } else if (['giverny', 'loire valley', 'normandy', 'avignon'].includes(activeCity.toLowerCase())) {
       activeCity = 'French Countryside';
+      localStorage.setItem('flaneur_active_city', activeCity);
+    } else if (['tuscany', 'italian riviera'].includes(activeCity.toLowerCase())) {
+      activeCity = 'Italian Countryside';
       localStorage.setItem('flaneur_active_city', activeCity);
     } else if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
       // If activeCity is no longer in Field Guide's cities list, fallback safely to Orange County

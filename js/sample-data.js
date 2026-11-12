@@ -1319,11 +1319,11 @@ export const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: "images/spots/florence-galleria-accademia.jpg"
   },
-  // --- TUSCANY ---,
+  // --- ITALIAN COUNTRYSIDE ---,
   {
     id: "tuscany-siena-cathedral",
     name: "Siena Cathedral (Duomo di Santa Maria Assunta)",
-    city: "Tuscany",
+    city: "Italian Countryside",
     neighborhood: "Piazza del Duomo, Siena",
     category: "museums_art",
     status: 'wishlist',
@@ -1339,7 +1339,7 @@ export const SAMPLE_SPOTS = [
   {
     id: "tuscany-palazzo-pubblico-siena",
     name: "Palazzo Pubblico & Piazza del Campo",
-    city: "Tuscany",
+    city: "Italian Countryside",
     neighborhood: "Piazza del Campo, Siena",
     category: "museums_art",
     status: 'wishlist',
@@ -1355,7 +1355,7 @@ export const SAMPLE_SPOTS = [
   {
     id: "tuscany-guinigi-tower",
     name: "Guinigi Tower (Torre Guinigi)",
-    city: "Tuscany",
+    city: "Italian Countryside",
     neighborhood: "Lucca",
     category: "museums_art",
     status: 'wishlist',
@@ -1371,7 +1371,7 @@ export const SAMPLE_SPOTS = [
   {
     id: "tuscany-mura-di-lucca",
     name: "Mura di Lucca (Walls of Lucca)",
-    city: "Tuscany",
+    city: "Italian Countryside",
     neighborhood: "Lucca",
     category: "parks_nature",
     status: 'wishlist',
@@ -1433,11 +1433,10 @@ export const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: "images/spots/venice-hotel-danieli.jpg"
   },
-  // --- ITALIAN RIVIERA ---,
   {
     id: "italian-riviera-chiesa-san-giorgio",
     name: "Chiesa di San Giorgio",
-    city: "Italian Riviera",
+    city: "Italian Countryside",
     neighborhood: "Salita San Giorgio, Portofino",
     category: "museums_art",
     status: 'wishlist',
@@ -1453,7 +1452,7 @@ export const SAMPLE_SPOTS = [
   {
     id: "italian-riviera-castello-brown",
     name: "Castello Brown",
-    city: "Italian Riviera",
+    city: "Italian Countryside",
     neighborhood: "Via alla Penisola, Portofino",
     category: "museums_art",
     status: 'wishlist',
@@ -1469,7 +1468,7 @@ export const SAMPLE_SPOTS = [
   {
     id: "italian-riviera-villa-durazzo",
     name: "Villa Durazzo",
-    city: "Italian Riviera",
+    city: "Italian Countryside",
     neighborhood: "Santa Margherita Ligure",
     category: "parks_nature",
     status: 'wishlist',

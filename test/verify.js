@@ -107,6 +107,12 @@ assert.strictEqual(frenchMeta.typeLabel, 'Area');
 assert.strictEqual(frenchMeta.code, 'FRA');
 console.log('✓ French Countryside classified as Area (FRA)');
 
+const italianCountryMeta = getDestinationMeta('Italian Countryside');
+assert.strictEqual(italianCountryMeta.type, 'area');
+assert.strictEqual(italianCountryMeta.typeLabel, 'Area');
+assert.strictEqual(italianCountryMeta.code, 'ITA');
+console.log('✓ Italian Countryside classified as Area (ITA)');
+
 const parisMeta = getDestinationMeta('Paris');
 assert.strictEqual(parisMeta.type, 'city');
 assert.strictEqual(parisMeta.typeLabel, 'City');
