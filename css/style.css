@@ -569,6 +569,19 @@ html, body {
   box-shadow: 0 0 0 1px var(--accent-blue), 0 8px 24px rgba(0, 71, 171, 0.12);
 }
 
+@keyframes spotCardUpdatedPulse {
+  0% {
+    box-shadow: 0 0 0 2px var(--accent-blue), 0 8px 24px rgba(0, 71, 171, 0.25);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+.spot-card.spot-card-updated {
+  animation: spotCardUpdatedPulse 1.4s ease-out;
+}
+
 .card-media {
   position: relative;
   width: 100%;

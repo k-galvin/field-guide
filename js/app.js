@@ -474,7 +474,7 @@ async function initCloudSync() {
     }
 
     saveStoredSpots(spots);
-    applyFiltersAndRender();
+    applyFiltersAndRender(false);
     setTimeout(() => updateSyncStatus('synced', `synced (${spots.length})`), 400);
   });
 }
@@ -896,7 +896,7 @@ function renderCategoryDropdown() {
 /**
  * Filter & Render Pipeline (with progressive loading to prevent freeze on All Destinations)
  */
-function applyFiltersAndRender(resetPagination = true) {
+function applyFiltersAndRender(resetPagination = true, targetSpotId = null) {
   // Update counts across active city
   const cityFiltered = spots.filter(s => {
     if (activeCity === 'all') return true;
@@ -942,7 +942,12 @@ function applyFiltersAndRender(resetPagination = true) {
 
   currentFilteredSpotsCache = filtered;
 
-  if (resetPagination) {
+  if (targetSpotId) {
+    const targetIdx = filtered.findIndex(s => s.id === targetSpotId);
+    if (targetIdx !== -1 && targetIdx >= currentVisibleSpotsCount) {
+      currentVisibleSpotsCount = Math.ceil((targetIdx + 1) / SPOTS_PAGE_SIZE) * SPOTS_PAGE_SIZE;
+    }
+  } else if (resetPagination) {
     currentVisibleSpotsCount = SPOTS_PAGE_SIZE;
   }
 
@@ -1001,8 +1006,8 @@ function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
     }
   });
 
-  // Reconcile and append cards in deterministic order
-  spotsToRender.forEach(spot => {
+  // Reconcile and place cards in deterministic order without tearing down DOM layout
+  spotsToRender.forEach((spot, idx) => {
     const cat = CATEGORY_MAP.get(spot.category) || { label: 'spot', code: '·', iconSvg: '' };
     const navUrl = generateSingleNavigationUrl(spot.lat, spot.lng);
     const distBadge = spot.distanceKm !== undefined
@@ -1019,8 +1024,11 @@ function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
     let card = existingCards.get(spot.id);
 
     if (card && card.dataset.fingerprint === fingerprint) {
-      // Content has not changed at all — just maintain sequence in DOM without resetting images or layout
-      spotsListContainer.appendChild(card);
+      // Content has not changed — ensure it is at the correct position in DOM without re-rendering
+      const currentChild = spotsListContainer.children[idx];
+      if (currentChild !== card) {
+        spotsListContainer.insertBefore(card, currentChild || null);
+      }
       return;
     }
 
@@ -1147,7 +1155,11 @@ function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
       }
     }
 
-    spotsListContainer.appendChild(card);
+    // Place at the correct position in DOM without tearing down already positioned siblings
+    const currentChild = spotsListContainer.children[idx];
+    if (currentChild !== card) {
+      spotsListContainer.insertBefore(card, currentChild || null);
+    }
   });
 
   // Remove existing loader or end indicator
@@ -1223,12 +1235,21 @@ function setupProgressiveIntersectionObserver(sentinelEl) {
 function toggleSpotStatus(id) {
   const target = spots.find(s => s.id === id);
   if (!target) return;
+
+  const feed = document.getElementById('spot-feed') || document.querySelector('.spot-feed');
+  const savedScrollTop = feed ? feed.scrollTop : 0;
+
   target.status = target.status === 'visited' ? 'wishlist' : 'visited';
   if (target.status === 'visited' && !target.visitDate) {
     target.visitDate = new Date().toISOString().slice(0, 10);
   }
   saveStoredSpots(spots);
-  applyFiltersAndRender();
+  applyFiltersAndRender(false, id);
+
+  if (feed) {
+    feed.scrollTop = savedScrollTop;
+  }
+
   updateSyncStatus('syncing', 'syncing...');
   upsertRemoteSpot(target).then(() => updateSyncStatus('synced', 'synced'));
 }
@@ -1239,9 +1260,18 @@ function toggleSpotStatus(id) {
 function toggleFavorite(id) {
   const target = spots.find(s => s.id === id);
   if (!target) return;
+
+  const feed = document.getElementById('spot-feed') || document.querySelector('.spot-feed');
+  const savedScrollTop = feed ? feed.scrollTop : 0;
+
   target.favorite = !target.favorite;
   saveStoredSpots(spots);
-  applyFiltersAndRender();
+  applyFiltersAndRender(false, id);
+
+  if (feed) {
+    feed.scrollTop = savedScrollTop;
+  }
+
   updateSyncStatus('syncing', 'syncing...');
   upsertRemoteSpot(target).then(() => updateSyncStatus('synced', 'synced'));
 }
@@ -1255,6 +1285,28 @@ function deleteSpot(id) {
   const ok = window.confirm(`Remove "${target.name.toLowerCase()}" from your guide?`);
   if (!ok) return;
 
+  const feed = document.getElementById('spot-feed') || document.querySelector('.spot-feed');
+  const savedScrollTop = feed ? feed.scrollTop : 0;
+
+  // Find adjacent spot in DOM before removing so the feed stays right on that spot
+  const targetCard = spotsListContainer ? spotsListContainer.querySelector(`.spot-card[data-id="${id}"]`) : null;
+  let anchorId = null;
+  if (targetCard) {
+    const neighbor = (targetCard.nextElementSibling && targetCard.nextElementSibling.classList.contains('spot-card'))
+      ? targetCard.nextElementSibling
+      : (targetCard.previousElementSibling && targetCard.previousElementSibling.classList.contains('spot-card'))
+        ? targetCard.previousElementSibling
+        : null;
+    if (neighbor) {
+      anchorId = neighbor.dataset.id;
+    }
+  }
+
+  // Prevent activeElement removal from forcing a container scroll jump to top
+  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
+
   spots = spots.filter(s => s.id !== id);
   saveStoredSpots(spots);
 
@@ -1263,7 +1315,19 @@ function deleteSpot(id) {
     editingSpotId = null;
   }
 
-  applyFiltersAndRender();
+  applyFiltersAndRender(false, anchorId);
+
+  // Restore scroll position
+  if (feed) {
+    feed.scrollTop = savedScrollTop;
+  }
+  if (anchorId) {
+    const anchorCard = spotsListContainer ? spotsListContainer.querySelector(`.spot-card[data-id="${anchorId}"]`) : null;
+    if (anchorCard) {
+      anchorCard.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+    }
+  }
+
   updateSyncStatus('syncing', 'syncing...');
   deleteRemoteSpot(id).then(() => updateSyncStatus('synced', 'synced'));
 }
@@ -1399,6 +1463,9 @@ function handleSpotFormSubmit(e) {
     return;
   }
 
+  const isEditing = !!editingSpotId;
+  const targetId = editingSpotId;
+
   if (editingSpotId) {
     const idx = spots.findIndex(s => s.id === editingSpotId);
     if (idx !== -1) {
@@ -1436,16 +1503,33 @@ function handleSpotFormSubmit(e) {
     spots.unshift(newSpot);
   }
 
-  const spotToSync = editingSpotId ? spots.find(s => s.id === editingSpotId) : spots[0];
+  const spotToSync = isEditing ? spots.find(s => s.id === targetId) : spots[0];
   saveStoredSpots(spots);
   closeModal(modalSpot);
 
   // If new spot was added to a different city than currently viewing, switch to that city
   if (city && activeCity !== 'all' && activeCity.toLowerCase() !== city.toLowerCase()) {
     setActiveCity(city);
-  } else {
+  } else if (!isEditing) {
     centerCityOnMap(activeCity, spots);
-    applyFiltersAndRender();
+    applyFiltersAndRender(true);
+  } else {
+    // When editing an existing spot, stay on the spot!
+    const feed = document.getElementById('spot-feed') || document.querySelector('.spot-feed');
+    const savedScrollTop = feed ? feed.scrollTop : 0;
+
+    applyFiltersAndRender(false, targetId);
+
+    if (feed) {
+      feed.scrollTop = savedScrollTop;
+    }
+
+    const editedCard = spotsListContainer ? spotsListContainer.querySelector(`.spot-card[data-id="${targetId}"]`) : null;
+    if (editedCard) {
+      editedCard.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+      editedCard.classList.add('spot-card-updated');
+      setTimeout(() => editedCard.classList.remove('spot-card-updated'), 1500);
+    }
   }
 
   if (spotToSync) {
