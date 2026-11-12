@@ -192,4 +192,36 @@ DEFAULT_CITIES.forEach(c => {
 });
 console.log('✓ Atlas divisions by State (Americas) and Country verified for all destinations');
 
+console.log('Testing newly added destinations & spots...');
+import { SAMPLE_SPOTS } from '../js/sample-data.js';
+
+const expectedNewSpots = [
+  { name: 'Taos', city: 'Santa Fe' },
+  { name: 'La Boca', city: 'Santa Fe' },
+  { name: 'Enchantment Resort', city: 'Sedona' },
+  { name: 'La Quinta Resort', city: 'Palm Springs' },
+  { name: 'Coachella Festival', city: 'Palm Springs' },
+  { name: 'Grand Canyon National Park', city: 'Grand Canyon' },
+  { name: 'Sugar Bowl', city: 'Phoenix' },
+  { name: 'Fairmont Le Château Frontenac', city: 'Quebec City' },
+  { name: 'Fairmont Banff Springs', city: 'Banff' },
+  { name: 'Monterey Bay Aquarium', city: 'Monterey' },
+  { name: "Bart's Books", city: 'Ojai' },
+  { name: "Rory's Place", city: 'Ojai' },
+  { name: "Zareen's", city: 'South Bay Area' },
+  { name: 'Filoli', city: 'South Bay Area' },
+  { name: 'Half Moon Bay Books', city: 'South Bay Area' },
+  { name: 'Mountain View Farmers Market', city: 'South Bay Area' },
+  { name: 'Half Moon Bay State Beach', city: 'South Bay Area' },
+  { name: 'Marin Country Mart', city: 'Marin' },
+  { name: 'Mill Valley Public Library', city: 'Marin' },
+  { name: 'Marin County Civic Center', city: 'Marin' }
+];
+
+expectedNewSpots.forEach(exp => {
+  const match = SAMPLE_SPOTS.find(s => s.name.includes(exp.name) && s.city === exp.city);
+  assert(match, `Expected spot matching '${exp.name}' in city '${exp.city}'`);
+});
+console.log('✓ All 20 newly requested spots verified in sample database');
+
 console.log('All Day Loop algorithms & Destination Atlas verified successfully!');

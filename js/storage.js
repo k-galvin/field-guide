@@ -4,15 +4,15 @@ const STORAGE_KEY = 'flaneur_spots_v2';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 export const DEFAULT_CITIES = [
-  'Amsterdam', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
+  'Amsterdam', 'Banff', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
   'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
-  'English Countryside', 'Florence', 'French Countryside', 'Helsinki', 'Huntington Beach',
+  'English Countryside', 'Florence', 'French Countryside', 'Grand Canyon', 'Helsinki', 'Huntington Beach',
   'Iceland', 'Irish Countryside', 'Italian Countryside', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
-  'Lisbon', 'London', 'Los Angeles', 'Melbourne', 'Mexico City',
-  'Montreal', 'Newport Beach', 'New York', 'Nice', 'Orange', 'Orange County',
-  'Oslo', 'Paris', 'Phoenix', 'Porto', 'Portland', 'Prague', 'Quebec City', 'Rome',
+  'Lisbon', 'London', 'Los Angeles', 'Marin', 'Melbourne', 'Mexico City',
+  'Monterey', 'Montreal', 'Newport Beach', 'New York', 'Nice', 'Ojai', 'Orange', 'Orange County',
+  'Oslo', 'Palm Springs', 'Paris', 'Phoenix', 'Porto', 'Portland', 'Prague', 'Quebec City', 'Rome',
   'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
-  'Seattle', 'Stockholm', 'Sydney', 'Tokyo', 'Vancouver', 'Venice', 'Vienna'
+  'Seattle', 'Sedona', 'South Bay Area', 'Stockholm', 'Sydney', 'Tokyo', 'Vancouver', 'Venice', 'Vienna'
 ];
 
 export const KNOWN_CITY_META = {
@@ -35,6 +35,14 @@ export const KNOWN_CITY_META = {
   'encinitas': { code: 'ENC', country: 'California', region: 'americas', type: 'city' },
   'los angeles': { code: 'LAX', country: 'California', region: 'americas', type: 'city' },
   'san francisco': { code: 'SFO', country: 'California', region: 'americas', type: 'city' },
+  'palm springs': { code: 'PSP', country: 'California', region: 'americas', type: 'city' },
+  'monterey': { code: 'MRY', country: 'California', region: 'americas', type: 'city' },
+  'monterey bay': { code: 'MRY', country: 'California', region: 'americas', type: 'area' },
+  'ojai': { code: 'OJA', country: 'California', region: 'americas', type: 'city' },
+  'south bay area': { code: 'SBA', country: 'California', region: 'americas', type: 'area' },
+  'south bay': { code: 'SBA', country: 'California', region: 'americas', type: 'area' },
+  'marin': { code: 'MRN', country: 'California', region: 'americas', type: 'county' },
+  'marin county': { code: 'MRN', country: 'California', region: 'americas', type: 'county' },
 
   // Americas - Other US States
   'new york': { code: 'NYC', country: 'New York', region: 'americas', type: 'city' },
@@ -44,7 +52,10 @@ export const KNOWN_CITY_META = {
   'seattle': { code: 'SEA', country: 'Washington', region: 'americas', type: 'city' },
   'portland': { code: 'PDX', country: 'Oregon', region: 'americas', type: 'city' },
   'santa fe': { code: 'SAF', country: 'New Mexico', region: 'americas', type: 'city' },
+  'taos': { code: 'TAO', country: 'New Mexico', region: 'americas', type: 'city' },
   'phoenix': { code: 'PHX', country: 'Arizona', region: 'americas', type: 'city' },
+  'sedona': { code: 'SED', country: 'Arizona', region: 'americas', type: 'city' },
+  'grand canyon': { code: 'GCN', country: 'Arizona', region: 'americas', type: 'area' },
   'austin': { code: 'AUS', country: 'Texas', region: 'americas', type: 'city' },
   'nashville': { code: 'BNA', country: 'Tennessee', region: 'americas', type: 'city' },
   'new orleans': { code: 'MSY', country: 'Louisiana', region: 'americas', type: 'city' },
@@ -54,6 +65,7 @@ export const KNOWN_CITY_META = {
   'memphis': { code: 'MEM', country: 'Tennessee', region: 'americas', type: 'city' },
 
   // Americas - International
+  'banff': { code: 'BAN', country: 'Canada', region: 'americas', type: 'area' },
   'vancouver': { code: 'YVR', country: 'Canada', region: 'americas', type: 'city' },
   'toronto': { code: 'YYZ', country: 'Canada', region: 'americas', type: 'city' },
   'montreal': { code: 'YUL', country: 'Canada', region: 'americas', type: 'city' },
