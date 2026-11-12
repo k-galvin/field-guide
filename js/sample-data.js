@@ -2226,7 +2226,7 @@ export const SAMPLE_SPOTS = [
     hours: "Thu - Mon 09:00 - 16:00",
     notes: "Storied multi-storied adobe pueblo and historic artist colony north of Santa Fe. Continuously inhabited for over a millennium, showcasing vibrant indigenous craft, adobe galleries, and dramatic Sangre de Cristo mountain vistas.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-santa-fe-taos.jpg'
   },
   {
     id: 'spot-santa-fe-la-boca',
@@ -2242,7 +2242,7 @@ export const SAMPLE_SPOTS = [
     hours: "Daily 17:00 - 21:00",
     notes: "Intimate Spanish tapas and natural wine bar by Chef James Campbell Caruso, steps from Santa Fe Plaza. Celebrated for artisan Iberian cheeses, grilled octopus, jam\u00f3n ib\u00e9rico, and Spanish sherry flights.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1515443961218-a51367888e4b?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-santa-fe-la-boca.jpg'
   },
   {
     id: 'spot-sedona-enchantment-resort',
@@ -2258,7 +2258,7 @@ export const SAMPLE_SPOTS = [
     hours: "Open 24 hours",
     notes: "Secluded luxury adobe sanctuary tucked into the dramatic red-rock amphitheater of Boynton Canyon. Home to the legendary Mii amo destination spa, scenic canyon trails, and starlit courtyard firepits.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-sedona-enchantment-resort.jpg'
   },
   {
     id: 'spot-palm-springs-la-quinta-resort',
@@ -2274,7 +2274,7 @@ export const SAMPLE_SPOTS = [
     hours: "Open 24 hours",
     notes: "Iconic 1926 Spanish hacienda resort framed by citrus groves and the Santa Rosa Mountains. Legendary Hollywood hideaway featuring 41 secluded pools, historic whitewashed casitas, and championship tennis courts.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-palm-springs-la-quinta-resort.jpg'
   },
   {
     id: 'spot-palm-springs-coachella-festival',
@@ -2290,7 +2290,7 @@ export const SAMPLE_SPOTS = [
     hours: "Annual spring festival",
     notes: "World-renowned music and arts festival staged across the immaculate polo fields of Indio, famous for monumental interactive sculptural installations, twilight palm-tree panoramas, and iconic global headline stages.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-palm-springs-coachella-festival.jpg'
   },
   {
     id: 'spot-grand-canyon-south-rim',
@@ -2306,7 +2306,7 @@ export const SAMPLE_SPOTS = [
     hours: "Open 24 hours",
     notes: "Monumental geological wonder carved by the Colorado River across billions of years of strata. Dramatic overlooks from Mather Point and Rim Trail, with historic architecture by Mary Colter.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1615551043360-33de8b5f410c?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-grand-canyon-south-rim.jpg'
   },
   {
     id: 'spot-phoenix-sugar-bowl',
@@ -2322,7 +2322,7 @@ export const SAMPLE_SPOTS = [
     hours: "Daily 11:00 - 21:00",
     notes: "Beloved retro pink soda fountain and ice cream parlor operating in Old Town Scottsdale since 1958. Famed for classic banana splits, floats, sundaes, and nostalgia illustrated in Bil Keane's Family Circus comics.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-phoenix-sugar-bowl.jpg'
   },
   {
     id: 'spot-quebec-city-chateau-frontenac',
@@ -2338,7 +2338,7 @@ export const SAMPLE_SPOTS = [
     hours: "Open 24 hours",
     notes: "The world's most photographed grand railway hotel, soaring majestically over the St. Lawrence River from Cap Diamant. An iconic turreted castle anchoring the historic UNESCO walled citadel of Old Quebec.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-quebec-city-chateau-frontenac.jpg'
   },
   {
     id: 'spot-banff-fairmont-banff-springs',
@@ -2354,7 +2354,7 @@ export const SAMPLE_SPOTS = [
     hours: "Open 24 hours",
     notes: "Known as the 'Castle in the Rockies', this grand 1888 Scottish Baronial railway hotel sits amidst pine forests and glacial peaks in Banff National Park, featuring panoramic mountain terraces and mineral thermal springs.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-banff-fairmont-banff-springs.jpg'
   },
   {
     id: 'spot-monterey-aquarium',
@@ -2370,7 +2370,7 @@ export const SAMPLE_SPOTS = [
     hours: "Daily 10:00 - 17:00",
     notes: "Pioneering non-profit public oceanarium on historic Cannery Row, celebrated for its soaring 28-foot living kelp forest canopy, hypnotic jellyfish galleries, and open-ocean tuna and sea turtle exhibits.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-monterey-aquarium.jpg'
   },
   {
     id: 'spot-ojai-barts-books',
@@ -2386,7 +2386,7 @@ export const SAMPLE_SPOTS = [
     hours: "Tue - Sun 10:00 - 18:00",
     notes: "The world's largest outdoor independent bookstore, founded in 1964. Sun-drenched open-air book stalls, tranquil grapefruit courtyard patios, and an iconic street-side honor-system coin drop.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-ojai-barts-books.jpg'
   },
   {
     id: 'spot-ojai-rorys-place',
@@ -2402,7 +2402,7 @@ export const SAMPLE_SPOTS = [
     hours: "Wed - Sun 17:00 - 21:30",
     notes: "Lively sister-owned Ojai bistro and natural wine bar centered around a live-wood hearth. Spotlighting freshly shucked Pacific oysters, hyper-seasonal Ventura County produce, and low-intervention natural wines.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-ojai-rorys-place.jpg'
   },
   {
     id: 'spot-south-bay-zareens-palo-alto',
@@ -2418,7 +2418,7 @@ export const SAMPLE_SPOTS = [
     hours: "Daily 11:00 - 21:00",
     notes: "Michelin Bib Gourmand casual Pakistani and Indian kitchen on California Avenue. Renowned for succulent Gola kabab burgers, chicken tikka masala, garlic naan fresh from the tandoor, and complimentary cardamom chai.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-south-bay-zareens-palo-alto.jpg'
   },
   {
     id: 'spot-south-bay-filoli-gardens',
@@ -2434,7 +2434,7 @@ export const SAMPLE_SPOTS = [
     hours: "Daily 10:00 - 17:00",
     notes: "Exquisite 654-acre historic country estate nestled along the Santa Cruz Mountains. Features 16 acres of formal English Renaissance gardens, century-old fruit orchards, and a Georgian Revival manor.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-south-bay-filoli-gardens.jpg'
   },
   {
     id: 'spot-south-bay-half-moon-bay-books',
@@ -2450,7 +2450,7 @@ export const SAMPLE_SPOTS = [
     hours: "Daily 10:00 - 18:00",
     notes: "Charming independent coastal bookshop on historic Main Street with well-curated fiction, nature writing, local Pacific maritime history, and cozy reading corners.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-south-bay-half-moon-bay-books.jpg'
   },
   {
     id: 'spot-south-bay-mountain-view-farmers-market',
@@ -2466,7 +2466,7 @@ export const SAMPLE_SPOTS = [
     hours: "Sun 09:00 - 13:00",
     notes: "One of Northern California's premier Sunday certified farmers markets at the Caltrain depot, featuring 80+ organic Central Valley farms, seasonal stone fruit, artisan bread, and fresh street food stalls.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-south-bay-mountain-view-farmers-market.jpg'
   },
   {
     id: 'spot-south-bay-half-moon-bay-beach',
@@ -2482,7 +2482,7 @@ export const SAMPLE_SPOTS = [
     hours: "Daily 08:00 - Sunset",
     notes: "Sweeping four-mile crescent of Pacific sandy beach backed by dramatic coastal bluffs. Ideal for breezy shoreline walks, coastal birdwatching, and sunset strolls along the Coastside Trail.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-south-bay-half-moon-bay-beach.jpg'
   },
   {
     id: 'spot-marin-country-mart',
@@ -2498,7 +2498,7 @@ export const SAMPLE_SPOTS = [
     hours: "Daily 10:00 - 18:00",
     notes: "Chic open-air village square across from the Larkspur Ferry Terminal, featuring curated indie boutiques, farm-to-table organic eateries, Saturday farmers markets, and alfresco firepit seating.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-marin-country-mart.jpg'
   },
   {
     id: 'spot-marin-mill-valley-library',
@@ -2514,7 +2514,7 @@ export const SAMPLE_SPOTS = [
     hours: "Mon - Thu 10:00 - 21:00, Fri - Sat 10:00 - 17:00",
     notes: "Architectural marvel immersed in a tranquil redwood forest next to Old Mill Creek. Boasting high open-timber ceiling trusses, stone fireplaces, and soaring glass walls overlooking ancient redwoods.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-marin-mill-valley-library.jpg'
   },
   {
     id: 'spot-marin-civic-center',
@@ -2530,6 +2530,86 @@ export const SAMPLE_SPOTS = [
     hours: "Mon - Fri 08:00 - 17:00",
     notes: "Frank Lloyd Wright's last and largest commissioned masterwork, spanning across low rolling hills with sky-blue barrel-vaulted roofs, sculpted golden spires, circular archways, and a sunlit 80-foot rotunda.",
     visitDate: '2026-11-10',
-    photoUrl: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=85'
+    photoUrl: 'images/spots/spot-marin-civic-center.jpg'
+  },
+  {
+    id: 'paris-musee-de-lorangerie',
+    name: "Musée de l'Orangerie",
+    city: 'Paris',
+    neighborhood: '1er Arrondissement',
+    category: 'museums_art',
+    status: 'visited',
+    favorite: true,
+    lat: 48.8638,
+    lng: 2.3227,
+    daysOpen: 'Wed-Mon',
+    hours: '09:00 - 18:00 (Closed Tue)',
+    notes: 'Intimate impressionist sanctuary in the western corner of the Tuileries Garden, renowned for its two custom oval galleries housing Claude Monet’s monumental Water Lilies (Nymphéas) cycle.',
+    visitDate: '2025-05-18',
+    photoUrl: 'https://images.unsplash.com/photo-1574169208507-84376144848b?auto=format&fit=crop&w=1200&q=80'
+  },
+  {
+    id: 'sf-ferry-building',
+    name: 'Ferry Building',
+    city: 'San Francisco',
+    neighborhood: 'Embarcadero',
+    category: 'food_dining',
+    status: 'visited',
+    favorite: true,
+    lat: 37.7955,
+    lng: -122.3937,
+    daysOpen: 'Daily',
+    hours: '07:00 - 20:00',
+    notes: 'Historic 1898 Beaux-Arts waterfront ferry terminal with an iconic 245-foot clock tower. World-class food hall housing Acme Bread, Blue Bottle Coffee, Hog Island Oyster Co., and California artisan purveyors.',
+    visitDate: '2025-06-20',
+    photoUrl: 'https://images.unsplash.com/photo-1506146332389-18140dc7b2fb?auto=format&fit=crop&w=1200&q=80'
+  },
+  {
+    id: 'rome-colosseum',
+    name: 'The Colosseum',
+    city: 'Rome',
+    neighborhood: 'Piazza del Colosseo',
+    category: 'museums_art',
+    status: 'visited',
+    favorite: true,
+    lat: 41.8902,
+    lng: 12.4922,
+    daysOpen: 'Daily',
+    hours: '09:00 - 19:15',
+    notes: 'The monumental Flavian Amphitheatre completed in 80 AD, the largest amphitheater of the ancient world. Grand travertine exterior arches, subterranean hypogeum staging chambers, and tiered arena standing adjacent to the Roman Forum.',
+    visitDate: '2025-05-22',
+    photoUrl: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80'
+  },
+  {
+    id: 'rome-pantheon',
+    name: 'The Pantheon',
+    city: 'Rome',
+    neighborhood: 'Piazza della Rotonda',
+    category: 'museums_art',
+    status: 'visited',
+    favorite: true,
+    lat: 41.8986,
+    lng: 12.4769,
+    daysOpen: 'Daily',
+    hours: '09:00 - 19:00',
+    notes: 'Remarkably preserved ancient Roman temple commissioned by Marcus Agrippa and rebuilt by Hadrian c. 126 AD. Famed for its monumental unreinforced concrete dome with a 9-meter open oculus and the tomb of Raphael.',
+    visitDate: '2025-05-22',
+    photoUrl: 'https://images.unsplash.com/photo-1555992828-ca4dbe41d294?auto=format&fit=crop&w=1200&q=80'
+  },
+  {
+    id: 'florence-ponte-vecchio',
+    name: 'Ponte Vecchio',
+    city: 'Florence',
+    neighborhood: 'Centro Storico / Oltrarno',
+    category: 'parks_nature',
+    status: 'visited',
+    favorite: true,
+    lat: 43.7680,
+    lng: 11.2532,
+    daysOpen: 'Daily',
+    hours: 'Open 24 hours',
+    notes: "Iconic 1345 medieval stone segmental arch bridge spanning the Arno River. Packed with traditional goldsmiths and jewelers, connecting the Uffizi Gallery to Palazzo Pitti beneath Vasari's elevated corridor.",
+    visitDate: '2025-05-24',
+    photoUrl: 'https://images.unsplash.com/photo-1543429776-2782fc8e1acd?auto=format&fit=crop&w=1200&q=80'
   },
 ];
