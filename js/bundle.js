@@ -3482,31 +3482,37 @@ let userLocationMarker = null;
 let loopPolyline = null;
 let onMapClickCallback = null;
 let onSpotSelectCallback = null;
+let onSpotSelectMarkerCallback = null;
+let onSpotUnfocusCallback = null;
+let isProgrammaticFocusing = false;
+let isClearingMarkers = false;
 let currentMapRenderToken = 0;
 let allSpotsCache = [];
 let activeSpotIdCache = null;
 let mapMoveDebounceTimer = null;
+const markerMap = new Map();
 
 /**
  * Creates custom styled HTML marker for Leaflet with category icons
  */
-function createMarkerIcon(category, isFavorite, isVisited) {
+function createMarkerIcon(category, isFavorite, isVisited, isActive = false) {
   const cat = CATEGORY_MAP.get(category) || { code: '·', color: '#0047ab' };
   const badgeClass = isVisited ? 'pin-visited' : 'pin-wishlist';
+  const activeClass = isActive ? 'pin-active-focus' : '';
   const favDot = isFavorite ? '<span class="pin-star" title="starred"></span>' : '';
   const iconHtml = cat.iconSvg ? `<span class="pin-icon">${cat.iconSvg}</span>` : `<span class="pin-glyph">${cat.code || '·'}</span>`;
 
   return L.divIcon({
-    className: 'custom-flaneur-marker',
+    className: `custom-flaneur-marker ${isActive ? 'custom-marker-active' : ''}`,
     html: `
-      <div class="pin-container ${badgeClass}" data-cat="${category}">
+      <div class="pin-container ${badgeClass} ${activeClass}" data-cat="${category}">
         ${iconHtml}
         ${favDot}
       </div>
     `,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -16]
+    iconSize: isActive ? [34, 34] : [28, 28],
+    iconAnchor: isActive ? [17, 17] : [14, 14],
+    popupAnchor: [0, -18]
   });
 }
 
@@ -3661,14 +3667,30 @@ function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 
 
   // Viewport-based marker virtualization when panning or zooming on large collections
   mapInstance.on('moveend', () => {
+    if (isProgrammaticFocusing) return;
     if (allSpotsCache && allSpotsCache.length > 80) {
       clearTimeout(mapMoveDebounceTimer);
       mapMoveDebounceTimer = setTimeout(updateVisibleMarkers, 80);
     }
   });
 
-  // Map click for dropping pins
+  // Map click for dropping pins and unfocusing active selection
   mapInstance.on('click', (e) => {
+    if (activeSpotIdCache && !isProgrammaticFocusing) {
+      const prevSpotId = activeSpotIdCache;
+      activeSpotIdCache = null;
+      if (markerMap.has(prevSpotId)) {
+        const prevMarker = markerMap.get(prevSpotId);
+        const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
+        if (prevMarker && prevSpot) {
+          prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
+          prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+        }
+      }
+      if (onSpotUnfocusCallback) {
+        onSpotUnfocusCallback();
+      }
+    }
     if (onMapClickCallback) {
       onMapClickCallback(e.latlng.lat, e.latlng.lng);
     }
@@ -3685,9 +3707,45 @@ function setOnSpotSelectListener(cb) {
   onSpotSelectCallback = cb;
 }
 
+function setOnSpotSelectMarkerListener(cb) {
+  onSpotSelectMarkerCallback = cb;
+}
+
+function setOnSpotUnfocusListener(cb) {
+  onSpotUnfocusCallback = cb;
+}
+
 /**
- * Renders spots on the map
+ * Handles selecting a spot from its map pin (with z-index elevation and popup display)
  */
+function handleMarkerSelection(spot) {
+  if (!spot) return;
+  const prevSpotId = activeSpotIdCache;
+  activeSpotIdCache = spot.id;
+
+  if (prevSpotId && prevSpotId !== spot.id && markerMap.has(prevSpotId)) {
+    const prevMarker = markerMap.get(prevSpotId);
+    const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
+    if (prevMarker && prevSpot) {
+      prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
+      prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+    }
+  }
+
+  const currentMarker = markerMap.get(spot.id);
+  if (currentMarker) {
+    currentMarker.setIcon(createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', true));
+    currentMarker.setZIndexOffset(2500);
+    if (!currentMarker.isPopupOpen()) {
+      currentMarker.openPopup();
+    }
+  }
+
+  if (onSpotSelectMarkerCallback) {
+    onSpotSelectMarkerCallback(spot);
+  }
+}
+
 /**
  * Generates spot popup DOM on-demand (lazy allocation to avoid locking the thread on 900+ spots)
  */
@@ -3735,16 +3793,46 @@ function createSpotPopupElement(spot) {
 function createSingleMarker(spot, activeSpotId) {
   if (typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return null;
 
+  const isActive = Boolean(activeSpotId && spot.id === activeSpotId);
   const marker = L.marker([spot.lat, spot.lng], {
-    icon: createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited')
+    icon: createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', isActive),
+    zIndexOffset: isActive ? 2500 : (spot.favorite ? 50 : 0),
+    riseOnHover: true
   });
 
-  // Lazy popup creation: DOM node is only constructed when the marker is clicked
-  marker.bindPopup(() => createSpotPopupElement(spot), { maxWidth: 280, minWidth: 220 });
+  markerMap.set(spot.id, marker);
 
-  if (activeSpotId && spot.id === activeSpotId) {
-    setTimeout(() => marker.openPopup(), 100);
-  }
+  // Lazy popup creation: DOM node is only constructed when the marker is opened
+  marker.bindPopup(() => createSpotPopupElement(spot), {
+    maxWidth: 280,
+    minWidth: 220,
+    autoPan: true,
+    autoPanPadding: [30, 30]
+  });
+
+  marker.on('click', (e) => {
+    L.DomEvent.stopPropagation(e);
+    handleMarkerSelection(spot);
+  });
+
+  marker.on('popupopen', () => {
+    if (isClearingMarkers) return;
+    if (activeSpotIdCache !== spot.id) {
+      handleMarkerSelection(spot);
+    }
+  });
+
+  marker.on('popupclose', () => {
+    if (isClearingMarkers || isProgrammaticFocusing) return;
+    if (activeSpotIdCache === spot.id) {
+      activeSpotIdCache = null;
+      marker.setIcon(createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', false));
+      marker.setZIndexOffset(spot.favorite ? 50 : 0);
+      if (onSpotUnfocusCallback) {
+        onSpotUnfocusCallback(spot);
+      }
+    }
+  });
 
   return marker;
 }
@@ -3758,7 +3846,10 @@ function updateVisibleMarkers() {
   currentMapRenderToken++;
   const thisToken = currentMapRenderToken;
 
+  isClearingMarkers = true;
   markersLayer.clearLayers();
+  markerMap.clear();
+  isClearingMarkers = false;
 
   if (!allSpotsCache || allSpotsCache.length === 0) return;
 
@@ -3768,7 +3859,7 @@ function updateVisibleMarkers() {
   let spotsToDisplay;
   if (validSpots.length <= 80) {
     // Single destination (e.g. Orange County, Paris, London): render all directly in 1 frame
-    spotsToDisplay = validSpots;
+    spotsToDisplay = [...validSpots];
   } else {
     // Large global set (e.g. All Destinations with 900+ spots):
     const zoom = mapInstance.getZoom();
@@ -3783,13 +3874,16 @@ function updateVisibleMarkers() {
     } else {
       // When zoomed into a continent, country or city: strictly render markers within the viewport
       spotsToDisplay = validSpots.filter(s => currentBounds.contains([s.lat, s.lng]));
-      // Ensure the actively selected spot's pin is always present
-      if (activeSpotIdCache) {
-        const activeSpot = validSpots.find(s => s.id === activeSpotIdCache);
-        if (activeSpot && !spotsToDisplay.includes(activeSpot)) {
-          spotsToDisplay.push(activeSpot);
-        }
-      }
+    }
+  }
+
+  // CRITICAL: Always ensure active spot's pin is present, regardless of zoom or bounds!
+  // Sort active spot to the END of array so it renders last in DOM order (on top of any overlapping pins)
+  if (activeSpotIdCache) {
+    const activeSpot = validSpots.find(s => s.id === activeSpotIdCache);
+    if (activeSpot) {
+      spotsToDisplay = spotsToDisplay.filter(s => s.id !== activeSpotIdCache);
+      spotsToDisplay.push(activeSpot);
     }
   }
 
@@ -3799,6 +3893,14 @@ function updateVisibleMarkers() {
     const marker = createSingleMarker(s, activeSpotIdCache);
     if (marker) marker.addTo(markersLayer);
   });
+
+  // Keep popup open for active spot if not mid-flight
+  if (activeSpotIdCache && !isProgrammaticFocusing) {
+    const activeMarker = markerMap.get(activeSpotIdCache);
+    if (activeMarker && !activeMarker.isPopupOpen()) {
+      activeMarker.openPopup();
+    }
+  }
 }
 
 /**
@@ -3824,11 +3926,80 @@ function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = false) {
 }
 
 /**
- * Highlights and centers a specific spot on the map
+ * Clears active spot selection and resets all markers to default styling
+ */
+function clearActiveSpot() {
+  if (activeSpotIdCache && markerMap.has(activeSpotIdCache)) {
+    const prevMarker = markerMap.get(activeSpotIdCache);
+    const prevSpot = allSpotsCache.find(s => s.id === activeSpotIdCache);
+    if (prevMarker && prevSpot) {
+      prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
+      prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+      prevMarker.closePopup();
+    }
+  }
+  activeSpotIdCache = null;
+  if (onSpotUnfocusCallback) {
+    onSpotUnfocusCallback();
+  }
+}
+
+/**
+ * Highlights, elevates, and centers a specific spot on the map (even from world/zoomed-out views)
  */
 function focusSpot(spot) {
-  if (!mapInstance || !spot) return;
-  mapInstance.setView([spot.lat, spot.lng], 16, { animate: true });
+  if (!mapInstance || !spot || typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return;
+
+  const prevSpotId = activeSpotIdCache;
+  activeSpotIdCache = spot.id;
+
+  if (prevSpotId && prevSpotId !== spot.id && markerMap.has(prevSpotId)) {
+    const prevMarker = markerMap.get(prevSpotId);
+    const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
+    if (prevMarker && prevSpot) {
+      prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
+      prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+    }
+  }
+
+  const currentCenter = mapInstance.getCenter();
+  const currentZoom = mapInstance.getZoom();
+  const targetZoom = Math.max(currentZoom, 16);
+  const distance = currentCenter.distanceTo([spot.lat, spot.lng]);
+
+  // If already at the spot and at target zoom level:
+  if (distance < 25 && currentZoom >= 15) {
+    updateVisibleMarkers();
+    const marker = markerMap.get(spot.id);
+    if (marker) {
+      marker.setIcon(createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', true));
+      marker.setZIndexOffset(2500);
+      marker.openPopup();
+    }
+    return;
+  }
+
+  // Programmatic flight: ignore intermediate zoom/moveend events until flight completes
+  isProgrammaticFocusing = true;
+  clearTimeout(mapMoveDebounceTimer);
+
+  const onArrival = () => {
+    mapInstance.off('moveend', onArrival);
+    isProgrammaticFocusing = false;
+    updateVisibleMarkers();
+    const marker = markerMap.get(spot.id);
+    if (marker) {
+      marker.setIcon(createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', true));
+      marker.setZIndexOffset(2500);
+      marker.openPopup();
+    }
+  };
+
+  mapInstance.on('moveend', onArrival);
+  mapInstance.flyTo([spot.lat, spot.lng], targetZoom, {
+    duration: 0.9,
+    easeLinearity: 0.3
+  });
 }
 
 /**
@@ -4877,6 +5048,21 @@ function init() {
     }
   });
 
+  // Set Spot marker click handler (when marker on map is clicked)
+  setOnSpotSelectMarkerListener((spot) => {
+    document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
+    const targetCard = document.querySelector(`.spot-card[data-id="${spot.id}"]`);
+    if (targetCard) {
+      targetCard.classList.add('active-spot');
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+
+  // Set Spot unfocus handler (when popup is closed or user clicks map background)
+  setOnSpotUnfocusListener(() => {
+    document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
+  });
+
   // Setup Event Listeners
   setupEventListeners();
 
@@ -5673,7 +5859,6 @@ function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
       document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
       card.classList.add('active-spot');
       focusSpot(spot);
-      renderMapSpots(allSpots, spot.id);
 
       // On mobile screens, automatically switch to map view when a card is selected
       if (window.innerWidth <= 820 && mobileToggleMap) {

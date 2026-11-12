@@ -950,6 +950,17 @@ html, body {
   box-shadow: 0 6px 16px rgba(0, 71, 171, 0.45);
 }
 
+.pin-container.pin-active-focus {
+  transform: scale(1.35) !important;
+  background: #002d72 !important;
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px var(--accent-blue), 0 8px 24px rgba(0, 71, 171, 0.6) !important;
+  z-index: 2500 !important;
+}
+
+.custom-flaneur-marker.custom-marker-active {
+  z-index: 3500 !important;
+}
+
 .pin-icon {
   display: flex;
   align-items: center;

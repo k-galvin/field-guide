@@ -24,11 +24,14 @@ import {
   initMap,
   renderMapSpots,
   focusSpot,
+  clearActiveSpot,
   setUserLocation,
   drawLoopPolyline,
   clearLoopPolyline,
   setOnMapClickListener,
   setOnSpotSelectListener,
+  setOnSpotSelectMarkerListener,
+  setOnSpotUnfocusListener,
   invalidateMapSize,
   centerCityOnMap,
   KNOWN_CITY_COORDS
@@ -393,6 +396,21 @@ function init() {
     if (!isReadOnlyGuide) {
       openEditSpotModal(spot);
     }
+  });
+
+  // Set Spot marker click handler (when marker on map is clicked)
+  setOnSpotSelectMarkerListener((spot) => {
+    document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
+    const targetCard = document.querySelector(`.spot-card[data-id="${spot.id}"]`);
+    if (targetCard) {
+      targetCard.classList.add('active-spot');
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+
+  // Set Spot unfocus handler (when popup is closed or user clicks map background)
+  setOnSpotUnfocusListener(() => {
+    document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
   });
 
   // Setup Event Listeners
@@ -1191,7 +1209,6 @@ function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
       document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
       card.classList.add('active-spot');
       focusSpot(spot);
-      renderMapSpots(allSpots, spot.id);
 
       // On mobile screens, automatically switch to map view when a card is selected
       if (window.innerWidth <= 820 && mobileToggleMap) {
