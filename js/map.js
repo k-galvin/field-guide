@@ -164,10 +164,11 @@ export function initMap(elementId, initialCenter = [33.6411, -117.9187], initial
   // Add custom zoom control in bottom right
   L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 
-  // OpenStreetMap standard tiles: 100% free, zero API key, zero watermark
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  // CartoDB Voyager: Fast global CDN, OpenStreetMap data, retina/HiDPI support, zero 403 blocks
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
   }).addTo(mapInstance);
 
   markersLayer = L.layerGroup().addTo(mapInstance);
