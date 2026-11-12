@@ -1,6 +1,6 @@
 // Leaflet Map Controller for Flâneur
 
-import { CATEGORIES, CATEGORY_MAP } from './storage.js';
+import { CATEGORIES, CATEGORY_MAP, escapeHtml } from './storage.js';
 import { generateSingleNavigationUrl } from './day-loop.js';
 
 let mapInstance = null;
@@ -9,6 +9,7 @@ let userLocationMarker = null;
 let loopPolyline = null;
 let onMapClickCallback = null;
 let onSpotSelectCallback = null;
+let currentMapRenderToken = 0;
 
 /**
  * Creates custom styled HTML marker for Leaflet with category icons
@@ -199,75 +200,87 @@ export function setOnSpotSelectListener(cb) {
 /**
  * Renders spots on the map
  */
-export function renderMapSpots(spots, activeSpotId = null) {
+/**
+ * Generates spot popup DOM on-demand (lazy allocation to avoid locking the thread on 900+ spots)
+ */
+function createSpotPopupElement(spot) {
+  const cat = CATEGORY_MAP.get(spot.category) || { label: 'Spot', code: '·' };
+  const navUrl = generateSingleNavigationUrl(spot.lat, spot.lng);
+  const popupContent = document.createElement('div');
+  popupContent.className = 'flaneur-popup';
+  popupContent.innerHTML = `
+    ${spot.photoUrl ? `
+      <div class="popup-photo-wrap">
+        <img src="${escapeHtml(spot.photoUrl)}" alt="${escapeHtml(spot.name)}" class="popup-photo" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none';">
+      </div>
+    ` : ''}
+    <div class="popup-body">
+      <div class="popup-header">
+        <span class="popup-category">${cat.iconSvg ? `<span class="popup-cat-icon">${cat.iconSvg}</span>` : ''}${escapeHtml(cat.label.toLowerCase())}</span>
+        <span class="popup-status ${spot.status}">${spot.status === 'visited' ? 'visited' : 'wishlist'}</span>
+      </div>
+      <h3 class="popup-title">${escapeHtml(spot.name.toLowerCase())}</h3>
+      ${spot.neighborhood ? `<div class="popup-neighborhood">${escapeHtml(spot.neighborhood.toLowerCase())}</div>` : ''}
+      ${spot.notes ? `<p class="popup-notes">${escapeHtml(spot.notes)}</p>` : ''}
+      <div class="popup-actions">
+        <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="popup-btn-nav">
+          directions ↗
+        </a>
+        <button type="button" class="popup-btn-detail" data-id="${spot.id}">
+          edit
+        </button>
+      </div>
+    </div>
+  `;
+
+  const detailBtn = popupContent.querySelector('.popup-btn-detail');
+  if (detailBtn) {
+    detailBtn.addEventListener('click', () => {
+      if (onSpotSelectCallback) {
+        onSpotSelectCallback(spot);
+      }
+    });
+  }
+  return popupContent;
+}
+
+function createSingleMarker(spot, activeSpotId) {
+  if (typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return null;
+
+  const marker = L.marker([spot.lat, spot.lng], {
+    icon: createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited')
+  });
+
+  // Lazy popup creation: DOM node is only constructed when the marker is clicked
+  marker.bindPopup(() => createSpotPopupElement(spot), { maxWidth: 280, minWidth: 220 });
+
+  if (activeSpotId && spot.id === activeSpotId) {
+    setTimeout(() => marker.openPopup(), 100);
+  }
+
+  return marker;
+}
+
+/**
+ * Renders spots on the map with non-blocking progressive chunking and lazy popups
+ */
+export function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = false) {
   if (!mapInstance || !markersLayer) return;
+
+  currentMapRenderToken++;
+  const thisToken = currentMapRenderToken;
 
   markersLayer.clearLayers();
 
   if (!spots || spots.length === 0) return;
 
-  const bounds = [];
+  const validSpots = spots.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+  if (validSpots.length === 0) return;
 
-  spots.forEach(spot => {
-    if (typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return;
-
-    const marker = L.marker([spot.lat, spot.lng], {
-      icon: createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited')
-    });
-
-    const cat = CATEGORY_MAP.get(spot.category) || { label: 'Spot', code: '·' };
-    const navUrl = generateSingleNavigationUrl(spot.lat, spot.lng);
-
-    const popupContent = document.createElement('div');
-    popupContent.className = 'flaneur-popup';
-    popupContent.innerHTML = `
-      ${spot.photoUrl ? `
-        <div class="popup-photo-wrap">
-          <img src="${spot.photoUrl}" alt="${spot.name}" class="popup-photo" loading="lazy" onerror="this.parentElement.style.display='none';">
-        </div>
-      ` : ''}
-      <div class="popup-body">
-        <div class="popup-header">
-          <span class="popup-category">${cat.iconSvg ? `<span class="popup-cat-icon">${cat.iconSvg}</span>` : ''}${cat.label.toLowerCase()}</span>
-          <span class="popup-status ${spot.status}">${spot.status === 'visited' ? 'visited' : 'wishlist'}</span>
-        </div>
-        <h3 class="popup-title">${spot.name.toLowerCase()}</h3>
-        ${spot.neighborhood ? `<div class="popup-neighborhood">${spot.neighborhood.toLowerCase()}</div>` : ''}
-        ${spot.notes ? `<p class="popup-notes">${spot.notes}</p>` : ''}
-        <div class="popup-actions">
-          <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="popup-btn-nav">
-            directions ↗
-          </a>
-          <button type="button" class="popup-btn-detail" data-id="${spot.id}">
-            edit
-          </button>
-        </div>
-      </div>
-    `;
-
-    const detailBtn = popupContent.querySelector('.popup-btn-detail');
-    if (detailBtn) {
-      detailBtn.addEventListener('click', () => {
-        if (onSpotSelectCallback) {
-          onSpotSelectCallback(spot);
-        }
-      });
-    }
-
-    marker.bindPopup(popupContent, { maxWidth: 280, minWidth: 220 });
-    marker.addTo(markersLayer);
-
-    bounds.push([spot.lat, spot.lng]);
-
-    if (activeSpotId && spot.id === activeSpotId) {
-      setTimeout(() => marker.openPopup(), 100);
-    }
-  });
-
-  if (bounds.length > 0 && !activeSpotId) {
+  if (shouldFitBounds && !activeSpotId) {
     try {
-      const lats = bounds.map(b => b[0]);
-      const lngs = bounds.map(b => b[1]);
+      const lats = validSpots.map(b => b.lat);
+      const lngs = validSpots.map(b => b.lng);
       const latSpan = Math.max(...lats) - Math.min(...lats);
       const lngSpan = Math.max(...lngs) - Math.min(...lngs);
 
@@ -278,11 +291,41 @@ export function renderMapSpots(spots, activeSpotId = null) {
         targetMaxZoom = 12;
       }
 
+      const bounds = validSpots.map(s => [s.lat, s.lng]);
       mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: targetMaxZoom });
     } catch (e) {
       // ignore
     }
   }
+
+  // Small sets (<= 50 spots) are rendered synchronously in a single instant frame
+  const CHUNK_SIZE = 50;
+  if (validSpots.length <= CHUNK_SIZE) {
+    validSpots.forEach(s => {
+      const marker = createSingleMarker(s, activeSpotId);
+      if (marker) marker.addTo(markersLayer);
+    });
+    return;
+  }
+
+  // Large sets (e.g. 900+ on "All Destinations") stream markers progressively using requestAnimationFrame
+  let index = 0;
+  function processChunk() {
+    if (thisToken !== currentMapRenderToken) return; // Stale render superseded
+
+    const end = Math.min(index + CHUNK_SIZE, validSpots.length);
+    for (let i = index; i < end; i++) {
+      const marker = createSingleMarker(validSpots[i], activeSpotId);
+      if (marker) marker.addTo(markersLayer);
+    }
+    index = end;
+
+    if (index < validSpots.length) {
+      requestAnimationFrame(processChunk);
+    }
+  }
+
+  processChunk();
 }
 
 /**

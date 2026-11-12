@@ -434,6 +434,16 @@ function exportBackupJSON(spots, cities) {
   URL.revokeObjectURL(url);
 }
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 
 // --- js/sample-data.js ---
 // Sample curated spots for initial load with verified editorial photography across all categories
@@ -1149,6 +1159,7 @@ let userLocationMarker = null;
 let loopPolyline = null;
 let onMapClickCallback = null;
 let onSpotSelectCallback = null;
+let currentMapRenderToken = 0;
 
 /**
  * Creates custom styled HTML marker for Leaflet with category icons
@@ -1339,75 +1350,87 @@ function setOnSpotSelectListener(cb) {
 /**
  * Renders spots on the map
  */
-function renderMapSpots(spots, activeSpotId = null) {
+/**
+ * Generates spot popup DOM on-demand (lazy allocation to avoid locking the thread on 900+ spots)
+ */
+function createSpotPopupElement(spot) {
+  const cat = CATEGORY_MAP.get(spot.category) || { label: 'Spot', code: '·' };
+  const navUrl = generateSingleNavigationUrl(spot.lat, spot.lng);
+  const popupContent = document.createElement('div');
+  popupContent.className = 'flaneur-popup';
+  popupContent.innerHTML = `
+    ${spot.photoUrl ? `
+      <div class="popup-photo-wrap">
+        <img src="${escapeHtml(spot.photoUrl)}" alt="${escapeHtml(spot.name)}" class="popup-photo" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none';">
+      </div>
+    ` : ''}
+    <div class="popup-body">
+      <div class="popup-header">
+        <span class="popup-category">${cat.iconSvg ? `<span class="popup-cat-icon">${cat.iconSvg}</span>` : ''}${escapeHtml(cat.label.toLowerCase())}</span>
+        <span class="popup-status ${spot.status}">${spot.status === 'visited' ? 'visited' : 'wishlist'}</span>
+      </div>
+      <h3 class="popup-title">${escapeHtml(spot.name.toLowerCase())}</h3>
+      ${spot.neighborhood ? `<div class="popup-neighborhood">${escapeHtml(spot.neighborhood.toLowerCase())}</div>` : ''}
+      ${spot.notes ? `<p class="popup-notes">${escapeHtml(spot.notes)}</p>` : ''}
+      <div class="popup-actions">
+        <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="popup-btn-nav">
+          directions ↗
+        </a>
+        <button type="button" class="popup-btn-detail" data-id="${spot.id}">
+          edit
+        </button>
+      </div>
+    </div>
+  `;
+
+  const detailBtn = popupContent.querySelector('.popup-btn-detail');
+  if (detailBtn) {
+    detailBtn.addEventListener('click', () => {
+      if (onSpotSelectCallback) {
+        onSpotSelectCallback(spot);
+      }
+    });
+  }
+  return popupContent;
+}
+
+function createSingleMarker(spot, activeSpotId) {
+  if (typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return null;
+
+  const marker = L.marker([spot.lat, spot.lng], {
+    icon: createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited')
+  });
+
+  // Lazy popup creation: DOM node is only constructed when the marker is clicked
+  marker.bindPopup(() => createSpotPopupElement(spot), { maxWidth: 280, minWidth: 220 });
+
+  if (activeSpotId && spot.id === activeSpotId) {
+    setTimeout(() => marker.openPopup(), 100);
+  }
+
+  return marker;
+}
+
+/**
+ * Renders spots on the map with non-blocking progressive chunking and lazy popups
+ */
+function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = false) {
   if (!mapInstance || !markersLayer) return;
+
+  currentMapRenderToken++;
+  const thisToken = currentMapRenderToken;
 
   markersLayer.clearLayers();
 
   if (!spots || spots.length === 0) return;
 
-  const bounds = [];
+  const validSpots = spots.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+  if (validSpots.length === 0) return;
 
-  spots.forEach(spot => {
-    if (typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return;
-
-    const marker = L.marker([spot.lat, spot.lng], {
-      icon: createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited')
-    });
-
-    const cat = CATEGORY_MAP.get(spot.category) || { label: 'Spot', code: '·' };
-    const navUrl = generateSingleNavigationUrl(spot.lat, spot.lng);
-
-    const popupContent = document.createElement('div');
-    popupContent.className = 'flaneur-popup';
-    popupContent.innerHTML = `
-      ${spot.photoUrl ? `
-        <div class="popup-photo-wrap">
-          <img src="${spot.photoUrl}" alt="${spot.name}" class="popup-photo" loading="lazy" onerror="this.parentElement.style.display='none';">
-        </div>
-      ` : ''}
-      <div class="popup-body">
-        <div class="popup-header">
-          <span class="popup-category">${cat.iconSvg ? `<span class="popup-cat-icon">${cat.iconSvg}</span>` : ''}${cat.label.toLowerCase()}</span>
-          <span class="popup-status ${spot.status}">${spot.status === 'visited' ? 'visited' : 'wishlist'}</span>
-        </div>
-        <h3 class="popup-title">${spot.name.toLowerCase()}</h3>
-        ${spot.neighborhood ? `<div class="popup-neighborhood">${spot.neighborhood.toLowerCase()}</div>` : ''}
-        ${spot.notes ? `<p class="popup-notes">${spot.notes}</p>` : ''}
-        <div class="popup-actions">
-          <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="popup-btn-nav">
-            directions ↗
-          </a>
-          <button type="button" class="popup-btn-detail" data-id="${spot.id}">
-            edit
-          </button>
-        </div>
-      </div>
-    `;
-
-    const detailBtn = popupContent.querySelector('.popup-btn-detail');
-    if (detailBtn) {
-      detailBtn.addEventListener('click', () => {
-        if (onSpotSelectCallback) {
-          onSpotSelectCallback(spot);
-        }
-      });
-    }
-
-    marker.bindPopup(popupContent, { maxWidth: 280, minWidth: 220 });
-    marker.addTo(markersLayer);
-
-    bounds.push([spot.lat, spot.lng]);
-
-    if (activeSpotId && spot.id === activeSpotId) {
-      setTimeout(() => marker.openPopup(), 100);
-    }
-  });
-
-  if (bounds.length > 0 && !activeSpotId) {
+  if (shouldFitBounds && !activeSpotId) {
     try {
-      const lats = bounds.map(b => b[0]);
-      const lngs = bounds.map(b => b[1]);
+      const lats = validSpots.map(b => b.lat);
+      const lngs = validSpots.map(b => b.lng);
       const latSpan = Math.max(...lats) - Math.min(...lats);
       const lngSpan = Math.max(...lngs) - Math.min(...lngs);
 
@@ -1418,11 +1441,41 @@ function renderMapSpots(spots, activeSpotId = null) {
         targetMaxZoom = 12;
       }
 
+      const bounds = validSpots.map(s => [s.lat, s.lng]);
       mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: targetMaxZoom });
     } catch (e) {
       // ignore
     }
   }
+
+  // Small sets (<= 50 spots) are rendered synchronously in a single instant frame
+  const CHUNK_SIZE = 50;
+  if (validSpots.length <= CHUNK_SIZE) {
+    validSpots.forEach(s => {
+      const marker = createSingleMarker(s, activeSpotId);
+      if (marker) marker.addTo(markersLayer);
+    });
+    return;
+  }
+
+  // Large sets (e.g. 900+ on "All Destinations") stream markers progressively using requestAnimationFrame
+  let index = 0;
+  function processChunk() {
+    if (thisToken !== currentMapRenderToken) return; // Stale render superseded
+
+    const end = Math.min(index + CHUNK_SIZE, validSpots.length);
+    for (let i = index; i < end; i++) {
+      const marker = createSingleMarker(validSpots[i], activeSpotId);
+      if (marker) marker.addTo(markersLayer);
+    }
+    index = end;
+
+    if (index < validSpots.length) {
+      requestAnimationFrame(processChunk);
+    }
+  }
+
+  processChunk();
 }
 
 /**
@@ -2152,6 +2205,13 @@ let atlasViewMode = localStorage.getItem('flaneur_atlas_view') || 'compact'; // 
 let atlasSearchQuery = '';
 let isReadOnlyGuide = false;
 
+// Progressive Loading & Feed Pagination (prevents UI freeze on large collections like All Destinations)
+const SPOTS_PAGE_SIZE = 30;
+let currentVisibleSpotsCount = SPOTS_PAGE_SIZE;
+let currentFilteredSpotsCache = [];
+let spotsIntersectionObserver = null;
+let searchDebounceTimer = null;
+
 const REGION_DEFINITIONS = [
   {
     id: 'americas',
@@ -2513,10 +2573,13 @@ function setupEventListeners() {
     setActiveCity(e.target.value);
   });
 
-  // Search Input
+  // Search Input (debounced to avoid freeze while typing)
   searchInput.addEventListener('input', (e) => {
-    searchQuery = e.target.value.trim().toLowerCase();
-    applyFiltersAndRender();
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+      searchQuery = e.target.value.trim().toLowerCase();
+      applyFiltersAndRender(true);
+    }, 120);
   });
 
   // Status Tabs
@@ -2915,7 +2978,10 @@ function renderCategoryDropdown() {
 /**
  * Filter & Render Pipeline
  */
-function applyFiltersAndRender() {
+/**
+ * Filter & Render Pipeline (with progressive loading to prevent freeze on All Destinations)
+ */
+function applyFiltersAndRender(resetPagination = true) {
   // Update counts across active city
   const cityFiltered = spots.filter(s => {
     if (activeCity === 'all') return true;
@@ -2938,7 +3004,7 @@ function applyFiltersAndRender() {
     if (activeCategory !== 'all' && s.category !== activeCategory) return false;
     // Search query
     if (searchQuery) {
-      const match = (s.name + ' ' + (s.neighborhood || '') + ' ' + (s.notes || '')).toLowerCase();
+      const match = (s.name + ' ' + (s.neighborhood || '') + ' ' + (s.notes || '') + ' ' + (s.city || '')).toLowerCase();
       if (!match.includes(searchQuery)) return false;
     }
     return true;
@@ -2959,21 +3025,33 @@ function applyFiltersAndRender() {
     });
   }
 
+  currentFilteredSpotsCache = filtered;
+
+  if (resetPagination) {
+    currentVisibleSpotsCount = SPOTS_PAGE_SIZE;
+  }
+
   // Update spot count label
-  spotsCountLabel.textContent = `Showing ${filtered.length} of ${countAll} spots`;
+  const visibleCount = Math.min(currentVisibleSpotsCount, filtered.length);
+  if (visibleCount < filtered.length) {
+    spotsCountLabel.textContent = `Showing ${visibleCount} of ${filtered.length} spots`;
+  } else {
+    spotsCountLabel.textContent = `Showing ${filtered.length} of ${countAll} spots`;
+  }
 
-  // Render cards
-  renderSpotCards(filtered);
+  // Render cards progressively
+  renderSpotCards(filtered, currentVisibleSpotsCount);
 
-  // Render on Map
+  // Render on Map with progressive streaming & lazy popups
   renderMapSpots(filtered);
 }
 
 /**
- * Render Spot Cards in Feed (with smooth DOM reconciliation to prevent reload flash)
+ * Render Spot Cards in Feed (with progressive pagination to keep mobile main thread fast)
  */
-function renderSpotCards(spotsToRender) {
-  if (spotsToRender.length === 0) {
+function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
+  if (allSpots.length === 0) {
+    if (spotsIntersectionObserver) spotsIntersectionObserver.disconnect();
     spotsListContainer.innerHTML = `
       <div class="empty-spots-notice" style="text-align: center; padding: 40px 20px; color: var(--ink-muted);">
         <p style="font-family: var(--font-serif); font-size: 1.1rem; margin-bottom: 6px;">No spots found</p>
@@ -2982,6 +3060,9 @@ function renderSpotCards(spotsToRender) {
     `;
     return;
   }
+
+  const spotsToRender = allSpots.slice(0, maxVisibleCount);
+  const remainingCount = allSpots.length - spotsToRender.length;
 
   // Remove empty-state notice if present
   const emptyNotice = spotsListContainer.querySelector('.empty-spots-notice');
@@ -3100,7 +3181,7 @@ function renderSpotCards(spotsToRender) {
       document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
       card.classList.add('active-spot');
       focusSpot(spot);
-      renderMapSpots(spotsToRender, spot.id);
+      renderMapSpots(allSpots, spot.id);
 
       // On mobile screens, automatically switch to map view when a card is selected
       if (window.innerWidth <= 820 && mobileToggleMap) {
@@ -3153,6 +3234,72 @@ function renderSpotCards(spotsToRender) {
 
     spotsListContainer.appendChild(card);
   });
+
+  // Remove existing loader or end indicator
+  const existingLoader = spotsListContainer.querySelector('.spots-progressive-loader');
+  if (existingLoader) existingLoader.remove();
+  const existingEnd = spotsListContainer.querySelector('.spots-end-indicator');
+  if (existingEnd) existingEnd.remove();
+
+  if (remainingCount > 0) {
+    const loaderEl = document.createElement('div');
+    loaderEl.className = 'spots-progressive-loader';
+    loaderEl.innerHTML = `
+      <button type="button" class="btn-load-more" id="btn-load-more-spots">
+        Load More Spots (${remainingCount} remaining) ↓
+      </button>
+      <span class="progressive-scroll-hint">or scroll down</span>
+    `;
+    spotsListContainer.appendChild(loaderEl);
+
+    // Button click handler
+    const btn = loaderEl.querySelector('#btn-load-more-spots');
+    if (btn) {
+      btn.addEventListener('click', () => {
+        loadNextSpotsBatch();
+      });
+    }
+
+    // IntersectionObserver for auto-loading as user reaches bottom
+    setupProgressiveIntersectionObserver(loaderEl);
+  } else if (allSpots.length > SPOTS_PAGE_SIZE) {
+    const endEl = document.createElement('div');
+    endEl.className = 'spots-end-indicator';
+    endEl.textContent = `All ${allSpots.length} spots loaded · Archival Field Guide`;
+    spotsListContainer.appendChild(endEl);
+    if (spotsIntersectionObserver) spotsIntersectionObserver.disconnect();
+  } else {
+    if (spotsIntersectionObserver) spotsIntersectionObserver.disconnect();
+  }
+}
+
+/**
+ * Loads next batch of spots smoothly
+ */
+function loadNextSpotsBatch() {
+  if (currentVisibleSpotsCount >= currentFilteredSpotsCache.length) return;
+  currentVisibleSpotsCount += SPOTS_PAGE_SIZE;
+  applyFiltersAndRender(false);
+}
+
+/**
+ * Sets up IntersectionObserver for seamless infinite scrolling
+ */
+function setupProgressiveIntersectionObserver(sentinelEl) {
+  if (spotsIntersectionObserver) {
+    spotsIntersectionObserver.disconnect();
+  }
+  if (!window.IntersectionObserver) return;
+
+  spotsIntersectionObserver = new IntersectionObserver((entries) => {
+    if (entries[0] && entries[0].isIntersecting) {
+      loadNextSpotsBatch();
+    }
+  }, {
+    rootMargin: '300px'
+  });
+
+  spotsIntersectionObserver.observe(sentinelEl);
 }
 
 /**
@@ -4312,11 +4459,6 @@ function openModal(modalEl) {
 
 function closeModal(modalEl) {
   modalEl.classList.remove('active');
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 // Kickoff
