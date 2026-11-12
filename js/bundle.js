@@ -4703,24 +4703,91 @@ const mobileToggleMap = document.getElementById('mobile-toggle-map');
 function init() {
   // Load stored data or default
   const storedCities = getStoredCities();
-  const storedSpots = getStoredSpots();
+  let storedSpots = getStoredSpots();
   if (storedSpots && storedSpots.length > 0) {
+    let spotsMigrated = false;
+    const legacySpotCityMap = {
+      'provence-pont-saint-benezet': 'Provence',
+      'provence-collection-lambert': 'Provence',
+      'provence-cafe-tulipe': 'Provence',
+      'spot-1794432728252-63521': 'Provence',
+      'spot-1794432728255-18062': 'Provence',
+      'spot-1794432728258-41131': 'Provence',
+      'spot-1794432728261-55366': 'Provence',
+      'french-countryside-gordes': 'Provence',
+      'spot-1794432728155-07260': 'Loire Valley',
+      'spot-1794432728158-82508': 'Loire Valley',
+      'spot-1794432728161-69906': 'Loire Valley',
+      'spot-1794432728164-06986': 'Loire Valley',
+      'loire-valley-boulangerie-bigot': 'Loire Valley',
+      'loire-valley-villandry': 'Loire Valley',
+      'french-countryside-chateau-amboise': 'Loire Valley',
+      'spot-1794432728276-62974': 'Normandy',
+      'spot-1794432728279-31993': 'Normandy',
+      'spot-1794432728282-57507': 'Normandy',
+      'normandy-hotel-baudy': 'Normandy',
+      'normandy-mont-saint-michel': 'Normandy',
+      'normandy-bayeux-museum': 'Normandy',
+      'paris-le-moulin-de-la-galette': 'Normandy',
+      'paris-palace-of-versailles': 'Versailles',
+      'paris-petit-trianon': 'Versailles',
+      'paris-airelles-versailles': 'Versailles',
+      'tuscany-siena-cathedral': 'Tuscany',
+      'tuscany-palazzo-pubblico-siena': 'Tuscany',
+      'tuscany-guinigi-tower': 'Tuscany',
+      'tuscany-mura-di-lucca': 'Tuscany',
+      'italian-riviera-chiesa-san-giorgio': 'Italian Riviera',
+      'italian-riviera-castello-brown': 'Italian Riviera',
+      'italian-riviera-villa-durazzo': 'Italian Riviera'
+    };
+
+    storedSpots.forEach(s => {
+      if (legacySpotCityMap[s.id] && s.city !== legacySpotCityMap[s.id]) {
+        s.city = legacySpotCityMap[s.id];
+        spotsMigrated = true;
+      } else if (s.city) {
+        const lc = s.city.toLowerCase();
+        if (lc === 'french countryside' || lc === 'avignon') {
+          s.city = 'Provence';
+          spotsMigrated = true;
+        } else if (lc === 'giverny') {
+          s.city = 'Normandy';
+          spotsMigrated = true;
+        } else if (lc === 'italian countryside') {
+          s.city = 'Tuscany';
+          spotsMigrated = true;
+        } else if (lc === 'costa mesa') {
+          s.city = 'Orange County';
+          spotsMigrated = true;
+        }
+      }
+    });
+    if (spotsMigrated) {
+      saveStoredSpots(storedSpots);
+    }
     spots = storedSpots;
   } else {
     // If local storage is empty, preload SAMPLE_SPOTS so the app is never empty while awaiting cloud sync
     spots = [...SAMPLE_SPOTS];
   }
 
-  // Sanitize stored cities: only keep cities that are in DEFAULT_CITIES or currently have spots
+  // Sanitize stored cities: remove deprecated regions and only keep cities that are in DEFAULT_CITIES or currently have spots
+  const legacyForbiddenCities = new Set(['french countryside', 'italian countryside', 'avignon', 'giverny', 'costa mesa']);
   const validDefaultSet = new Set(DEFAULT_CITIES.map(c => c.toLowerCase()));
-  const spotCitySet = new Set(spots.map(s => (s.city || '').toLowerCase()).filter(Boolean));
+  const spotCitySet = new Set(spots.map(s => (s.city || '').toLowerCase()).filter(c => Boolean(c) && !legacyForbiddenCities.has(c)));
   cities = storedCities.filter(c => {
     const l = c.toLowerCase();
+    if (legacyForbiddenCities.has(l)) return false;
     return validDefaultSet.has(l) || spotCitySet.has(l);
   });
-  if (cities.length === 0) {
-    cities = [...DEFAULT_CITIES];
-  }
+  // Ensure all DEFAULT_CITIES are included
+  DEFAULT_CITIES.forEach(c => {
+    if (!cities.some(existing => existing.toLowerCase() === c.toLowerCase())) {
+      cities.push(c);
+    }
+  });
+  cities.sort((a, b) => a.localeCompare(b));
+  saveStoredCities(cities);
 
   // Restore active city preference if available and valid in Field Guide
   let savedActiveCity = localStorage.getItem('flaneur_active_city');
@@ -4862,27 +4929,41 @@ async function syncWithSupabase(manual = false) {
     }
 
     // Remote Supabase is source of truth
-    const isDataDifferent = (spots.length !== remote.length) || (localNewSpots.length > 0);
+    const isDataDifferent = (spots.length !== remote.length) ||
+      (localNewSpots.length > 0) ||
+      spots.some(s => {
+        const r = remoteMap.get(s.id);
+        return !r || r.photoUrl !== s.photoUrl || r.status !== s.status || r.name !== s.name || r.notes !== s.notes || r.hours !== s.hours || r.city !== s.city;
+      });
     const prevActiveCity = activeCity;
 
     spots = remote;
-    if (isDataDifferent) {
-      saveStoredSpots(spots);
-    }
+    saveStoredSpots(spots);
 
     // 4. Synchronize cities strictly from dedicated field_guide_cities and spots
     const remoteCities = await fetchRemoteCities();
     const spotCityNames = [...new Set(spots.map(s => s.city).filter(Boolean))];
 
+    const forbiddenLegacy = new Set(['french countryside', 'italian countryside', 'avignon', 'giverny', 'costa mesa']);
     let combinedCities = (Array.isArray(remoteCities) && remoteCities.length > 0)
-      ? remoteCities
+      ? remoteCities.filter(c => !forbiddenLegacy.has(c.toLowerCase()))
       : [...DEFAULT_CITIES];
 
     // Ensure any city present in spots is represented
     const citySet = new Set(combinedCities.map(c => c.toLowerCase()));
     spotCityNames.forEach(c => {
-      if (!citySet.has(c.toLowerCase())) {
-        citySet.add(c.toLowerCase());
+      const lc = c.toLowerCase();
+      if (!forbiddenLegacy.has(lc) && !citySet.has(lc)) {
+        citySet.add(lc);
+        combinedCities.push(c);
+      }
+    });
+
+    // Ensure all DEFAULT_CITIES are included
+    DEFAULT_CITIES.forEach(c => {
+      const lc = c.toLowerCase();
+      if (!forbiddenLegacy.has(lc) && !citySet.has(lc)) {
+        citySet.add(lc);
         combinedCities.push(c);
       }
     });
@@ -4922,13 +5003,11 @@ async function syncWithSupabase(manual = false) {
 
     updateCityTriggerButton();
 
-    // Only trigger re-render if data actually changed or active city switched!
-    if (isDataDifferent || activeCity !== prevActiveCity) {
-      if (activeCity !== prevActiveCity) {
-        centerCityOnMap(activeCity, spots);
-      }
-      applyFiltersAndRender(false);
+    if (activeCity !== prevActiveCity) {
+      centerCityOnMap(activeCity, spots);
     }
+    applyFiltersAndRender(false);
+    renderCityManagerList();
 
     updateSyncStatus('synced', `synced (${spots.length})`);
 
