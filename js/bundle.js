@@ -10,9 +10,9 @@ const CITIES_KEY = 'flaneur_cities_v1';
 const DEFAULT_CITIES = [
   'Amsterdam', 'Avignon', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
   'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
-  'English Countryside', 'Florence', 'Giverny', 'Helsinki', 'Huntington Beach',
+  'English Countryside', 'Florence', 'French Countryside', 'Helsinki', 'Huntington Beach',
   'Iceland', 'Irish Countryside', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
-  'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Melbourne', 'Mexico City',
+  'Lisbon', 'London', 'Los Angeles', 'Melbourne', 'Mexico City',
   'Montreal', 'Newport Beach', 'New York', 'Nice', 'Orange', 'Orange County',
   'Oslo', 'Paris', 'Phoenix', 'Portland', 'Prague', 'Quebec City', 'Rome',
   'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
@@ -21,12 +21,11 @@ const DEFAULT_CITIES = [
 
 const KNOWN_CITY_META = {
   'orange county': { code: 'OC', country: 'California, USA', region: 'americas', type: 'county' },
-  'loire valley': { code: 'LOI', country: 'France', region: 'europe', type: 'area' },
+  'french countryside': { code: 'FRA', country: 'France', region: 'europe', type: 'area' },
   'english countryside': { code: 'ENG', country: 'United Kingdom', region: 'europe', type: 'area' },
   'scottish countryside': { code: 'SCO', country: 'Scotland, UK', region: 'europe', type: 'area' },
   'irish countryside': { code: 'IRE', country: 'Ireland', region: 'europe', type: 'area' },
   'iceland': { code: 'ICE', country: 'Iceland', region: 'europe', type: 'area' },
-  'giverny': { code: 'GIV', country: 'France', region: 'europe', type: 'area' },
   'boston': { code: 'BOS', country: 'Massachusetts, USA', region: 'americas', type: 'city' },
   'barcelona': { code: 'BCN', country: 'Spain', region: 'europe', type: 'city' },
   'seattle': { code: 'SEA', country: 'Washington, USA', region: 'americas', type: 'city' },
@@ -1041,6 +1040,315 @@ const SAMPLE_SPOTS = [
     notes: 'One of England most celebrated 20th-century gardens, created by poet Vita Sackville-West and Harold Nicolson. Famous for its monochromatic White Garden, Rose Garden, and historic Elizabethan tower.',
     visitDate: '',
     photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Statue_in_the_Gardens_at_Sissinghurst_Castle.jpg/1280px-Statue_in_the_Gardens_at_Sissinghurst_Castle.jpg'
+  },
+  // --- FRENCH COUNTRYSIDE ---
+  {
+    id: 'spot-1794432728164-06986',
+    name: 'Boulangerie Pâtisserie Bigot',
+    city: 'French Countryside',
+    neighborhood: 'Amboise',
+    category: 'pastry_bakery',
+    status: 'wishlist',
+    favorite: false,
+    lat: 47.4135,
+    lng: 0.9832,
+    daysOpen: 'Daily',
+    hours: 'Tue-Sun 07:30 - 19:30, Mon Closed',
+    notes: 'Beloved family-run tearoom and confectionery operating since 1913 at the foot of Château d\'Amboise, legendary for artisanal macarons, nougat, tarte Tatin, and rich hot chocolate.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/La_tour_de_l%27Horloge%2C_vue_prise_%C3%A0_l%27angle_de_l%27actuelle_rue_Nationale_et_la_rue_Victor_Hugo_%28actuelle_place_Michel_Debr%C3%A9%29_-_A72220.jpg/1280px-La_tour_de_l%27Horloge%2C_vue_prise_%C3%A0_l%27angle_de_l%27actuelle_rue_Nationale_et_la_rue_Victor_Hugo_%28actuelle_place_Michel_Debr%C3%A9%29_-_A72220.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  {
+    id: 'spot-1794432728158-82508',
+    name: 'Château de Chambord',
+    city: 'French Countryside',
+    neighborhood: 'Chambord',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 47.6161,
+    lng: 1.5172,
+    daysOpen: 'Daily',
+    hours: 'Daily 09:00 - 17:00',
+    notes: 'Monumental French Renaissance hunting lodge built for Francis I with Leonardo da Vinci\'s famed central double-helix staircase, crowned by an intricate rooftop forest of lantern towers and chimneys.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Aerial_image_of_Ch%C3%A2teau_de_Chambord_%28view_from_the_southeast%29.jpg/1280px-Aerial_image_of_Ch%C3%A2teau_de_Chambord_%28view_from_the_southeast%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  {
+    id: 'spot-1794432728155-07260',
+    name: 'Château de Chenonceau',
+    city: 'French Countryside',
+    neighborhood: 'Chenonceaux',
+    category: 'parks_nature',
+    status: 'visited',
+    favorite: true,
+    lat: 47.3249,
+    lng: 1.0703,
+    daysOpen: 'Daily',
+    hours: 'Daily 09:00 - 18:00',
+    notes: 'The iconic \'Ladies\' Château\' gracefully arched across the Cher River. Exceptional French formal parterres planted by Diane de Poitiers and Catherine de\' Medici, alongside magnificent Renaissance grand galleries.',
+    visitDate: '2026-11-12',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Chateau_de_Chenonceau_2008E_%28adjusted2%29.jpg/1280px-Chateau_de_Chenonceau_2008E_%28adjusted2%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  {
+    id: 'loire-valley-villandry',
+    name: 'Château de Villandry',
+    city: 'French Countryside',
+    neighborhood: 'Villandry, Indre-et-Loire',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 47.340566,
+    lng: 0.514606,
+    daysOpen: 'Daily',
+    hours: '09:00 - 18:00 (Gardens from 09:00)',
+    notes: 'World-renowned Renaissance château famous for its elaborate formal terraced gardens: geometric water garden, ornamental flower salons of love and music, Renaissance kitchen vegetable parterres, and herb garden.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/16_Villandry_%2896%29_%2813197365114%29.jpg/1280px-16_Villandry_%2896%29_%2813197365114%29.jpg'
+  },
+  {
+    id: 'spot-1794432728276-62974',
+    name: 'Claude Monet\'s House & Water Lilies Gardens',
+    city: 'French Countryside',
+    neighborhood: 'Giverny',
+    category: 'parks_nature',
+    status: 'visited',
+    favorite: true,
+    lat: 49.0753,
+    lng: 1.5337,
+    daysOpen: 'Daily',
+    hours: 'Daily (Apr-Nov) 09:30 - 18:00',
+    notes: 'Monet\'s radiant pink-stucco home and iconic Japanese water garden with the green arched bridge, weeping willows, and floating water lilies that inspired the Nymphéas masterpieces.',
+    visitDate: '2026-11-12',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/La_maison_de_Claude_Monet_%28Giverny%29_%2848744281997%29.jpg/1280px-La_maison_de_Claude_Monet_%28Giverny%29_%2848744281997%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  {
+    id: 'spot-1794432728161-69906',
+    name: 'Domaine de Chaumont-sur-Loire',
+    city: 'French Countryside',
+    neighborhood: 'Chaumont-sur-Loire',
+    category: 'museums_art',
+    status: 'visited',
+    favorite: true,
+    lat: 47.4789,
+    lng: 1.1818,
+    daysOpen: 'Daily',
+    hours: 'Daily 10:00 - 19:00',
+    notes: 'Historic cliffside fortress overlooking the Loire, world-famous for its annual International Garden Festival featuring avant-garde landscape architecture and contemporary botanical installations.',
+    visitDate: '2026-11-12',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Chateau_de_Chaumont%2C_2008.jpg/1280px-Chateau_de_Chaumont%2C_2008.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  {
+    id: 'spot-1794432728282-57507',
+    name: 'Hôtel Baudy (Historic Impressionist Inn)',
+    city: 'French Countryside',
+    neighborhood: 'Giverny',
+    category: 'food_wine',
+    status: 'wishlist',
+    favorite: false,
+    lat: 49.0768,
+    lng: 1.5284,
+    daysOpen: 'Daily',
+    hours: 'Tue-Sun 10:00 - 21:00',
+    notes: 'Historic gathering haunt for Cézanne, Rodin, and American Impressionists in the 1890s, retaining its original artist studio in the garden behind the terraced bistro.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Ancien_Hotel_Baudy_-_Giverny_%283746435669%29.jpg/1280px-Ancien_Hotel_Baudy_-_Giverny_%283746435669%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  {
+    id: 'normandy-mont-saint-michel',
+    name: 'Mont-Saint-Michel',
+    city: 'French Countryside',
+    neighborhood: 'Manche, Normandy',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 48.635954,
+    lng: -1.51146,
+    daysOpen: 'Daily',
+    hours: 'Island open 24/7 · Abbey 09:30 - 18:00',
+    notes: 'Sublime UNESCO World Heritage tidal island commune crowned by a soaring 8th-century Gothic-Romanesque Benedictine abbey. Famous for Europe’s highest tidal range, medieval ramparts, winding cobblestone streets, and the dramatic causeway approach.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Mont_St_Michel_at_sunrise.jpg/1280px-Mont_St_Michel_at_sunrise.jpg'
+  },
+  {
+    id: 'normandy-bayeux-museum',
+    name: 'Musée de la Tapisserie de Bayeux',
+    city: 'French Countryside',
+    neighborhood: 'Centre Guillaume le Conquérant, Bayeux',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 49.274413,
+    lng: -0.699938,
+    daysOpen: 'Daily',
+    hours: '09:00 - 18:30 (seasonal)',
+    notes: 'Home of the legendary 11th-century Bayeux Tapestry (UNESCO Memory of the World), an embroidered linen masterpiece nearly 70 meters long depicting William the Conqueror, the Norman Conquest, and the Battle of Hastings in 1066.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Bayeux_Centre_Guillaume_le_Conqu%C3%A9rant_Tapisserie_de_Bayeux_1.jpg/1280px-Bayeux_Centre_Guillaume_le_Conqu%C3%A9rant_Tapisserie_de_Bayeux_1.jpg'
+  },
+  {
+    id: 'spot-1794432728279-31993',
+    name: 'Musée des Impressionnismes Giverny',
+    city: 'French Countryside',
+    neighborhood: 'Rue Claude Monet',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 49.0763,
+    lng: 1.5312,
+    daysOpen: 'Daily',
+    hours: 'Daily 10:00 - 18:00',
+    notes: 'Contemporary museum dedicated to the global history and evolution of Impressionism, surrounded by breathtaking garden terraces designed by Mark Rudkin.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Mus%C3%A9e_des_impressionnismes_Giverny_01.jpg/1280px-Mus%C3%A9e_des_impressionnismes_Giverny_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+  },
+  // --- IRISH COUNTRYSIDE ---
+  {
+    id: 'irish-countryside-tearaght-island',
+    name: 'Tearaght Island (An Tiaracht)',
+    city: 'Irish Countryside',
+    neighborhood: 'Blasket Islands, Co. Kerry',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 52.075939,
+    lng: -10.656331,
+    daysOpen: 'Accessible by boat tour / weather permitting',
+    hours: 'Boat departures seasonal from Dingle & Dunquin',
+    notes: 'The westernmost of the Blasket Islands and the most westerly point of Ireland. Towering pyramidal rock pinnacle rising 200m from the Atlantic Ocean with a historic 1870 lighthouse and Ireland’s steepest funicular incline railway.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/1987._Tearaght_Island_aka_Inishtearaght_aka_An_Tiaracht_01.jpg/1280px-1987._Tearaght_Island_aka_Inishtearaght_aka_An_Tiaracht_01.jpg'
+  },
+  // --- SCOTTISH COUNTRYSIDE ---
+  {
+    id: 'scottish-countryside-kellie-castle',
+    name: 'Kellie Castle & Garden',
+    city: 'Scottish Countryside',
+    neighborhood: 'Arncroach, Pittenweem, Fife',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 56.237210,
+    lng: -2.775957,
+    daysOpen: 'Thu - Mon',
+    hours: 'Estate 10:00 - 17:00 · Castle seasonal',
+    notes: 'Magnificent 14th-century Scottish baronial fortress in the East Neuk of Fife, restored by the artistic Lorimer family. Features Scotland’s oldest decorative plaster ceilings, painted paneling, and an organic Arts & Crafts walled garden.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Kellie_Castle%2C_East_Neuk_of_Fife.jpg/1280px-Kellie_Castle%2C_East_Neuk_of_Fife.jpg'
+  },
+  // --- ENGLISH COUNTRYSIDE ---
+  {
+    id: 'english-countryside-nymans',
+    name: 'Nymans',
+    city: 'English Countryside',
+    neighborhood: 'Handcross, Haywards Heath, West Sussex',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 51.052508,
+    lng: -0.199828,
+    daysOpen: 'Daily',
+    hours: '10:00 - 17:00',
+    notes: 'Romantic National Trust estate created by Ludwig Messel in the Sussex High Weald. Renowned for its theatrical stone house ruins draped in wisteria, vibrant summer borders, rare botanical collection, and tranquil woodland walks.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Nymans_West-Sussex-UK.jpg/1280px-Nymans_West-Sussex-UK.jpg'
+  },
+  {
+    id: 'english-countryside-grasmere-gingerbread',
+    name: "Sarah Nelson's Grasmere Gingerbread",
+    city: 'English Countryside',
+    neighborhood: 'Church Cottage, Grasmere, Lake District',
+    category: 'pastry_bakery',
+    status: 'wishlist',
+    favorite: true,
+    lat: 54.457914,
+    lng: -3.023610,
+    daysOpen: 'Mon - Sat 09:30 - 17:00 · Sun 11:30 - 16:30',
+    hours: '09:30 - 17:00',
+    notes: "Iconic Lake District bakery founded in 1854 by Victorian cook Sarah Nelson in Church Cottage, a tiny former village schoolhouse beside St Oswald's Church. World-famous secret-recipe gingerbread cross between cake and biscuit, hand-wrapped in greaseproof parchment.",
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Grasmere_%2C_Sarah_Nelson%27s_Grasmere_Gingerbread_-_geograph.org.uk_-_6357655.jpg/1280px-Grasmere_%2C_Sarah_Nelson%27s_Grasmere_Gingerbread_-_geograph.org.uk_-_6357655.jpg'
+  },
+  {
+    id: 'english-countryside-arundel-castle',
+    name: 'Arundel Castle',
+    city: 'English Countryside',
+    neighborhood: 'Arundel, West Sussex',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 50.856776,
+    lng: -0.554030,
+    daysOpen: 'Tue - Sun (Apr - Oct)',
+    hours: '10:00 - 17:00',
+    notes: "Dramatic nearly 1,000-year-old medieval castle and ancestral seat of the Duke of Norfolk, overlooking the River Arun and South Downs. Highlights include the Norman keep, Baron's Hall, Collector Earl's Italianate Garden, and extensive armory.",
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Arundel-Castle.jpg/1280px-Arundel-Castle.jpg'
+  },
+  {
+    id: 'english-countryside-swanbourne-lake',
+    name: 'Swanbourne Lake',
+    city: 'English Countryside',
+    neighborhood: 'Mill Road, Arundel, West Sussex',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 50.863171,
+    lng: -0.557861,
+    daysOpen: 'Daily',
+    hours: 'Dawn to dusk · Tea Room 10:00 - 16:30',
+    notes: 'Picturesque spring-fed chalk lake situated directly beneath Arundel Castle and the wooded slopes of Arundel Park. Popular for quiet woodland perimeter walks, wild waterfowl watching, rowing boat rentals, and the traditional Swanbourne Lake Tea Room.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Swanbourne_Lake%2C_Arundel_-_geograph.org.uk_-_3985489.jpg/1280px-Swanbourne_Lake%2C_Arundel_-_geograph.org.uk_-_3985489.jpg'
+  },
+  {
+    id: 'english-countryside-seven-sisters',
+    name: 'Seven Sisters Cliffs',
+    city: 'English Countryside',
+    neighborhood: 'South Downs National Park, East Sussex',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 50.745569,
+    lng: 0.194016,
+    daysOpen: 'Daily',
+    hours: 'Open 24 hours · Visitor Centre 10:00 - 16:30',
+    notes: 'Iconic series of undulating chalk sea cliffs along the English Channel between Seaford and Eastbourne. Pristine natural shoreline within the South Downs National Park offering dramatic coastal clifftop hiking from Cuckmere Haven to Birling Gap and Beachy Head.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Seven_Sisters_4.jpg/1280px-Seven_Sisters_4.jpg'
+  },
+  {
+    id: 'english-countryside-lamb-house',
+    name: 'Lamb House',
+    city: 'English Countryside',
+    neighborhood: 'West Street, Rye, East Sussex',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 50.949932,
+    lng: 0.732714,
+    daysOpen: 'Mon, Tue, Fri, Sat (seasonal)',
+    hours: '11:00 - 16:30',
+    notes: 'Charming Grade II* listed Georgian red-brick house in the historic hilltop citadel of Rye. Rich literary heritage as the home of American author Henry James from 1898 to 1916 (where he wrote The Wings of the Dove and The Ambassadors) and later E.F. Benson.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/LAMB_HOUSE%2C_RYE%2C_ENGLAND.jpg/1280px-LAMB_HOUSE%2C_RYE%2C_ENGLAND.jpg'
+  },
+  // --- PARIS ---
+  {
+    id: 'paris-le-moulin-de-la-galette',
+    name: 'Le Moulin de la Galette',
+    city: 'Paris',
+    neighborhood: 'Montmartre, 18e Arrondissement',
+    category: 'food_wine',
+    status: 'wishlist',
+    favorite: true,
+    lat: 48.887651,
+    lng: 2.336297,
+    daysOpen: 'Daily',
+    hours: '12:00 - 23:00',
+    notes: "Historic 17th-century wooden windmill and celebrated Montmartre guinguette immortalized in Renoir's 1876 masterpiece and paintings by Van Gogh. Now an atmospheric bistro on Rue Lepic serving refined seasonal French cuisine and wine in a romantic garden courtyard.",
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Moulin_de_la_Galette%2C_Montmartre%2C_Paris_October_2016_001.jpg/1280px-Moulin_de_la_Galette%2C_Montmartre%2C_Paris_October_2016_001.jpg'
   }
 ];
 
@@ -1345,12 +1653,11 @@ function createMarkerIcon(category, isFavorite, isVisited) {
 
 const KNOWN_CITY_COORDS = {
   'orange county': [33.7175, -117.8311],
-  'loire valley': [47.3941, 0.6848],
+  'french countryside': [48.3000, 0.3000],
   'english countryside': [51.9294, -1.8236],
   'scottish countryside': [57.1497, -4.6780],
   'irish countryside': [53.4862, -9.6644],
   'iceland': [64.1466, -21.9426],
-  'giverny': [49.0760, 1.5303],
   'boston': [42.3601, -71.0589],
   'barcelona': [41.3879, 2.1699],
   'seattle': [47.6062, -122.3321],
@@ -2538,6 +2845,11 @@ function init() {
     savedActiveCity = 'Orange County';
     localStorage.setItem('flaneur_active_city', 'Orange County');
   }
+  // Auto-migrate legacy 'Giverny', 'Loire Valley', and 'Normandy' to 'French Countryside'
+  if (savedActiveCity && ['giverny', 'loire valley', 'normandy'].includes(savedActiveCity.toLowerCase())) {
+    savedActiveCity = 'French Countryside';
+    localStorage.setItem('flaneur_active_city', 'French Countryside');
+  }
 
   if (savedActiveCity && (savedActiveCity === 'all' || cities.some(c => c.toLowerCase() === savedActiveCity.toLowerCase()))) {
     activeCity = savedActiveCity;
@@ -2699,6 +3011,9 @@ async function syncWithSupabase(manual = false) {
       }
     } else if (activeCity.toLowerCase() === 'costa mesa') {
       activeCity = 'Orange County';
+      localStorage.setItem('flaneur_active_city', activeCity);
+    } else if (['giverny', 'loire valley', 'normandy'].includes(activeCity.toLowerCase())) {
+      activeCity = 'French Countryside';
       localStorage.setItem('flaneur_active_city', activeCity);
     } else if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
       // If activeCity is no longer in Field Guide's cities list, fallback safely to Orange County

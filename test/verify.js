@@ -101,11 +101,11 @@ assert.strictEqual(ocMeta.typeLabel, 'County');
 assert.strictEqual(ocMeta.code, 'OC');
 console.log('✓ Orange County classified as County (OC)');
 
-const loireMeta = getDestinationMeta('Loire Valley');
-assert.strictEqual(loireMeta.type, 'area');
-assert.strictEqual(loireMeta.typeLabel, 'Area');
-assert.strictEqual(loireMeta.code, 'LOI');
-console.log('✓ Loire Valley classified as Area (LOI)');
+const frenchMeta = getDestinationMeta('French Countryside');
+assert.strictEqual(frenchMeta.type, 'area');
+assert.strictEqual(frenchMeta.typeLabel, 'Area');
+assert.strictEqual(frenchMeta.code, 'FRA');
+console.log('✓ French Countryside classified as Area (FRA)');
 
 const parisMeta = getDestinationMeta('Paris');
 assert.strictEqual(parisMeta.type, 'city');

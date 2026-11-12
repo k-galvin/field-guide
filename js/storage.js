@@ -6,9 +6,9 @@ const CITIES_KEY = 'flaneur_cities_v1';
 export const DEFAULT_CITIES = [
   'Amsterdam', 'Avignon', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
   'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
-  'English Countryside', 'Florence', 'Giverny', 'Helsinki', 'Huntington Beach',
+  'English Countryside', 'Florence', 'French Countryside', 'Helsinki', 'Huntington Beach',
   'Iceland', 'Irish Countryside', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
-  'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Melbourne', 'Mexico City',
+  'Lisbon', 'London', 'Los Angeles', 'Melbourne', 'Mexico City',
   'Montreal', 'Newport Beach', 'New York', 'Nice', 'Orange', 'Orange County',
   'Oslo', 'Paris', 'Phoenix', 'Portland', 'Prague', 'Quebec City', 'Rome',
   'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
@@ -17,12 +17,11 @@ export const DEFAULT_CITIES = [
 
 export const KNOWN_CITY_META = {
   'orange county': { code: 'OC', country: 'California, USA', region: 'americas', type: 'county' },
-  'loire valley': { code: 'LOI', country: 'France', region: 'europe', type: 'area' },
+  'french countryside': { code: 'FRA', country: 'France', region: 'europe', type: 'area' },
   'english countryside': { code: 'ENG', country: 'United Kingdom', region: 'europe', type: 'area' },
   'scottish countryside': { code: 'SCO', country: 'Scotland, UK', region: 'europe', type: 'area' },
   'irish countryside': { code: 'IRE', country: 'Ireland', region: 'europe', type: 'area' },
   'iceland': { code: 'ICE', country: 'Iceland', region: 'europe', type: 'area' },
-  'giverny': { code: 'GIV', country: 'France', region: 'europe', type: 'area' },
   'boston': { code: 'BOS', country: 'Massachusetts, USA', region: 'americas', type: 'city' },
   'barcelona': { code: 'BCN', country: 'Spain', region: 'europe', type: 'city' },
   'seattle': { code: 'SEA', country: 'Washington, USA', region: 'americas', type: 'city' },

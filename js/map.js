@@ -39,12 +39,11 @@ function createMarkerIcon(category, isFavorite, isVisited) {
 
 export const KNOWN_CITY_COORDS = {
   'orange county': [33.7175, -117.8311],
-  'loire valley': [47.3941, 0.6848],
+  'french countryside': [48.3000, 0.3000],
   'english countryside': [51.9294, -1.8236],
   'scottish countryside': [57.1497, -4.6780],
   'irish countryside': [53.4862, -9.6644],
   'iceland': [64.1466, -21.9426],
-  'giverny': [49.0760, 1.5303],
   'boston': [42.3601, -71.0589],
   'barcelona': [41.3879, 2.1699],
   'seattle': [47.6062, -122.3321],
