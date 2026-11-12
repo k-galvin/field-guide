@@ -1026,6 +1026,22 @@ export const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: 'images/spots/amsterdam-van-gogh-museum.jpg'
   },
+  {
+    id: 'amsterdam-rijksmuseum',
+    name: 'Rijksmuseum',
+    city: 'Amsterdam',
+    neighborhood: 'Museumplein',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 52.3600,
+    lng: 4.8852,
+    daysOpen: 'Daily',
+    hours: 'Daily 09:00 - 17:00',
+    notes: 'The national museum of the Netherlands, housed in Pierre Cuypers’ monumental 1885 neo-Renaissance palace. World-renowned for Dutch Golden Age masterpieces including Rembrandt’s The Night Watch, Vermeer’s The Milkmaid, and the Cuypers Library.',
+    visitDate: '',
+    photoUrl: 'images/spots/amsterdam-rijksmuseum.jpg'
+  },
   // --- ICELAND ---
   {
     id: 'iceland-280-bakari',
@@ -1058,5 +1074,39 @@ export const SAMPLE_SPOTS = [
     notes: 'Geothermal oceanfront sanctuary with a dramatic 70-meter infinity edge blending directly into the North Atlantic. Features traditional turf-house architecture, a swim-up bar, and the signature 7-Step Ritual with panoramic ocean-view sauna.',
     visitDate: '',
     photoUrl: 'images/spots/iceland-sky-lagoon.jpg'
+  },
+  // --- ROME ---
+  {
+    id: 'rome-capitoline-museums',
+    name: 'Capitoline Museums (Musei Capitolini)',
+    city: 'Rome',
+    neighborhood: 'Piazza del Campidoglio',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 41.893126,
+    lng: 12.482660,
+    daysOpen: 'Daily',
+    hours: 'Daily 09:30 - 19:30',
+    notes: 'The world’s oldest public museum, founded in 1471 by Pope Sixtus IV atop the Capitoline Hill. Housed in Michelangelo-designed palazzi on Piazza del Campidoglio, featuring the colossal statue of Constantine, the Capitoline Wolf bronze, and equestrian Marcus Aurelius.',
+    visitDate: '',
+    photoUrl: 'images/spots/rome-capitoline-museums.jpg'
+  },
+  // --- BARCELONA ---
+  {
+    id: 'barcelona-picasso-museum',
+    name: 'Museu Picasso',
+    city: 'Barcelona',
+    neighborhood: 'El Born / La Ribera',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 41.3852,
+    lng: 2.1809,
+    daysOpen: 'Tue - Sun',
+    hours: 'Tue - Sun 10:00 - 19:00 (Closed Mon)',
+    notes: 'Housed across five contiguous medieval stone palaces on Carrer de Montcada in El Born. Houses over 4,000 works tracing Picasso’s formative early years in Barcelona, his Blue Period, and his complete 58-canvas Las Meninas interpretation series.',
+    visitDate: '',
+    photoUrl: 'images/spots/barcelona-picasso-museum.jpg'
   }
 ];
