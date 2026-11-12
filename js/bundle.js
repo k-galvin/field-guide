@@ -909,7 +909,7 @@ const SAMPLE_SPOTS = [
     hours: 'Check-in 15:00 · Dinner 18:30 - 21:00',
     notes: 'Historic 17th-century country house hotel and birthplace of modern Irish farm-to-table cuisine founded by Myrtle Allen. Surrounded by rolling East Cork farmland, herb gardens, and walled orchards.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Midleton_-_Ballymaloe_House_-_20180813133530.jpg/1280px-Midleton_-_Ballymaloe_House_-_20180813133530.jpg'
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/38/Ballymaloe_House.jpg'
   },
   {
     id: 'irish-countryside-dingle-fish',
