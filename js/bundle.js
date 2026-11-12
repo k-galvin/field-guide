@@ -2855,12 +2855,25 @@ function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 
   // Add custom zoom control in bottom right
   L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 
-  // CartoDB Voyager: Fast global CDN, OpenStreetMap data, retina/HiDPI support, zero 403 blocks
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-  }).addTo(mapInstance);
+  // OpenStreetMap standard tiles (100% free, zero API key) with automatic HOT fallback
+  const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  });
+
+  osmLayer.on('tileerror', () => {
+    if (!mapInstance._hasFallenBackTileLayer) {
+      mapInstance._hasFallenBackTileLayer = true;
+      mapInstance.removeLayer(osmLayer);
+      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        subdomains: 'abc',
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/">Humanitarian OpenStreetMap Team</a>'
+      }).addTo(mapInstance);
+    }
+  });
+
+  osmLayer.addTo(mapInstance);
 
   markersLayer = L.layerGroup().addTo(mapInstance);
 
@@ -4710,7 +4723,7 @@ function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
 
     const mediaHtml = spot.photoUrl ? `
       <div class="card-media">
-        <img src="${escapeHtml(spot.photoUrl)}" alt="${escapeHtml(spot.name)}" class="card-photo" loading="lazy" onerror="this.parentElement.style.display='none';">
+        <img src="${escapeHtml(spot.photoUrl)}" alt="${escapeHtml(spot.name)}" class="card-photo" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none';">
         <span class="card-media-cat-badge">
           ${cat.iconSvg ? `<span class="badge-icon">${cat.iconSvg}</span>` : ''}
           ${escapeHtml(cat.label.toLowerCase())}

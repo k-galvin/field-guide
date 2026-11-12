@@ -1034,7 +1034,7 @@ function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
 
     const mediaHtml = spot.photoUrl ? `
       <div class="card-media">
-        <img src="${escapeHtml(spot.photoUrl)}" alt="${escapeHtml(spot.name)}" class="card-photo" loading="lazy" onerror="this.parentElement.style.display='none';">
+        <img src="${escapeHtml(spot.photoUrl)}" alt="${escapeHtml(spot.name)}" class="card-photo" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none';">
         <span class="card-media-cat-badge">
           ${cat.iconSvg ? `<span class="badge-icon">${cat.iconSvg}</span>` : ''}
           ${escapeHtml(cat.label.toLowerCase())}
