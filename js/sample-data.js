@@ -993,6 +993,38 @@ export const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: 'images/spots/english-countryside-hundred-acre-wood.jpg'
   },
+  {
+    id: 'english-countryside-blenheim-palace',
+    name: 'Blenheim Palace',
+    city: 'English Countryside',
+    neighborhood: 'Woodstock, Oxfordshire',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 51.841940,
+    lng: -1.361390,
+    daysOpen: 'Daily',
+    hours: 'Palace 10:30 - 16:30, Park 09:00 - 17:30',
+    notes: 'Monumental English Baroque country palace and UNESCO World Heritage site, seat of the Dukes of Marlborough and the birthplace of Sir Winston Churchill. Surrounded by 2,000 acres of Capability Brown-designed landscaped parkland, formal water terraces, and the Great Lake.',
+    visitDate: '',
+    photoUrl: 'images/spots/english-countryside-blenheim-palace.jpg'
+  },
+  {
+    id: 'english-countryside-salisbury-cathedral',
+    name: 'Salisbury Cathedral',
+    city: 'English Countryside',
+    neighborhood: 'The Close, Salisbury, Wiltshire',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 51.064720,
+    lng: -1.797500,
+    daysOpen: 'Daily',
+    hours: 'Mon - Sat 09:30 - 17:00, Sun 12:30 - 16:00',
+    notes: 'Masterpiece of Early English Gothic architecture set in Britain’s largest Cathedral Close. Houses the tallest church spire in the United Kingdom (123m), the world’s oldest working mechanical clock (1386), and the best-preserved 1215 original copy of the Magna Carta.',
+    visitDate: '',
+    photoUrl: 'images/spots/english-countryside-salisbury-cathedral.jpg'
+  },
   // --- AMSTERDAM ---
   {
     id: 'amsterdam-winkel-43',
@@ -1108,5 +1140,21 @@ export const SAMPLE_SPOTS = [
     notes: 'Housed across five contiguous medieval stone palaces on Carrer de Montcada in El Born. Houses over 4,000 works tracing Picasso’s formative early years in Barcelona, his Blue Period, and his complete 58-canvas Las Meninas interpretation series.',
     visitDate: '',
     photoUrl: 'images/spots/barcelona-picasso-museum.jpg'
+  },
+  {
+    id: 'barcelona-la-pedrera',
+    name: 'Casa Milà (La Pedrera)',
+    city: 'Barcelona',
+    neighborhood: 'Passeig de Gràcia, Eixample',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 41.395278,
+    lng: 2.161667,
+    daysOpen: 'Daily',
+    hours: 'Daily 09:00 - 20:30 (Night visits 21:00 - 23:00)',
+    notes: 'Antoni Gaudí’s modernist civic masterpiece, celebrated for its undulating rough-hewn stone facade, wrought-iron balconies, catenary attic arches, and the surreal Warrior Chimney rooftop sculptures overlooking Passeig de Gràcia.',
+    visitDate: '',
+    photoUrl: 'images/spots/barcelona-la-pedrera.jpg'
   }
 ];
