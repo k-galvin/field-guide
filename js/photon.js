@@ -23,13 +23,13 @@ export function mapOsmTagToCategory(props = {}, name = '') {
     return 'hotels_stays';
   }
   if (['bar', 'pub', 'lounge', 'biergarten'].includes(osmValue) || /cocktail|cocktails|speakeasy|listening bar|pub\b|tavern|taproom|saloon|brewery/.test(lowerName)) {
-    return 'bars_nightlife';
+    return 'cocktails_nightlife';
   }
   if (['deli', 'sandwich', 'fast_food', 'food_court', 'canteen'].includes(osmValue) || /brunch|lunch|sandwich|deli\b|bagel|bagels|diner|all-day café|all-day cafe/.test(lowerName)) {
     return 'food_dining';
   }
   if (['wine'].includes(osmValue) || /wine bar|natural wine|vins\b|enoteca|bodega/.test(lowerName)) {
-    return 'food_wine';
+    return 'wine_small_plates';
   }
   if (['restaurant', 'bistro'].includes(osmValue) || /restaurant|bistro|tacos?|pizza|ramen|taqueria|trattoria|izakaya|dining|steakhouse|sushi|pasta/.test(lowerName)) {
     return 'food_dining';

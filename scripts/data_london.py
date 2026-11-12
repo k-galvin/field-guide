@@ -50,7 +50,7 @@ DATA_LONDON = {
         "notes": "Sourdough craft bakery tucked in a mews behind the British Museum. Famous for slow-fermented morning buns, sourdough beignets, and seasonal cream buns."
     },
     "Café Vins": {
-        "category": "food_wine",
+        "category": "wine_small_plates",
         "neighborhood": "Soho",
         "hours": "12:00 - 23:00",
         "notes": "Cozy natural wine bar and bistro offering European low-intervention bottles, artisanal charcuterie, and candlelit evening conversation."

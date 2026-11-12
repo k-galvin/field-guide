@@ -250,15 +250,15 @@ export const CATEGORIES = [
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"></path><path d="M15 2v19"></path><path d="M5 2v19"></path><path d="M2 2v6a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2"></path></svg>'
   },
   {
-    id: 'food_wine',
-    label: 'dining & wine',
+    id: 'wine_small_plates',
+    label: 'wine & small plates',
     code: '04',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"></path><path d="M12 15v7"></path><path d="M12 15a5 5 0 0 0 5-5V3H7v7a5 5 0 0 0 5 5z"></path></svg>'
   },
   {
-    id: 'bars_nightlife',
-    label: 'bars & nightlife',
+    id: 'cocktails_nightlife',
+    label: 'cocktails & nightlife',
     code: '05',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-7 8-7-8Z"></path></svg>'
@@ -339,6 +339,8 @@ export const CATEGORY_MAP = new Map(CATEGORIES.map(c => [c.id, c]));
 // Backwards-compatibility aliases
 CATEGORY_MAP.set('books_cinema', CATEGORY_MAP.get('books'));
 CATEGORY_MAP.set('brunch_lunch', CATEGORY_MAP.get('food_dining'));
+CATEGORY_MAP.set('food_wine', CATEGORY_MAP.get('wine_small_plates'));
+CATEGORY_MAP.set('bars_nightlife', CATEGORY_MAP.get('cocktails_nightlife'));
 
 export function normalizeSpotCategory(spot) {
   if (!spot) return spot;
@@ -358,14 +360,17 @@ export function normalizeSpotCategory(spot) {
     spot.category = 'food_dining';
   }
 
-  // Move spots in dining & wine (food_wine) over to food_dining if they are food/dining rather than wine bars
+  // Normalize legacy bars_nightlife to cocktails_nightlife
+  if (spot.category === 'bars_nightlife') {
+    spot.category = 'cocktails_nightlife';
+  }
+
+  // Migrate legacy food_wine to wine_small_plates (or food_dining if restaurant)
   if (spot.category === 'food_wine') {
     const text = `${spot.name || ''} ${spot.notes || ''}`.toLowerCase();
     const isWineBar = /\b(wine bar|natural wine|vins\b|enoteca|bodega|cellar|tasting room)\b/.test(text) &&
       !/\b(seafood bar|raw bar|oyster bar|noodle bar|tacos?|ramen|pasta|trattoria|crêperie|creperie|inn\b)\b/.test(text);
-    if (!isWineBar) {
-      spot.category = 'food_dining';
-    }
+    spot.category = isWineBar ? 'wine_small_plates' : 'food_dining';
   }
 
   return spot;

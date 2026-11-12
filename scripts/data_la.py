@@ -177,7 +177,7 @@ DATA_LA = {
         "notes": "Classic mid-century diner (formerly 101 Coffee Shop) revitalized by Clark Street Bakery. Fluffy buttermilk pancakes, pastrami hash, and sourdough toast."
     },
     "Wilde's": {
-        "category": "food_wine",
+        "category": "wine_small_plates",
         "neighborhood": "Los Feliz",
         "hours": "17:00 - 23:00",
         "notes": "Cozy, candlelit neighborhood wine bar offering low-intervention natural bottles, tinned fish, and seasonal small plates."
@@ -355,7 +355,7 @@ DATA_LA = {
         "notes": "Sleek, minimalist coffee bar on La Brea Avenue pouring Canyon Coffee, iced matcha, and morning viennoiserie."
     },
     "Zinqué": {
-        "category": "food_wine",
+        "category": "wine_small_plates",
         "neighborhood": "Venice",
         "hours": "07:00 - 23:00",
         "notes": "Low-slung French wine bar and cafe on Abbot Kinney with an outdoor fire pit, Le Bowl brown rice salads, and European wines."
@@ -415,7 +415,7 @@ DATA_LA = {
         "notes": "Aesthetic cafe blending specialty coffee with calming botanical interiors and seasonal wellness beverages."
     },
     "Granada": {
-        "category": "food_wine",
+        "category": "wine_small_plates",
         "neighborhood": "Highland Park",
         "hours": "17:00 - 23:00",
         "notes": "Spanish-inspired wine bar and tapas restaurant serving Iberian conservas, croquetas, and vibrant chilled sherries."
@@ -819,7 +819,7 @@ DATA_LA = {
         "notes": "Abbot Kinney's historic dive and music bar since the 1950s. Pool tables, DJ sets, weekend dancing, and outdoor food trucks."
     },
     "Seco": {
-        "category": "bars_nightlife",
+        "category": "cocktails_nightlife",
         "neighborhood": "Pasadena",
         "hours": "17:00 - 23:00",
         "notes": "Modern Peruvian-Californian cocktail bar and kitchen with creative pisco craft drinks, ceviches, and warm evening patio seating."
@@ -831,7 +831,7 @@ DATA_LA = {
         "notes": "Iconic, dimly lit Silver Lake dive bar on Sunset Blvd with velvet banquettes, Indian shrine decor, craft beers, and good jukebox tunes."
     },
     "Only The Wild Ones": {
-        "category": "food_wine",
+        "category": "wine_small_plates",
         "neighborhood": "Venice",
         "hours": "17:00 - 23:00",
         "notes": "Natural wine bar and bistro focusing on biodynamic bottles, zero-zero pet nats, organic small plates, and candlelit ambiance."

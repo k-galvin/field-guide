@@ -72,9 +72,9 @@ export function parseKML(kmlText, targetCity = '') {
     } else if (/hotel|hostel|inn\b|ryokan|guesthouse|residence|lodging|suites\b/.test(lowerText)) {
       category = 'hotels_stays';
     } else if (/cocktail|cocktails|speakeasy|listening bar|pub\b|tavern|taproom|saloon|bar\b/.test(lowerText)) {
-      category = 'bars_nightlife';
+      category = 'cocktails_nightlife';
     } else if (/wine bar|natural wine|vins\b|enoteca|bodega/.test(lowerText)) {
-      category = 'food_wine';
+      category = 'wine_small_plates';
     } else if (/brunch|lunch|sandwich|deli\b|bagel|bagels|diner|restaurant|bistro|dining|dinner|ramen|trattoria|izakaya|tacos?|pizza|sushi|pasta/.test(lowerText)) {
       category = 'food_dining';
     } else if (/park|garden|botanical|square|walk|trail|forest|nature|jardin/.test(lowerText)) {

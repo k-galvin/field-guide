@@ -343,7 +343,7 @@ DATA_SF_MX_JAPAN = {
         "notes": "Individual flavor concentration dining booths for focused tonkotsu ramen appreciation with customizable broth richness, garlic, and red pepper sauce."
     },
     "Moshimoya": {
-        "category": "food_wine",
+        "category": "wine_small_plates",
         "neighborhood": "Shimogyo",
         "hours": "17:30 - 23:00",
         "notes": "Intimate Kyoto sake counter and modern obanzai bistro featuring seasonal market vegetables, grilled river fish, and rare regional sakes."
@@ -633,13 +633,13 @@ DATA_SF_MX_JAPAN = {
         "notes": "Hilltop park famous for the postcard Painted Ladies Victorian row houses backed by the modern downtown skyline."
     },
     "Cavaña": {
-        "category": "bars_nightlife",
+        "category": "cocktails_nightlife",
         "neighborhood": "Mission Bay",
         "hours": "16:00 - 00:00",
         "notes": "Rooftop lounge perched high above Mission Bay with Latin American cocktails, small plates, and panoramic sunset skyline views."
     },
     "Moongate Lounge": {
-        "category": "bars_nightlife",
+        "category": "cocktails_nightlife",
         "neighborhood": "Chinatown",
         "hours": "17:30 - 00:00",
         "notes": "Atmospheric retro-futurist cocktail lounge above Mister Jiu's, serving lunar-calendar inspired craft drinks in plush velvet banquettes."

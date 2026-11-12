@@ -254,15 +254,15 @@ const CATEGORIES = [
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"></path><path d="M15 2v19"></path><path d="M5 2v19"></path><path d="M2 2v6a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2"></path></svg>'
   },
   {
-    id: 'food_wine',
-    label: 'dining & wine',
+    id: 'wine_small_plates',
+    label: 'wine & small plates',
     code: '04',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"></path><path d="M12 15v7"></path><path d="M12 15a5 5 0 0 0 5-5V3H7v7a5 5 0 0 0 5 5z"></path></svg>'
   },
   {
-    id: 'bars_nightlife',
-    label: 'bars & nightlife',
+    id: 'cocktails_nightlife',
+    label: 'cocktails & nightlife',
     code: '05',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-7 8-7-8Z"></path></svg>'
@@ -343,6 +343,8 @@ const CATEGORY_MAP = new Map(CATEGORIES.map(c => [c.id, c]));
 // Backwards-compatibility aliases
 CATEGORY_MAP.set('books_cinema', CATEGORY_MAP.get('books'));
 CATEGORY_MAP.set('brunch_lunch', CATEGORY_MAP.get('food_dining'));
+CATEGORY_MAP.set('food_wine', CATEGORY_MAP.get('wine_small_plates'));
+CATEGORY_MAP.set('bars_nightlife', CATEGORY_MAP.get('cocktails_nightlife'));
 
 function normalizeSpotCategory(spot) {
   if (!spot) return spot;
@@ -362,14 +364,17 @@ function normalizeSpotCategory(spot) {
     spot.category = 'food_dining';
   }
 
-  // Move spots in dining & wine (food_wine) over to food_dining if they are food/dining rather than wine bars
+  // Normalize legacy bars_nightlife to cocktails_nightlife
+  if (spot.category === 'bars_nightlife') {
+    spot.category = 'cocktails_nightlife';
+  }
+
+  // Migrate legacy food_wine to wine_small_plates (or food_dining if restaurant)
   if (spot.category === 'food_wine') {
     const text = `${spot.name || ''} ${spot.notes || ''}`.toLowerCase();
     const isWineBar = /\b(wine bar|natural wine|vins\b|enoteca|bodega|cellar|tasting room)\b/.test(text) &&
       !/\b(seafood bar|raw bar|oyster bar|noodle bar|tacos?|ramen|pasta|trattoria|crêperie|creperie|inn\b)\b/.test(text);
-    if (!isWineBar) {
-      spot.category = 'food_dining';
-    }
+    spot.category = isWineBar ? 'wine_small_plates' : 'food_dining';
   }
 
   return spot;
@@ -2916,9 +2921,9 @@ function parseKML(kmlText, targetCity = '') {
     } else if (/hotel|hostel|inn\b|ryokan|guesthouse|residence|lodging|suites\b/.test(lowerText)) {
       category = 'hotels_stays';
     } else if (/cocktail|cocktails|speakeasy|listening bar|pub\b|tavern|taproom|saloon|bar\b/.test(lowerText)) {
-      category = 'bars_nightlife';
+      category = 'cocktails_nightlife';
     } else if (/wine bar|natural wine|vins\b|enoteca|bodega/.test(lowerText)) {
-      category = 'food_wine';
+      category = 'wine_small_plates';
     } else if (/brunch|lunch|sandwich|deli\b|bagel|bagels|diner|restaurant|bistro|dining|dinner|ramen|trattoria|izakaya|tacos?|pizza|sushi|pasta/.test(lowerText)) {
       category = 'food_dining';
     } else if (/park|garden|botanical|square|walk|trail|forest|nature|jardin/.test(lowerText)) {
@@ -3716,13 +3721,13 @@ function mapRowToSpot(row) {
     category = /cinema|film|theatre|theater|repertory|movie|screening/.test(text) ? 'theater_cinema' : 'books';
   } else if (category === 'brunch_lunch') {
     category = 'food_dining';
+  } else if (category === 'bars_nightlife') {
+    category = 'cocktails_nightlife';
   } else if (category === 'food_wine') {
     const text = `${row.name || ''} ${row.notes || ''}`.toLowerCase();
     const isWineBar = /\b(wine bar|natural wine|vins\b|enoteca|bodega|cellar|tasting room)\b/.test(text) &&
       !/\b(seafood bar|raw bar|oyster bar|noodle bar|tacos?|ramen|pasta|trattoria|crêperie|creperie|inn\b)\b/.test(text);
-    if (!isWineBar) {
-      category = 'food_dining';
-    }
+    category = isWineBar ? 'wine_small_plates' : 'food_dining';
   }
   return {
     id: row.id,
@@ -3768,13 +3773,13 @@ function mapOsmTagToCategory(props = {}, name = '') {
     return 'hotels_stays';
   }
   if (['bar', 'pub', 'lounge', 'biergarten'].includes(osmValue) || /cocktail|cocktails|speakeasy|listening bar|pub\b|tavern|taproom|saloon|brewery/.test(lowerName)) {
-    return 'bars_nightlife';
+    return 'cocktails_nightlife';
   }
   if (['deli', 'sandwich', 'fast_food', 'food_court', 'canteen'].includes(osmValue) || /brunch|lunch|sandwich|deli\b|bagel|bagels|diner|all-day café|all-day cafe/.test(lowerName)) {
     return 'food_dining';
   }
   if (['wine'].includes(osmValue) || /wine bar|natural wine|vins\b|enoteca|bodega/.test(lowerName)) {
-    return 'food_wine';
+    return 'wine_small_plates';
   }
   if (['restaurant', 'bistro'].includes(osmValue) || /restaurant|bistro|tacos?|pizza|ramen|taqueria|trattoria|izakaya|dining|steakhouse|sushi|pasta/.test(lowerName)) {
     return 'food_dining';
@@ -5565,8 +5570,10 @@ function renderAutocompleteDropdown(results) {
     pastry_bakery: 'pastry & bakery',
     food_dining: 'food & dining',
     brunch_lunch: 'food & dining',
-    food_wine: 'dining & wine',
-    bars_nightlife: 'bars & nightlife',
+    wine_small_plates: 'wine & small plates',
+    food_wine: 'wine & small plates',
+    cocktails_nightlife: 'cocktails & nightlife',
+    bars_nightlife: 'cocktails & nightlife',
     hotels_stays: 'hotels & stays',
     shops_retail: 'shops & retail',
     museums_art: 'museums & art',

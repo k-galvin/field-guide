@@ -50,13 +50,17 @@ console.log('Testing category definitions...');
 assert(CATEGORIES.some(c => c.id === 'books' && c.label === 'books'), 'books category should exist');
 assert(CATEGORIES.some(c => c.id === 'theater_cinema' && c.label === 'theater & cinema'), 'theater_cinema category should exist');
 assert(CATEGORIES.some(c => c.id === 'food_dining' && c.label === 'food & dining'), 'food_dining category should exist');
-assert(CATEGORIES.some(c => c.id === 'bars_nightlife' && c.label === 'bars & nightlife'), 'bars_nightlife category should exist');
+assert(CATEGORIES.some(c => c.id === 'wine_small_plates' && c.label === 'wine & small plates'), 'wine_small_plates category should exist');
+assert(CATEGORIES.some(c => c.id === 'cocktails_nightlife' && c.label === 'cocktails & nightlife'), 'cocktails_nightlife category should exist');
 assert(CATEGORIES.some(c => c.id === 'hotels_stays' && c.label === 'hotels & stays'), 'hotels_stays category should exist');
 assert(CATEGORY_MAP.has('books'), 'CATEGORY_MAP should have books');
 assert(CATEGORY_MAP.has('theater_cinema'), 'CATEGORY_MAP should have theater_cinema');
 assert(CATEGORY_MAP.has('food_dining'), 'CATEGORY_MAP should have food_dining');
 assert(CATEGORY_MAP.has('brunch_lunch'), 'CATEGORY_MAP should alias brunch_lunch');
-assert(CATEGORY_MAP.has('bars_nightlife'), 'CATEGORY_MAP should have bars_nightlife');
+assert(CATEGORY_MAP.has('wine_small_plates'), 'CATEGORY_MAP should have wine_small_plates');
+assert(CATEGORY_MAP.has('food_wine'), 'CATEGORY_MAP should alias food_wine');
+assert(CATEGORY_MAP.has('cocktails_nightlife'), 'CATEGORY_MAP should have cocktails_nightlife');
+assert(CATEGORY_MAP.has('bars_nightlife'), 'CATEGORY_MAP should alias bars_nightlife');
 assert(CATEGORY_MAP.has('hotels_stays'), 'CATEGORY_MAP should have hotels_stays');
 
 // Test normalizeSpotCategory
@@ -73,14 +77,18 @@ const diningSpot = normalizeSpotCategory({ name: 'Dunne & Crescenzi', notes: 'Ru
 assert.strictEqual(diningSpot.category, 'food_dining', 'Restaurant spot in food_wine should normalize to food_dining');
 
 const wineSpot = normalizeSpotCategory({ name: "Wilde's", notes: 'Cozy neighborhood natural wine bar', category: 'food_wine' });
-assert.strictEqual(wineSpot.category, 'food_wine', 'Wine bar spot in food_wine should remain food_wine');
+assert.strictEqual(wineSpot.category, 'wine_small_plates', 'Wine bar spot in food_wine should normalize to wine_small_plates');
+
+const barSpot = normalizeSpotCategory({ name: 'Bar Termini', notes: 'Espresso & negronis', category: 'bars_nightlife' });
+assert.strictEqual(barSpot.category, 'cocktails_nightlife', 'Legacy bars_nightlife should normalize to cocktails_nightlife');
 
 // Test Photon categorization
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'cinema' }, 'Film Center'), 'theater_cinema');
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'theatre' }, 'Globe Theatre'), 'theater_cinema');
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'books' }, 'Daunt Books'), 'books');
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'hotel' }, 'Ace Hotel'), 'hotels_stays');
-assert.strictEqual(mapOsmTagToCategory({ osm_value: 'bar' }, 'Bar Termini'), 'bars_nightlife');
+assert.strictEqual(mapOsmTagToCategory({ osm_value: 'bar' }, 'Bar Termini'), 'cocktails_nightlife');
+assert.strictEqual(mapOsmTagToCategory({ osm_value: 'wine' }, 'Septime La Cave'), 'wine_small_plates');
 assert.strictEqual(mapOsmTagToCategory({ osm_value: 'deli' }, 'Katz Deli'), 'food_dining');
 console.log('✓ Category separation and normalization verified');
 
