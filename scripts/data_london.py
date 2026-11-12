@@ -350,7 +350,7 @@ DATA_LONDON = {
         "notes": "Europe's largest multi-arts center in a landmark Brutalist concrete estate, featuring art galleries, concert halls, cinemas, and an indoor conservatory."
     },
     "Dal Fiorentino Fitzrovia": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Fitzrovia",
         "hours": "11:00 - 21:00",
         "notes": "Authentic Florentine schiacciata sandwiches stuffed with cured Tuscan meats, truffled pecorino, and artichoke cream."
@@ -362,49 +362,49 @@ DATA_LONDON = {
         "notes": "Beloved pavement street kiosk on Hampstead High Street flipping traditional sweet and savory Breton buckwheat crêpes since 1980."
     },
     "Speedboat Bar": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Chinatown",
         "hours": "12:00 - 24:00",
         "notes": "Electrifying Bangkok Chinatown-inspired restaurant serving fiery wok-fried dishes, crispy pork, and tower beers to Thai pop tunes."
     },
     "Gloria": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Shoreditch",
         "hours": "11:45 - 23:00",
         "notes": "Extravagant 1970s Capri-style trattoria by Big Mamma Group. Truffle pasta, wheel-spun cacio e pepe, and lemon meringue pie in lush velvet booths."
     },
     "Dishoom Kensington": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Kensington",
         "hours": "08:00 - 23:00",
         "notes": "Art Deco Bombay cafe tribute in the Barkers building. Iconic house black daal, bacon naan rolls, and spiced chai."
     },
     "INKO NITO - Soho": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Soho",
         "hours": "12:00 - 22:30",
         "notes": "Vibrant Japanese robatayaki grill centered around open charcoal counter cooking, serving charred skewers and creative izakaya plates."
     },
     "Borough Market": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Southwark",
         "hours": "10:00 - 17:00",
         "notes": "London's historic food market dating back to 1014. Artisan cheeses, fresh seafood, British game, street food stalls, and seasonal produce."
     },
     "Le Relais de Venise L'Entrecote - Marylebone": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Marylebone",
         "hours": "12:00 - 22:30",
         "notes": "Traditional Parisian steak-frites concept: a simple green salad with walnuts, followed by steak in secret green herb sauce served in two stages."
     },
     "Flat Iron London Bridge": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "London Bridge",
         "hours": "12:00 - 23:00",
         "notes": "Unpretentious, quality-obsessed steakhouse serving tender flat iron cuts, dripping fries, creamed spinach, and complimentary soft serve."
     },
     "Dishoom Shoreditch": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Shoreditch",
         "hours": "08:00 - 23:00",
         "notes": "East London Bombay cafe with a sun-dappled verandah, serving fragrant biryanis, crispy calamari, and rich black daal."
@@ -500,7 +500,7 @@ DATA_LONDON = {
         "notes": "Pioneering tea merchant on Dering Street sourcing solely from small family-run tea farms with provenance printed on every postcard tin."
     },
     "Nathalie": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Mayfair",
         "hours": "08:00 - 18:00",
         "notes": "Refined delicatessen and cafe offering bespoke gourmet lunch boxes, wholesome salads, and specialty coffees."

@@ -247,8 +247,8 @@ const CATEGORIES = [
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17c1-3 3-7 8-7s7 4 8 7"></path><path d="M3 13c1.5-4 5.5-8 9-8s7.5 4 9 8"></path><path d="M7 16a3 3 0 0 1 5-2 3 3 0 0 1 5 2"></path></svg>'
   },
   {
-    id: 'brunch_lunch',
-    label: 'brunch & lunch',
+    id: 'food_dining',
+    label: 'food & dining',
     code: '03',
     color: '#0047ab',
     iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"></path><path d="M15 2v19"></path><path d="M5 2v19"></path><path d="M2 2v6a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2"></path></svg>'
@@ -340,11 +340,14 @@ const CATEGORIES = [
 ];
 
 const CATEGORY_MAP = new Map(CATEGORIES.map(c => [c.id, c]));
-// Alias books_cinema for seamless backwards compatibility
+// Backwards-compatibility aliases
 CATEGORY_MAP.set('books_cinema', CATEGORY_MAP.get('books'));
+CATEGORY_MAP.set('brunch_lunch', CATEGORY_MAP.get('food_dining'));
 
 function normalizeSpotCategory(spot) {
   if (!spot) return spot;
+
+  // Normalize legacy books_cinema
   if (spot.category === 'books_cinema') {
     const text = `${spot.name || ''} ${spot.notes || ''}`.toLowerCase();
     if (/cinema|film|theatre|theater|repertory|movie|screening/.test(text)) {
@@ -353,6 +356,22 @@ function normalizeSpotCategory(spot) {
       spot.category = 'books';
     }
   }
+
+  // Normalize legacy brunch_lunch to food_dining
+  if (spot.category === 'brunch_lunch') {
+    spot.category = 'food_dining';
+  }
+
+  // Move spots in dining & wine (food_wine) over to food_dining if they are food/dining rather than wine bars
+  if (spot.category === 'food_wine') {
+    const text = `${spot.name || ''} ${spot.notes || ''}`.toLowerCase();
+    const isWineBar = /\b(wine bar|natural wine|vins\b|enoteca|bodega|cellar|tasting room)\b/.test(text) &&
+      !/\b(seafood bar|raw bar|oyster bar|noodle bar|tacos?|ramen|pasta|trattoria|crêperie|creperie|inn\b)\b/.test(text);
+    if (!isWineBar) {
+      spot.category = 'food_dining';
+    }
+  }
+
   return spot;
 }
 
@@ -917,7 +936,7 @@ const SAMPLE_SPOTS = [
     name: 'The Fish Box (Reel Dingle Fish)',
     city: 'Irish Countryside',
     neighborhood: 'Green Street, Dingle, Co. Kerry',
-    category: 'food_wine',
+    category: 'food_dining',
     status: 'wishlist',
     favorite: true,
     lat: 52.139439,
@@ -950,7 +969,7 @@ const SAMPLE_SPOTS = [
     name: 'Dunne & Crescenzi',
     city: 'Dublin',
     neighborhood: 'South Frederick Street, Dublin 2',
-    category: 'food_wine',
+    category: 'food_dining',
     status: 'wishlist',
     favorite: true,
     lat: 53.342279,
@@ -1145,7 +1164,7 @@ const SAMPLE_SPOTS = [
     name: 'Hôtel Baudy (Historic Impressionist Inn)',
     city: 'French Countryside',
     neighborhood: 'Giverny',
-    category: 'food_wine',
+    category: 'food_dining',
     status: 'wishlist',
     favorite: false,
     lat: 49.0768,
@@ -1405,7 +1424,7 @@ const SAMPLE_SPOTS = [
     name: 'Le Moulin de la Galette',
     city: 'French Countryside',
     neighborhood: '38 Rue de Nesmond, Bayeux, Normandy',
-    category: 'food_wine',
+    category: 'food_dining',
     status: 'wishlist',
     favorite: true,
     lat: 49.274073,
@@ -2898,10 +2917,10 @@ function parseKML(kmlText, targetCity = '') {
       category = 'hotels_stays';
     } else if (/cocktail|cocktails|speakeasy|listening bar|pub\b|tavern|taproom|saloon|bar\b/.test(lowerText)) {
       category = 'bars_nightlife';
-    } else if (/brunch|lunch|sandwich|deli\b|bagel|bagels|diner/.test(lowerText)) {
-      category = 'brunch_lunch';
-    } else if (/restaurant|bistro|wine|dining|dinner|tapas|ramen|trattoria|izakaya/.test(lowerText)) {
+    } else if (/wine bar|natural wine|vins\b|enoteca|bodega/.test(lowerText)) {
       category = 'food_wine';
+    } else if (/brunch|lunch|sandwich|deli\b|bagel|bagels|diner|restaurant|bistro|dining|dinner|ramen|trattoria|izakaya|tacos?|pizza|sushi|pasta/.test(lowerText)) {
+      category = 'food_dining';
     } else if (/park|garden|botanical|square|walk|trail|forest|nature|jardin/.test(lowerText)) {
       category = 'parks_nature';
     } else if (/surf|beach|wave|pilates|yoga|movement/.test(lowerText)) {
@@ -3695,6 +3714,15 @@ function mapRowToSpot(row) {
   if (category === 'books_cinema') {
     const text = `${row.name || ''} ${row.notes || ''}`.toLowerCase();
     category = /cinema|film|theatre|theater|repertory|movie|screening/.test(text) ? 'theater_cinema' : 'books';
+  } else if (category === 'brunch_lunch') {
+    category = 'food_dining';
+  } else if (category === 'food_wine') {
+    const text = `${row.name || ''} ${row.notes || ''}`.toLowerCase();
+    const isWineBar = /\b(wine bar|natural wine|vins\b|enoteca|bodega|cellar|tasting room)\b/.test(text) &&
+      !/\b(seafood bar|raw bar|oyster bar|noodle bar|tacos?|ramen|pasta|trattoria|crêperie|creperie|inn\b)\b/.test(text);
+    if (!isWineBar) {
+      category = 'food_dining';
+    }
   }
   return {
     id: row.id,
@@ -3743,10 +3771,13 @@ function mapOsmTagToCategory(props = {}, name = '') {
     return 'bars_nightlife';
   }
   if (['deli', 'sandwich', 'fast_food', 'food_court', 'canteen'].includes(osmValue) || /brunch|lunch|sandwich|deli\b|bagel|bagels|diner|all-day café|all-day cafe/.test(lowerName)) {
-    return 'brunch_lunch';
+    return 'food_dining';
   }
-  if (['restaurant', 'bistro', 'wine'].includes(osmValue) || /restaurant|bistro|wine|tacos|pizza|ramen|taqueria|trattoria|izakaya/.test(lowerName)) {
+  if (['wine'].includes(osmValue) || /wine bar|natural wine|vins\b|enoteca|bodega/.test(lowerName)) {
     return 'food_wine';
+  }
+  if (['restaurant', 'bistro'].includes(osmValue) || /restaurant|bistro|tacos?|pizza|ramen|taqueria|trattoria|izakaya|dining|steakhouse|sushi|pasta/.test(lowerName)) {
+    return 'food_dining';
   }
   if (['museum', 'gallery', 'artwork', 'arts_centre'].includes(osmValue) || /museum|gallery|art|exhibition/.test(lowerName)) {
     return 'museums_art';
@@ -5532,7 +5563,8 @@ function renderAutocompleteDropdown(results) {
   const CATEGORY_LABEL_MAP = {
     matcha_coffee: 'coffee & matcha',
     pastry_bakery: 'pastry & bakery',
-    brunch_lunch: 'brunch & lunch',
+    food_dining: 'food & dining',
+    brunch_lunch: 'food & dining',
     food_wine: 'dining & wine',
     bars_nightlife: 'bars & nightlife',
     hotels_stays: 'hotels & stays',

@@ -31,7 +31,7 @@ spots_payload = [
         "name": "Crystal Cove Shake Shack",
         "city": "Orange County",
         "neighborhood": "Newport Beach",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://static.wixstatic.com/media/b65c51_6ec7d52e379540eb8d785210dbe2d8da~mv2.jpg/v1/fill/w_1024,h_768,al_c,q_85/b65c51_6ec7d52e379540eb8d785210dbe2d8da~mv2.jpg",
         "notes": "Legendary 1940s clifftop roadside burger shack on Coast Highway, serving thick date shakes, crinkle-cut fries, and burgers with sweeping ocean views high above Crystal Cove State Beach.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -71,7 +71,7 @@ spots_payload = [
         "name": "Ruby's Diner",
         "city": "Orange County",
         "neighborhood": "Newport Beach",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://upload.wikimedia.org/wikipedia/en/7/70/Rubys1.jpg",
         "notes": "The original 1982 retro 1940s-style diner perched at the very tip of the historic Balboa Pier, iconic for ocean-breeze milkshakes, burgers, and 360-degree Pacific panorama views over the water.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -133,7 +133,7 @@ spots_payload = [
         "name": "Anaheim Packing House",
         "city": "Orange County",
         "neighborhood": "Anaheim",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://upload.wikimedia.org/wikipedia/commons/5/57/Anaheim_Packing_House_interior_-_December_2019.jpg",
         "notes": "Vibrant two-story food hall housed inside a restored 1919 Mission Revival citrus packing facility, featuring sunlit central atriums, live jazz, and diverse artisanal food vendors spanning Vietnamese street food to craft gelato.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -143,7 +143,7 @@ spots_payload = [
         "name": "Nobu",
         "city": "Orange County",
         "neighborhood": "Newport Beach",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://media.opulist.app/venues/nobu-newport-beach/0.webp",
         "notes": "Glamorous waterfront Japanese fine dining destination on the Lido Marina boardwalk, renowned for Chef Nobu Matsuhisa's black cod miso, yellowtail jalapeño, and panoramic harbor patio seating.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -183,7 +183,7 @@ spots_payload = [
         "name": "Boil & Bake",
         "city": "Orange County",
         "neighborhood": "Costa Mesa",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://images.squarespace-cdn.com/content/v1/624646e8cfaa392a71f7b1aa/f0c2a9f4-2dbd-42a9-ba10-b8c2b4f3465e/IMG_9397.jpg",
         "notes": "Artisanal bakery and cafe on Baker Street specializing in 72-hour naturally leavened sourdough bagels, house-cured salmon lox, open-faced bagel sandwiches, and local seasonal toppings.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -193,7 +193,7 @@ spots_payload = [
         "name": "Mercado Gonzàlez Northgate Market",
         "city": "Orange County",
         "neighborhood": "Costa Mesa",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://northgatemarket.com/wp-content/uploads/2023/11/DSC00831-1024x683.jpg",
         "notes": "Immersive 70,000-square-foot Mexican cultural marketplace and food hall featuring over 20 regional puestos (street tacos, birria, churros from Mexico City's El Moro), fresh tortillería, and carnicería.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -213,7 +213,7 @@ spots_payload = [
         "name": "Milligram Coffee and Kitchen",
         "city": "Orange County",
         "neighborhood": "Costa Mesa",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://media.opulist.app/venues/milligram-coffee-kitchen/0.jpg",
         "notes": "Modern, sun-drenched cafe and specialty coffee bar at Paseo 17 on East 17th Street, known for clean architectural aesthetics, specialty espresso, breakfast burritos, and seasonal toast.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -223,7 +223,7 @@ spots_payload = [
         "name": "Sapori Ristorante",
         "city": "Orange County",
         "neighborhood": "Newport Beach",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://static.spotapps.co/website_images/ab_websites/16687_website/order_new.jpg",
         "notes": "Long-standing authentic Italian trattoria and pizzeria in Bayside Shopping Center, celebrated for homemade pastas, veal scaloppine, wood-fired pizzas, and warm Mediterranean ambiance.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -243,7 +243,7 @@ spots_payload = [
         "name": "Bandera",
         "city": "Orange County",
         "neighborhood": "Corona del Mar",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://visitnewportbeach.com/wp-content/uploads/2018/04/10480110_669409639813023_7482833170217154136_o-700x400.jpg",
         "notes": "Iconic Hillstone destination in Corona del Mar famed for its open hardwood rotisserie chicken turning over wood flames, skillet cornbread with green chiles, ribs, and lively bar.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -263,7 +263,7 @@ spots_payload = [
         "name": "Harper Barbecue",
         "city": "Orange County",
         "neighborhood": "Costa Mesa",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://images.squarespace-cdn.com/content/v1/5fd9307f0e1ad753c0e92900/7a47524e-706c-479b-808c-f97aa275aa42/DSCF4579.jpg",
         "notes": "Acclaimed Central Texas-style craft barbecue joint by pitmaster Drew Harper, revered for melt-in-your-mouth prime smoked brisket, spare ribs, and house-made sausages fresh from offset wood smokers.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -273,7 +273,7 @@ spots_payload = [
         "name": "Phở 79",
         "city": "Orange County",
         "neighborhood": "Garden Grove",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://prod-pics.guide.michelin.com/api/public/content/f5a7de7192344c158245d47a554a89c5.jpg",
         "notes": "James Beard America's Classics award-winner and Michelin Bib Gourmand landmark in Little Saigon, celebrated since 1982 for legendary slow-simmered oxtail pho and aromatic beef noodle soups.",
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -283,7 +283,7 @@ spots_payload = [
         "name": "Brodard Restaurant",
         "city": "Orange County",
         "neighborhood": "Fountain Valley",
-        "category": "brunch_lunch",
+        "category": "food_dining",
         "photo_url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Brodard_-_Nem_nuong_cuon_and_chao_tom_cuon.jpg",
         "notes": "World-renowned Little Saigon institution legendary for its crispy grilled pork spring rolls (Nem Nướng Cuốn) served with warm secret family recipe orange dipping sauce.",
         "updated_at": datetime.now(timezone.utc).isoformat()

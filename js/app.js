@@ -1601,7 +1601,8 @@ function renderAutocompleteDropdown(results) {
   const CATEGORY_LABEL_MAP = {
     matcha_coffee: 'coffee & matcha',
     pastry_bakery: 'pastry & bakery',
-    brunch_lunch: 'brunch & lunch',
+    food_dining: 'food & dining',
+    brunch_lunch: 'food & dining',
     food_wine: 'dining & wine',
     bars_nightlife: 'bars & nightlife',
     hotels_stays: 'hotels & stays',

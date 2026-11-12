@@ -322,6 +322,15 @@ export function mapRowToSpot(row) {
   if (category === 'books_cinema') {
     const text = `${row.name || ''} ${row.notes || ''}`.toLowerCase();
     category = /cinema|film|theatre|theater|repertory|movie|screening/.test(text) ? 'theater_cinema' : 'books';
+  } else if (category === 'brunch_lunch') {
+    category = 'food_dining';
+  } else if (category === 'food_wine') {
+    const text = `${row.name || ''} ${row.notes || ''}`.toLowerCase();
+    const isWineBar = /\b(wine bar|natural wine|vins\b|enoteca|bodega|cellar|tasting room)\b/.test(text) &&
+      !/\b(seafood bar|raw bar|oyster bar|noodle bar|tacos?|ramen|pasta|trattoria|crêperie|creperie|inn\b)\b/.test(text);
+    if (!isWineBar) {
+      category = 'food_dining';
+    }
   }
   return {
     id: row.id,

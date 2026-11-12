@@ -51,19 +51,19 @@ DATA_SF_MX_JAPAN = {
         "notes": "Boutique art, architecture, and photography bookshop designed with warm white minimalism. Features artisanal small-batch chocolate bars by Savvy Studio."
     },
     "Cariñito Tacos": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Roma Norte",
         "hours": "13:00 - 22:00",
         "notes": "Innovative street-corner taco counter infusing Southeast Asian spices into classic Mexican taco formats. Pork belly and crispy roti-tortillas."
     },
     "Taquería Orinoco": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Roma Norte",
         "hours": "13:00 - 04:00",
         "notes": "Northern Mexican Monterrey-style street tacos in retro diner white tiles. Order trompo (pastor) with crispy pirata and golden potato purée."
     },
     "Tacos del Valle (Roma Norte)": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Roma Norte",
         "hours": "12:00 - 23:00",
         "notes": "Beloved neighborhood taquería delivering tender suadero, charbroiled costilla, and vibrant charred-chile salsas on fresh handmade corn tortillas."
@@ -169,7 +169,7 @@ DATA_SF_MX_JAPAN = {
         "notes": "Centuries-old riverside retreat reached via a peaceful wooden boat ride up the Oi River. Water mirrors, cedar craftsmanship, and autumn maple canopies."
     },
     "Sen-Oh": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Arashiyama",
         "hours": "11:30 - 15:00",
         "notes": "Quiet traditional soba and seasonal noodle house nestled near the foot of Mount Ogura. Slender buckwheat noodles in clear dashi broth."
@@ -331,13 +331,13 @@ DATA_SF_MX_JAPAN = {
         "notes": "Traditional teahouse perched along the historic preserved street of Saga-Toriimoto. Warabi mochi and hot roasted green tea."
     },
     "Ramen Nishiki": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Gion",
         "hours": "11:30 - 15:00, 18:00 - 21:00",
         "notes": "Refined duck and chicken broth ramen served in clean, minimalist ceramic bowls with hand-cut noodles and delicate seasonal toppings."
     },
     "Ichiran - Kyoto Kawaramachi": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Kawaramachi",
         "hours": "10:00 - 23:00",
         "notes": "Individual flavor concentration dining booths for focused tonkotsu ramen appreciation with customizable broth richness, garlic, and red pepper sauce."
@@ -369,31 +369,31 @@ DATA_SF_MX_JAPAN = {
         "notes": "Vibrant neighborhood art lounge with rotating contemporary gallery walls, Motown on vinyl, and eclectic craft cocktails."
     },
     "DAMNFiNE pizza": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Outer Sunset",
         "hours": "16:00 - 21:00",
         "notes": "Wood-fired thin crust pizza and natural wine near Ocean Beach. Cozy ocean-side community staple with crisp crusts and house chili oil."
     },
     "Outerlands": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Outer Sunset",
         "hours": "09:00 - 21:00",
         "notes": "Iconic rustic driftwood dining room. Sourdough cast-iron bread, seasonal coastal brunch, and warm ciders after a foggy beach stroll."
     },
     "Hook Fish Co": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Outer Sunset",
         "hours": "11:30 - 20:00",
         "notes": "Sustainably caught fish tacos, poke, and local craft drafts with outdoor wooden picnic benches near Judah St and Ocean Beach."
     },
     "La Taqueria": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Mission District",
         "hours": "11:00 - 20:45",
         "notes": "Legendary no-rice Mission burritos with charbroiled carne asada, pinto beans, avocado, and golden crispy dorado-style flat-top griddling."
     },
     "Flour + Water Pizza Shop": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Mission / Dogpatch",
         "hours": "11:30 - 21:00",
         "notes": "High-hydration artisan sourdough pizza crusts, seasonal Italian soft serve, and curated spritzes from the Flour + Water team."
@@ -405,19 +405,19 @@ DATA_SF_MX_JAPAN = {
         "notes": "Curated neighborhood grocer with local farm produce, artisan pantry goods, natural wine, fresh flowers, and made-to-order deli sandwiches."
     },
     "San Tung": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Inner Sunset",
         "hours": "11:00 - 21:00",
         "notes": "Beloved Shandong restaurant famous for shatteringly crisp, sweet-and-spicy dry-fried chicken wings and handmade hand-pulled noodles."
     },
     "Nopa Fish": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "NoPa",
         "hours": "11:00 - 19:00",
         "notes": "Neighborhood seafood market and counter serving daily catch ceviches, poke bowls, and pristine sustainable fish fillets."
     },
     "Ly's Vietnamese Cuisine": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Marina / Cow Hollow",
         "hours": "11:00 - 21:00",
         "notes": "Welcoming neighborhood spot for fragrant 24-hour simmered beef pho, crispy imperial rolls, and claypot lemongrass chicken."
@@ -441,7 +441,7 @@ DATA_SF_MX_JAPAN = {
         "notes": "Scandinavian-inspired bakery and cafe. House-milled sprouted rye bread, cardamom buns, and customizable smørrebrød brunch boards."
     },
     "HI NRG": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Inner Richmond",
         "hours": "11:00 - 19:00",
         "notes": "Modern Asian snacks, specialty milk teas, and vibrant savory street bites with upbeat, playful energy."
@@ -633,13 +633,13 @@ DATA_SF_MX_JAPAN = {
         "notes": "Hilltop park famous for the postcard Painted Ladies Victorian row houses backed by the modern downtown skyline."
     },
     "Cavaña": {
-        "category": "food_wine",
+        "category": "bars_nightlife",
         "neighborhood": "Mission Bay",
         "hours": "16:00 - 00:00",
         "notes": "Rooftop lounge perched high above Mission Bay with Latin American cocktails, small plates, and panoramic sunset skyline views."
     },
     "Moongate Lounge": {
-        "category": "food_wine",
+        "category": "bars_nightlife",
         "neighborhood": "Chinatown",
         "hours": "17:30 - 00:00",
         "notes": "Atmospheric retro-futurist cocktail lounge above Mister Jiu's, serving lunar-calendar inspired craft drinks in plush velvet banquettes."

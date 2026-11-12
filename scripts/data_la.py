@@ -9,97 +9,97 @@ DATA_LA = {
         "notes": "Cavernous white-marble patisserie, cafe, and Italian restaurant known for pastel macaron towers, portobello fries, and wood-fired pizzas."
     },
     "Manuela": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Arts District",
         "hours": "11:30 - 22:00",
         "notes": "Southern-inspired seasonal dining in the internal courtyard of Hauser & Wirth. Wood-grilled meats, cream biscuits with blackberry jam, and on-site garden."
     },
     "Damian": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Arts District",
         "hours": "17:30 - 22:00",
         "notes": "Enrique Olvera's sleek modern Mexican restaurant in an industrial garden setting. Duck carnitas, hibiscus ceviche, and corn husk meringue."
     },
     "All India Cafe": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Pasadena",
         "hours": "11:30 - 21:30",
         "notes": "Beloved home-style Northern and Southern Indian kitchen serving aromatic curries, clay-oven tandoori, and light, puffy samosas."
     },
     "Guisados": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "West Hollywood",
         "hours": "10:00 - 22:00",
         "notes": "Renowned handmade thick corn tortillas piled with slow-braised Mexican stews: tinga de pollo, chicharrón, and cochinita pibil."
     },
     "La Cabañita": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Montrose / Glendale",
         "hours": "11:00 - 21:00",
         "notes": "Cozy neighborhood Mexican haven famous for rich mole poblano, hand-pressed tortillas, and refreshing house margaritas."
     },
     "Oste": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Beverly Grove",
         "hours": "12:00 - 22:00",
         "notes": "Charming Roman pinsa and mussel bar on 3rd Street. Airy, light, cloud-like fermented pinsa flatbreads and crisp European wines."
     },
     "Cobi's": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Santa Monica",
         "hours": "17:00 - 22:00",
         "notes": "Maximalist, vintage floral wallpapered Southeast Asian restaurant. Fragrant beef rendang, pork belly bao, and natural orange wines."
     },
     "Joy": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Highland Park",
         "hours": "12:00 - 21:00",
         "notes": "Bright, airy Taiwanese neighborhood staple on York Blvd. Lu rou fan minced pork, Dan Dan noodles, scallion pancake sandwiches, and sweet potato fries."
     },
     "LOQUI": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Culver City",
         "hours": "11:00 - 21:00",
         "notes": "Casual taqueria originating in Baja Mexico. Flaky, buttery fresh-pressed flour tortillas, tender carne asada, and cheese-crusted tacos."
     },
     "Hatchet Hall": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Culver City",
         "hours": "17:30 - 22:00",
         "notes": "Wood-fire hearth cooking showcasing historic American heritage ingredients. Cast-iron cornbread, aged country hams, and Old Man Bar out back."
     },
     "All'Antico Vinaio": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Venice",
         "hours": "10:30 - 18:00",
         "notes": "Florence's famous panini maker bringing legendary Tuscan schiacciata bread overflowing with finocchiona, stracchino, and truffle cream to Abbot Kinney."
     },
     "Joan’s on Third": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Beverly Grove",
         "hours": "08:00 - 18:00",
         "notes": "Classic West Hollywood gourmet marketplace and cafe. Renowned Chinese chicken salad, short rib sandwiches, and rustic cheese boards."
     },
     "Julienne Fine Foods And Celebrations": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "San Marino",
         "hours": "08:00 - 16:00",
         "notes": "Boutique French-inspired bistro and gourmet pantry. Rosemary currant scones, quiches, and sunny patio seating in quiet San Marino."
     },
     "HiroNori Craft Ramen": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Playa Vista",
         "hours": "11:30 - 21:00",
         "notes": "Artisanal craft ramen shop serving 24-hour tonkotsu broth, handmade fresh noodles, and an exceptional creamy vegan ramen."
     },
     "Gjelina": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Venice",
         "hours": "08:00 - 22:00",
         "notes": "The culinary anchor of Abbot Kinney Blvd. Sourdough pizzas, wood-roasted market vegetables, natural wines, and a leafy back patio."
     },
     "Petit Trois": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Hollywood",
         "hours": "12:00 - 22:00",
         "notes": "Chef Ludo Lefebvre's intimate Parisian bistro counter in a Hollywood strip mall. The Big Mec burger, boursin omelet, and escargots."
@@ -111,67 +111,67 @@ DATA_LA = {
         "notes": "Italian-Argentine bakery and restaurant at Platform. Artisanal sourdough, medialunas, alfajores, and fresh pasta in a garden courtyard."
     },
     "Sonoratown": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "DTLA",
         "hours": "11:00 - 21:00",
         "notes": "Mastery of Sonoran-style flour tortillas grilled over mesquite wood. Costilla steak tacos, chivichangas, and fiery grilled chile gueros."
     },
     "HomeState": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Playa Vista",
         "hours": "08:00 - 21:00",
         "notes": "Texas-style breakfast tacos on warm handmade flour tortillas. Queso blanco dip, brisket tacos, and refreshing topo chico."
     },
     "KazuNori: The Original Hand Roll Bar": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Marina del Rey",
         "hours": "11:30 - 23:00",
         "notes": "From the Sugarfish team: focused counter seating where chefs hand crisp nori warm-rice hand rolls directly to your palm."
     },
     "mala class": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Highland Park",
         "hours": "12:00 - 21:00",
         "notes": "Modern Sichuan eatery celebrating tongue-tingling peppercorns, mala dry pots, and spicy handmade noodles in a vibrant dining room."
     },
     "Villa's Tacos Los Angeles": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Highland Park",
         "hours": "12:00 - 22:00",
         "notes": "Michelin Bib Gourmand taqueria famous for 'estilo Los Angeles' crispy cheese-skirt tacos with charred meats and a rainbow of fresh salsas."
     },
     "Ōwa": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Venice",
         "hours": "17:30 - 22:30",
         "notes": "Warm neighborhood Japanese izakaya and robata grill featuring fresh sashimi, grilled yakitori skewers, and chilled sakes."
     },
     "Loupiotte Kitchen": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Los Feliz",
         "hours": "08:00 - 15:30",
         "notes": "Charming, sunlit French-Californian cafe serving buckwheat galettes, croque monsieur, and lavender honey lattes on Vermont."
     },
     "Quarter Sheets": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Echo Park",
         "hours": "17:00 - 21:00",
         "notes": "Glendale Blvd sensation. Thick Detroit-meets-Sicilian pan pizzas with caramelized frico cheese edges and baker Hannah Ziskin's exceptional desserts."
     },
     "RVR": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Venice",
         "hours": "17:00 - 22:00",
         "notes": "Intimate Japanese-California robata and raw bar on Abbot Kinney with minimalist wood finishes, natural wines, and seasonal crudos."
     },
     "Felix Trattoria": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Venice",
         "hours": "17:00 - 22:00",
         "notes": "Chef Evan Funke's temple to handmade pasta. Glass pasta laboratory in the center of the dining room producing immaculate sfoglia shapes."
     },
     "Clark Street Diner": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Hollywood Hills",
         "hours": "07:00 - 15:00",
         "notes": "Classic mid-century diner (formerly 101 Coffee Shop) revitalized by Clark Street Bakery. Fluffy buttermilk pancakes, pastrami hash, and sourdough toast."
@@ -203,7 +203,7 @@ DATA_LA = {
         "notes": "Neighborhood artisan bakery specializing in naturally fermented sourdough country loaves, seed breads, and morning baguettes."
     },
     "Farmshop": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Brentwood",
         "hours": "08:00 - 21:00",
         "notes": "Brentwood Country Mart anchor restaurant and artisan market. California country cooking, house-baked croissants, and curated local cheeses."
@@ -391,7 +391,7 @@ DATA_LA = {
         "notes": "Chic Italian-style espresso counter serving traditional macchiatos, morning pastries, and sunny sidewalk bench seating."
     },
     "Fast Times": {
-        "category": "food_wine",
+        "category": "food_dining",
         "neighborhood": "Venice",
         "hours": "11:00 - 22:00",
         "notes": "Casual coastal bar and grill with laid-back beach town vibes, cold brews, and classic Californian pub fare."
@@ -819,7 +819,7 @@ DATA_LA = {
         "notes": "Abbot Kinney's historic dive and music bar since the 1950s. Pool tables, DJ sets, weekend dancing, and outdoor food trucks."
     },
     "Seco": {
-        "category": "food_wine",
+        "category": "bars_nightlife",
         "neighborhood": "Pasadena",
         "hours": "17:00 - 23:00",
         "notes": "Modern Peruvian-Californian cocktail bar and kitchen with creative pisco craft drinks, ceviches, and warm evening patio seating."

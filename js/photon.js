@@ -26,10 +26,13 @@ export function mapOsmTagToCategory(props = {}, name = '') {
     return 'bars_nightlife';
   }
   if (['deli', 'sandwich', 'fast_food', 'food_court', 'canteen'].includes(osmValue) || /brunch|lunch|sandwich|deli\b|bagel|bagels|diner|all-day café|all-day cafe/.test(lowerName)) {
-    return 'brunch_lunch';
+    return 'food_dining';
   }
-  if (['restaurant', 'bistro', 'wine'].includes(osmValue) || /restaurant|bistro|wine|tacos|pizza|ramen|taqueria|trattoria|izakaya/.test(lowerName)) {
+  if (['wine'].includes(osmValue) || /wine bar|natural wine|vins\b|enoteca|bodega/.test(lowerName)) {
     return 'food_wine';
+  }
+  if (['restaurant', 'bistro'].includes(osmValue) || /restaurant|bistro|tacos?|pizza|ramen|taqueria|trattoria|izakaya|dining|steakhouse|sushi|pasta/.test(lowerName)) {
+    return 'food_dining';
   }
   if (['museum', 'gallery', 'artwork', 'arts_centre'].includes(osmValue) || /museum|gallery|art|exhibition/.test(lowerName)) {
     return 'museums_art';
