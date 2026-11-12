@@ -12,6 +12,7 @@ import {
   getCityMeta,
   getCityRegion,
   getDestinationMeta,
+  getDestinationDivision,
   detectDestinationType,
   saveDestinationType,
   getCustomDestinationTypes,
@@ -1989,10 +1990,12 @@ function renderCityManagerList() {
     const citySpots = spots.filter(s => s.city.toLowerCase() === cityName.toLowerCase());
     const visitedCount = citySpots.filter(s => s.status === 'visited').length;
     const meta = getCityMeta(cityName);
+    const division = getDestinationDivision(cityName, meta);
     return {
       name: cityName,
       code: meta.code,
       country: meta.country,
+      division: division,
       region: getCityRegion(cityName),
       type: meta.type || 'city',
       typeLabel: meta.typeLabel || 'City',
@@ -2154,20 +2157,13 @@ function renderCityManagerList() {
       return (
         c.name.toLowerCase().includes(atlasSearchQuery) ||
         c.country.toLowerCase().includes(atlasSearchQuery) ||
+        c.division.toLowerCase().includes(atlasSearchQuery) ||
         c.code.toLowerCase().includes(atlasSearchQuery) ||
         c.typeLabel.toLowerCase().includes(atlasSearchQuery) ||
         c.region.toLowerCase().includes(atlasSearchQuery)
       );
     });
   }
-
-  // Sort: active city first, then by spots count descending, then alphabetical
-  displayCities.sort((a, b) => {
-    if (a.isActive) return -1;
-    if (b.isActive) return 1;
-    if (b.totalSpots !== a.totalSpots) return b.totalSpots - a.totalSpots;
-    return a.name.localeCompare(b.name);
-  });
 
   // Breadcrumb bar HTML (when viewing a specific region or all without search)
   let breadcrumbHtml = '';
@@ -2208,12 +2204,50 @@ function renderCityManagerList() {
     return;
   }
 
+  // Group displayCities by division (Country for non-US / international, State for US)
+  const divisionMap = new Map();
+  displayCities.forEach(city => {
+    const divName = city.division || city.country || 'Other Destinations';
+    if (!divisionMap.has(divName)) {
+      divisionMap.set(divName, []);
+    }
+    divisionMap.get(divName).push(city);
+  });
+
+  // Sort divisions: division containing active city comes first, then alphabetical
+  const sortedDivisions = Array.from(divisionMap.keys()).sort((a, b) => {
+    const aHasActive = divisionMap.get(a).some(c => c.isActive);
+    const bHasActive = divisionMap.get(b).some(c => c.isActive);
+    if (aHasActive && !bHasActive) return -1;
+    if (!aHasActive && bHasActive) return 1;
+    return a.localeCompare(b);
+  });
+
+  // Inside each division: active city first, then by spots count descending, then alphabetical
+  sortedDivisions.forEach(divName => {
+    divisionMap.get(divName).sort((a, b) => {
+      if (a.isActive) return -1;
+      if (b.isActive) return 1;
+      if (b.totalSpots !== a.totalSpots) return b.totalSpots - a.totalSpots;
+      return a.name.localeCompare(b.name);
+    });
+  });
+
   if (atlasViewMode === 'compact') {
-    // Luggage Tag Compact Grid
+    // Luggage Tag Compact Grid grouped by Country / State division
     listEl.innerHTML = `
       ${breadcrumbHtml}
 
       ${(!atlasSearchQuery && atlasActiveRegion === 'all' && atlasActiveType === 'all') ? `
+        <div class="atlas-division-header">
+          <div class="atlas-division-title-group">
+            <span class="atlas-division-name">Global Archive</span>
+            ${activeCity === 'all' ? '<span class="atlas-division-badge">CURRENT</span>' : ''}
+          </div>
+          <div class="atlas-division-meta">
+            Worldwide · ${spots.length} spots
+          </div>
+        </div>
         <div class="atlas-luggage-tag ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
           <div class="tag-code-block">
             <span class="tag-code-text">ALL</span>
@@ -2229,32 +2263,57 @@ function renderCityManagerList() {
         </div>
       ` : ''}
 
-      ${displayCities.map(c => `
-        <div class="atlas-luggage-tag ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
-          <div class="tag-code-block">
-            <span class="tag-code-text">${c.code}</span>
-            <span class="tag-type-pill tag-type-${c.type}">${c.type.toUpperCase()}</span>
+      ${sortedDivisions.map(divName => {
+        const divCities = divisionMap.get(divName);
+        const totalDivSpots = divCities.reduce((sum, c) => sum + c.totalSpots, 0);
+        const hasActiveCity = divCities.some(c => c.isActive);
+        return `
+          <div class="atlas-division-header">
+            <div class="atlas-division-title-group">
+              <span class="atlas-division-name">${escapeHtml(divName)}</span>
+              ${hasActiveCity ? '<span class="atlas-division-badge">CURRENT</span>' : ''}
+            </div>
+            <div class="atlas-division-meta">
+              ${divCities.length} ${divCities.length === 1 ? 'destination' : 'destinations'} · ${totalDivSpots} ${totalDivSpots === 1 ? 'spot' : 'spots'}
+            </div>
           </div>
-          <div class="tag-body-block">
-            <div class="tag-city-title">${escapeHtml(c.name)}</div>
-            <div class="tag-country-subtitle">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}${atlasSearchQuery ? ` · ${c.region.toUpperCase()}` : ''}</div>
-          </div>
-          <div class="tag-badge-block">
-            <span class="tag-count-pill">${c.totalSpots} ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
-          </div>
-          ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
-            <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="Remove ${c.typeLabel.toLowerCase()}">×</button>
-          ` : ''}
-        </div>
-      `).join('')}
+          ${divCities.map(c => `
+            <div class="atlas-luggage-tag ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
+              <div class="tag-code-block">
+                <span class="tag-code-text">${c.code}</span>
+                <span class="tag-type-pill tag-type-${c.type}">${c.type.toUpperCase()}</span>
+              </div>
+              <div class="tag-body-block">
+                <div class="tag-city-title">${escapeHtml(c.name)}</div>
+                <div class="tag-country-subtitle">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}${atlasSearchQuery ? ` · ${c.region.toUpperCase()}` : ''}</div>
+              </div>
+              <div class="tag-badge-block">
+                <span class="tag-count-pill">${c.totalSpots} ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
+              </div>
+              ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
+                <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="Remove ${c.typeLabel.toLowerCase()}">×</button>
+              ` : ''}
+            </div>
+          `).join('')}
+        `;
+      }).join('')}
     `;
   } else {
-    // Detailed Cards View
+    // Detailed Cards View grouped by Country / State division
     listEl.innerHTML = `
       ${breadcrumbHtml}
 
       <!-- "All Destinations" Card -->
       ${(!atlasSearchQuery && atlasActiveRegion === 'all' && atlasActiveType === 'all') ? `
+        <div class="atlas-division-header">
+          <div class="atlas-division-title-group">
+            <span class="atlas-division-name">Global Archive</span>
+            ${activeCity === 'all' ? '<span class="atlas-division-badge">CURRENT</span>' : ''}
+          </div>
+          <div class="atlas-division-meta">
+            Worldwide · ${spots.length} spots
+          </div>
+        </div>
         <div class="atlas-card ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
           <div class="atlas-card-header">
             <div class="atlas-code-type-wrap">
@@ -2279,39 +2338,55 @@ function renderCityManagerList() {
         </div>
       ` : ''}
 
-      ${displayCities.map(c => `
-        <div class="atlas-card ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
-          <div class="atlas-card-header">
-            <div class="atlas-code-type-wrap">
-              <span class="atlas-card-code">[ ${c.code} ]</span>
-              <span class="tag-type-pill tag-type-${c.type}">${c.type.toUpperCase()}</span>
+      ${sortedDivisions.map(divName => {
+        const divCities = divisionMap.get(divName);
+        const totalDivSpots = divCities.reduce((sum, c) => sum + c.totalSpots, 0);
+        const hasActiveCity = divCities.some(c => c.isActive);
+        return `
+          <div class="atlas-division-header">
+            <div class="atlas-division-title-group">
+              <span class="atlas-division-name">${escapeHtml(divName)}</span>
+              ${hasActiveCity ? '<span class="atlas-division-badge">CURRENT</span>' : ''}
             </div>
-            <div class="atlas-card-badges">
-              ${c.isActive ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
-              ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
-                <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="${c.totalSpots > 0 ? `Delete ${c.typeLabel.toLowerCase()} and its ${c.totalSpots} spots` : `Remove ${c.typeLabel.toLowerCase()}`}">×</button>
-              ` : ''}
+            <div class="atlas-division-meta">
+              ${divCities.length} ${divCities.length === 1 ? 'destination' : 'destinations'} · ${totalDivSpots} ${totalDivSpots === 1 ? 'spot' : 'spots'}
             </div>
           </div>
-          <div class="atlas-card-body">
-            <h3 class="atlas-card-title">${escapeHtml(c.name)}</h3>
-            <span class="atlas-card-country">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}${atlasSearchQuery ? ` · ${c.region.toUpperCase()}` : ''}</span>
-          </div>
-          <div class="atlas-card-footer">
-            ${c.totalSpots > 0 ? `
-              <div class="atlas-card-stats">
-                <span class="atlas-spot-count"><strong>${c.totalSpots}</strong> ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
-                <span class="atlas-visited-count">${c.visitedCount} visited</span>
+          ${divCities.map(c => `
+            <div class="atlas-card ${c.isActive ? 'active' : ''} ${c.totalSpots === 0 ? 'empty-city' : ''}" data-select-city="${escapeHtml(c.name)}">
+              <div class="atlas-card-header">
+                <div class="atlas-code-type-wrap">
+                  <span class="atlas-card-code">[ ${c.code} ]</span>
+                  <span class="tag-type-pill tag-type-${c.type}">${c.type.toUpperCase()}</span>
+                </div>
+                <div class="atlas-card-badges">
+                  ${c.isActive ? '<span class="atlas-active-badge">ACTIVE</span>' : ''}
+                  ${(!c.isActive || displayCities.length > 1) && !isReadOnlyGuide ? `
+                    <button type="button" class="atlas-btn-remove" data-delete-city="${escapeHtml(c.name)}" data-spot-count="${c.totalSpots}" title="${c.totalSpots > 0 ? `Delete ${c.typeLabel.toLowerCase()} and its ${c.totalSpots} spots` : `Remove ${c.typeLabel.toLowerCase()}`}">×</button>
+                  ` : ''}
+                </div>
               </div>
-              <div class="atlas-progress-bar">
-                <div class="atlas-progress-fill" style="width: ${c.visitedPercent}%"></div>
+              <div class="atlas-card-body">
+                <h3 class="atlas-card-title">${escapeHtml(c.name)}</h3>
+                <span class="atlas-card-country">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}${atlasSearchQuery ? ` · ${c.region.toUpperCase()}` : ''}</span>
               </div>
-            ` : `
-              <span class="atlas-empty-label">0 spots · wishlist index</span>
-            `}
-          </div>
-        </div>
-      `).join('')}
+              <div class="atlas-card-footer">
+                ${c.totalSpots > 0 ? `
+                  <div class="atlas-card-stats">
+                    <span class="atlas-spot-count"><strong>${c.totalSpots}</strong> ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
+                    <span class="atlas-visited-count">${c.visitedCount} visited</span>
+                  </div>
+                  <div class="atlas-progress-bar">
+                    <div class="atlas-progress-fill" style="width: ${c.visitedPercent}%"></div>
+                  </div>
+                ` : `
+                  <span class="atlas-empty-label">0 spots · wishlist index</span>
+                `}
+              </div>
+            </div>
+          `).join('')}
+        `;
+      }).join('')}
     `;
   }
 

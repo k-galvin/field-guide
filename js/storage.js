@@ -16,116 +16,127 @@ export const DEFAULT_CITIES = [
 ];
 
 export const KNOWN_CITY_META = {
-  'orange county': { code: 'OC', country: 'California, USA', region: 'americas', type: 'county' },
+  // Americas - California
+  'orange county': { code: 'OC', country: 'California', region: 'americas', type: 'county' },
+  'costa mesa': { code: 'SNA', country: 'California', region: 'americas', type: 'city' },
+  'newport beach': { code: 'NPB', country: 'California', region: 'americas', type: 'city' },
+  'laguna beach': { code: 'LGB', country: 'California', region: 'americas', type: 'city' },
+  'irvine': { code: 'IRV', country: 'California', region: 'americas', type: 'city' },
+  'anaheim': { code: 'ANA', country: 'California', region: 'americas', type: 'city' },
+  'garden grove': { code: 'GG', country: 'California', region: 'americas', type: 'city' },
+  'fountain valley': { code: 'FV', country: 'California', region: 'americas', type: 'city' },
+  'dana point': { code: 'DP', country: 'California', region: 'americas', type: 'city' },
+  'san diego': { code: 'SAN', country: 'California', region: 'americas', type: 'city' },
+  'joshua tree': { code: 'JTR', country: 'California', region: 'americas', type: 'area' },
+  'napa valley': { code: 'NAP', country: 'California', region: 'americas', type: 'area' },
+  'santa ana': { code: 'SNA', country: 'California', region: 'americas', type: 'city' },
+  'orange': { code: 'ORA', country: 'California', region: 'americas', type: 'city' },
+  'huntington beach': { code: 'HB', country: 'California', region: 'americas', type: 'city' },
+  'encinitas': { code: 'ENC', country: 'California', region: 'americas', type: 'city' },
+  'los angeles': { code: 'LAX', country: 'California', region: 'americas', type: 'city' },
+  'san francisco': { code: 'SFO', country: 'California', region: 'americas', type: 'city' },
+
+  // Americas - Other US States
+  'new york': { code: 'NYC', country: 'New York', region: 'americas', type: 'city' },
+  'hudson valley': { code: 'HUD', country: 'New York', region: 'americas', type: 'area' },
+  'boston': { code: 'BOS', country: 'Massachusetts', region: 'americas', type: 'city' },
+  'chicago': { code: 'ORD', country: 'Illinois', region: 'americas', type: 'city' },
+  'seattle': { code: 'SEA', country: 'Washington', region: 'americas', type: 'city' },
+  'portland': { code: 'PDX', country: 'Oregon', region: 'americas', type: 'city' },
+  'santa fe': { code: 'SAF', country: 'New Mexico', region: 'americas', type: 'city' },
+  'phoenix': { code: 'PHX', country: 'Arizona', region: 'americas', type: 'city' },
+  'austin': { code: 'AUS', country: 'Texas', region: 'americas', type: 'city' },
+  'nashville': { code: 'BNA', country: 'Tennessee', region: 'americas', type: 'city' },
+  'new orleans': { code: 'MSY', country: 'Louisiana', region: 'americas', type: 'city' },
+  'detroit': { code: 'DTW', country: 'Michigan', region: 'americas', type: 'city' },
+  'philadelphia': { code: 'PHL', country: 'Pennsylvania', region: 'americas', type: 'city' },
+  'miami': { code: 'MIA', country: 'Florida', region: 'americas', type: 'city' },
+  'memphis': { code: 'MEM', country: 'Tennessee', region: 'americas', type: 'city' },
+
+  // Americas - International
+  'vancouver': { code: 'YVR', country: 'Canada', region: 'americas', type: 'city' },
+  'toronto': { code: 'YYZ', country: 'Canada', region: 'americas', type: 'city' },
+  'montreal': { code: 'YUL', country: 'Canada', region: 'americas', type: 'city' },
+  'quebec city': { code: 'YQB', country: 'Canada', region: 'americas', type: 'city' },
+  'mexico city': { code: 'CDMX', country: 'Mexico', region: 'americas', type: 'city' },
+  'são paulo': { code: 'GRU', country: 'Brazil', region: 'americas', type: 'city' },
+  'sao paulo': { code: 'GRU', country: 'Brazil', region: 'americas', type: 'city' },
+  'buenos aires': { code: 'EZE', country: 'Argentina', region: 'americas', type: 'city' },
+
+  // Europe - France
+  'paris': { code: 'PAR', country: 'France', region: 'europe', type: 'city' },
   'french countryside': { code: 'FRA', country: 'France', region: 'europe', type: 'area' },
-  'english countryside': { code: 'ENG', country: 'United Kingdom', region: 'europe', type: 'area' },
-  'scottish countryside': { code: 'SCO', country: 'Scotland, UK', region: 'europe', type: 'area' },
-  'irish countryside': { code: 'IRE', country: 'Ireland', region: 'europe', type: 'area' },
+  'nice': { code: 'NCE', country: 'France', region: 'europe', type: 'city' },
+  'lyon': { code: 'LYS', country: 'France', region: 'europe', type: 'city' },
+
+  // Europe - Italy
+  'rome': { code: 'ROM', country: 'Italy', region: 'europe', type: 'city' },
+  'florence': { code: 'FLR', country: 'Italy', region: 'europe', type: 'city' },
+  'venice': { code: 'VCE', country: 'Italy', region: 'europe', type: 'city' },
+  'milan': { code: 'MIL', country: 'Italy', region: 'europe', type: 'city' },
   'italian countryside': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
   'italian riviera': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
-  'tuscany': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
-  'iceland': { code: 'ICE', country: 'Iceland', region: 'europe', type: 'area' },
-  'boston': { code: 'BOS', country: 'Massachusetts, USA', region: 'americas', type: 'city' },
-  'barcelona': { code: 'BCN', country: 'Spain', region: 'europe', type: 'city' },
-  'seattle': { code: 'SEA', country: 'Washington, USA', region: 'americas', type: 'city' },
-  'portland': { code: 'PDX', country: 'Oregon, USA', region: 'americas', type: 'city' },
-  'santa fe': { code: 'SAF', country: 'New Mexico, USA', region: 'americas', type: 'city' },
-  'phoenix': { code: 'PHX', country: 'Arizona, USA', region: 'americas', type: 'city' },
-  'chicago': { code: 'ORD', country: 'Illinois, USA', region: 'americas', type: 'city' },
-  'vancouver': { code: 'YVR', country: 'Canada', region: 'americas', type: 'city' },
-  'quebec city': { code: 'YQB', country: 'Canada', region: 'americas', type: 'city' },
-  'nice': { code: 'NCE', country: 'France', region: 'europe', type: 'city' },
-  'rome': { code: 'ROM', country: 'Italy', region: 'europe', type: 'city' },
-  'venice': { code: 'VCE', country: 'Italy', region: 'europe', type: 'city' },
-  'florence': { code: 'FLR', country: 'Italy', region: 'europe', type: 'city' },
-  'dublin': { code: 'DUB', country: 'Ireland', region: 'europe', type: 'city' },
-  'costa mesa': { code: 'SNA', country: 'California, USA', region: 'americas', type: 'city' },
-  'newport beach': { code: 'NPB', country: 'California, USA', region: 'americas', type: 'city' },
-  'laguna beach': { code: 'LGB', country: 'California, USA', region: 'americas', type: 'city' },
-  'irvine': { code: 'IRV', country: 'California, USA', region: 'americas', type: 'city' },
-  'anaheim': { code: 'ANA', country: 'California, USA', region: 'americas', type: 'city' },
-  'garden grove': { code: 'GG', country: 'California, USA', region: 'americas', type: 'city' },
-  'fountain valley': { code: 'FV', country: 'California, USA', region: 'americas', type: 'city' },
-  'dana point': { code: 'DP', country: 'California, USA', region: 'americas', type: 'city' },
-  'san diego': { code: 'SAN', country: 'California, USA', region: 'americas', type: 'city' },
-  'joshua tree': { code: 'JTR', country: 'California, USA', region: 'americas', type: 'area' },
-  'napa valley': { code: 'NAP', country: 'California, USA', region: 'americas', type: 'area' },
-  'cotswolds': { code: 'COT', country: 'UK', region: 'europe', type: 'area' },
-  'hudson valley': { code: 'HUD', country: 'New York, USA', region: 'americas', type: 'area' },
   'tuscany': { code: 'TUS', country: 'Italy', region: 'europe', type: 'area' },
-  'budapest': { code: 'BUD', country: 'Hungary', region: 'europe' },
-  'santa ana': { code: 'SNA', country: 'California, USA', region: 'americas' },
-  'orange': { code: 'ORA', country: 'California, USA', region: 'americas' },
-  'huntington beach': { code: 'HB', country: 'California, USA', region: 'americas' },
-  'encinitas': { code: 'ENC', country: 'California, USA', region: 'americas' },
-  'tokyo': { code: 'TYO', country: 'Japan', region: 'asia_pacific' },
-  'paris': { code: 'PAR', country: 'France', region: 'europe' },
-  'los angeles': { code: 'LAX', country: 'USA', region: 'americas' },
-  'copenhagen': { code: 'CPH', country: 'Denmark', region: 'europe' },
-  'new york': { code: 'NYC', country: 'USA', region: 'americas' },
-  'london': { code: 'LON', country: 'UK', region: 'europe' },
-  'lisbon': { code: 'LIS', country: 'Portugal', region: 'europe' },
-  'san francisco': { code: 'SFO', country: 'USA', region: 'americas' },
-  'kyoto': { code: 'KYO', country: 'Japan', region: 'asia_pacific' },
-  'berlin': { code: 'BER', country: 'Germany', region: 'europe' },
-  'rome': { code: 'ROM', country: 'Italy', region: 'europe' },
-  'milan': { code: 'MIL', country: 'Italy', region: 'europe' },
-  'venice': { code: 'VCE', country: 'Italy', region: 'europe' },
-  'mexico city': { code: 'CDMX', country: 'Mexico', region: 'americas' },
-  'seoul': { code: 'SEL', country: 'South Korea', region: 'asia_pacific' },
-  'amsterdam': { code: 'AMS', country: 'Netherlands', region: 'europe' },
-  'vienna': { code: 'VIE', country: 'Austria', region: 'europe' },
-  'barcelona': { code: 'BCN', country: 'Spain', region: 'europe' },
-  'madrid': { code: 'MAD', country: 'Spain', region: 'europe' },
-  'stockholm': { code: 'ARN', country: 'Sweden', region: 'europe' },
-  'oslo': { code: 'OSL', country: 'Norway', region: 'europe' },
-  'helsinki': { code: 'HEL', country: 'Finland', region: 'europe' },
-  'porto': { code: 'OPO', country: 'Portugal', region: 'europe' },
-  'prague': { code: 'PRG', country: 'Czech Republic', region: 'europe' },
-  'dublin': { code: 'DUB', country: 'Ireland', region: 'europe' },
-  'edinburgh': { code: 'EDI', country: 'UK', region: 'europe' },
-  'rotterdam': { code: 'RTM', country: 'Netherlands', region: 'europe' },
-  'dessau': { code: 'DES', country: 'Germany', region: 'europe' },
-  'kobe': { code: 'UKB', country: 'Japan', region: 'asia_pacific' },
-  'vancouver': { code: 'YVR', country: 'Canada', region: 'americas' },
-  'toronto': { code: 'YYZ', country: 'Canada', region: 'americas' },
-  'montreal': { code: 'YUL', country: 'Canada', region: 'americas' },
-  'são paulo': { code: 'GRU', country: 'Brazil', region: 'americas' },
-  'sao paulo': { code: 'GRU', country: 'Brazil', region: 'americas' },
-  'buenos aires': { code: 'EZE', country: 'Argentina', region: 'americas' },
-  'austin': { code: 'AUS', country: 'USA', region: 'americas' },
-  'seattle': { code: 'SEA', country: 'USA', region: 'americas' },
-  'nashville': { code: 'BNA', country: 'USA', region: 'americas' },
-  'new orleans': { code: 'MSY', country: 'USA', region: 'americas' },
-  'detroit': { code: 'DTW', country: 'USA', region: 'americas' },
-  'philadelphia': { code: 'PHL', country: 'USA', region: 'americas' },
-  'chicago': { code: 'ORD', country: 'USA', region: 'americas' },
-  'miami': { code: 'MIA', country: 'USA', region: 'americas' },
-  'marrakesh': { code: 'RAK', country: 'Morocco', region: 'europe' },
-  'istanbul': { code: 'IST', country: 'Turkey', region: 'europe' },
-  'bangkok': { code: 'BKK', country: 'Thailand', region: 'asia_pacific' },
-  'hong kong': { code: 'HKG', country: 'Hong Kong', region: 'asia_pacific' },
-  'mumbai': { code: 'BOM', country: 'India', region: 'asia_pacific' },
-  'munich': { code: 'MUC', country: 'Germany', region: 'europe' },
-  'hanoi': { code: 'HAN', country: 'Vietnam', region: 'asia_pacific' },
-  'auckland': { code: 'AKL', country: 'New Zealand', region: 'asia_pacific' },
-  'florence': { code: 'FLR', country: 'Italy', region: 'europe' },
-  'geneva': { code: 'GVA', country: 'Switzerland', region: 'europe' },
-  'lyon': { code: 'LYS', country: 'France', region: 'europe' },
-  'manchester': { code: 'MAN', country: 'UK', region: 'europe' },
-  'portland': { code: 'PDX', country: 'USA', region: 'americas' },
-  'düsseldorf': { code: 'DUS', country: 'Germany', region: 'europe' },
-  'dusseldorf': { code: 'DUS', country: 'Germany', region: 'europe' },
-  'leipzig': { code: 'LEJ', country: 'Germany', region: 'europe' },
-  'ikast': { code: 'IKA', country: 'Denmark', region: 'europe' },
-  'antwerp': { code: 'ANR', country: 'Belgium', region: 'europe' },
-  'lagos': { code: 'LOS', country: 'Nigeria', region: 'europe' },
-  'kyiv': { code: 'IEV', country: 'Ukraine', region: 'europe' },
-  'oxford': { code: 'OXF', country: 'UK', region: 'europe' },
-  'liverpool': { code: 'LPL', country: 'UK', region: 'europe' },
-  'memphis': { code: 'MEM', country: 'USA', region: 'americas' },
-  'melbourne': { code: 'MEL', country: 'Australia', region: 'asia_pacific' },
-  'sydney': { code: 'SYD', country: 'Australia', region: 'asia_pacific' }
+
+  // Europe - United Kingdom
+  'london': { code: 'LON', country: 'United Kingdom', region: 'europe', type: 'city' },
+  'edinburgh': { code: 'EDI', country: 'United Kingdom', region: 'europe', type: 'city' },
+  'manchester': { code: 'MAN', country: 'United Kingdom', region: 'europe', type: 'city' },
+  'oxford': { code: 'OXF', country: 'United Kingdom', region: 'europe', type: 'city' },
+  'liverpool': { code: 'LPL', country: 'United Kingdom', region: 'europe', type: 'city' },
+  'cotswolds': { code: 'COT', country: 'United Kingdom', region: 'europe', type: 'area' },
+  'english countryside': { code: 'ENG', country: 'United Kingdom', region: 'europe', type: 'area' },
+  'scottish countryside': { code: 'SCO', country: 'United Kingdom', region: 'europe', type: 'area' },
+
+  // Europe - Spain & Portugal
+  'barcelona': { code: 'BCN', country: 'Spain', region: 'europe', type: 'city' },
+  'madrid': { code: 'MAD', country: 'Spain', region: 'europe', type: 'city' },
+  'lisbon': { code: 'LIS', country: 'Portugal', region: 'europe', type: 'city' },
+  'porto': { code: 'OPO', country: 'Portugal', region: 'europe', type: 'city' },
+
+  // Europe - Germany & Central Europe
+  'berlin': { code: 'BER', country: 'Germany', region: 'europe', type: 'city' },
+  'munich': { code: 'MUC', country: 'Germany', region: 'europe', type: 'city' },
+  'düsseldorf': { code: 'DUS', country: 'Germany', region: 'europe', type: 'city' },
+  'dusseldorf': { code: 'DUS', country: 'Germany', region: 'europe', type: 'city' },
+  'leipzig': { code: 'LEJ', country: 'Germany', region: 'europe', type: 'city' },
+  'dessau': { code: 'DES', country: 'Germany', region: 'europe', type: 'city' },
+  'vienna': { code: 'VIE', country: 'Austria', region: 'europe', type: 'city' },
+  'prague': { code: 'PRG', country: 'Czech Republic', region: 'europe', type: 'city' },
+  'budapest': { code: 'BUD', country: 'Hungary', region: 'europe', type: 'city' },
+
+  // Europe - Northern Europe
+  'copenhagen': { code: 'CPH', country: 'Denmark', region: 'europe', type: 'city' },
+  'ikast': { code: 'IKA', country: 'Denmark', region: 'europe', type: 'city' },
+  'stockholm': { code: 'ARN', country: 'Sweden', region: 'europe', type: 'city' },
+  'oslo': { code: 'OSL', country: 'Norway', region: 'europe', type: 'city' },
+  'helsinki': { code: 'HEL', country: 'Finland', region: 'europe', type: 'city' },
+  'iceland': { code: 'ICE', country: 'Iceland', region: 'europe', type: 'area' },
+
+  // Europe - Other
+  'amsterdam': { code: 'AMS', country: 'Netherlands', region: 'europe', type: 'city' },
+  'rotterdam': { code: 'RTM', country: 'Netherlands', region: 'europe', type: 'city' },
+  'dublin': { code: 'DUB', country: 'Ireland', region: 'europe', type: 'city' },
+  'irish countryside': { code: 'IRE', country: 'Ireland', region: 'europe', type: 'area' },
+  'antwerp': { code: 'ANR', country: 'Belgium', region: 'europe', type: 'city' },
+  'geneva': { code: 'GVA', country: 'Switzerland', region: 'europe', type: 'city' },
+  'kyiv': { code: 'IEV', country: 'Ukraine', region: 'europe', type: 'city' },
+  'marrakesh': { code: 'RAK', country: 'Morocco', region: 'europe', type: 'city' },
+  'istanbul': { code: 'IST', country: 'Turkey', region: 'europe', type: 'city' },
+  'lagos': { code: 'LOS', country: 'Nigeria', region: 'europe', type: 'city' },
+
+  // Asia & Pacific
+  'tokyo': { code: 'TYO', country: 'Japan', region: 'asia_pacific', type: 'city' },
+  'kyoto': { code: 'KYO', country: 'Japan', region: 'asia_pacific', type: 'city' },
+  'kobe': { code: 'UKB', country: 'Japan', region: 'asia_pacific', type: 'city' },
+  'seoul': { code: 'SEL', country: 'South Korea', region: 'asia_pacific', type: 'city' },
+  'bangkok': { code: 'BKK', country: 'Thailand', region: 'asia_pacific', type: 'city' },
+  'hanoi': { code: 'HAN', country: 'Vietnam', region: 'asia_pacific', type: 'city' },
+  'hong kong': { code: 'HKG', country: 'Hong Kong', region: 'asia_pacific', type: 'city' },
+  'mumbai': { code: 'BOM', country: 'India', region: 'asia_pacific', type: 'city' },
+  'sydney': { code: 'SYD', country: 'Australia', region: 'asia_pacific', type: 'city' },
+  'melbourne': { code: 'MEL', country: 'Australia', region: 'asia_pacific', type: 'city' },
+  'auckland': { code: 'AKL', country: 'New Zealand', region: 'asia_pacific', type: 'city' }
 };
 
 export const DESTINATION_TYPES = {
@@ -182,11 +193,76 @@ export function detectDestinationType(name) {
   return 'city';
 }
 
+export const US_STATES = [
+  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
+  'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
+  'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
+  'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+  'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
+  'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+  'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+  'Wisconsin', 'Wyoming', 'District of Columbia', 'Puerto Rico'
+];
+
+export const US_STATE_ABBRS = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
+  CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia',
+  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa',
+  KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
+  MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri',
+  MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
+  NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio',
+  OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
+  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
+  VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming', DC: 'District of Columbia'
+};
+
+export function getDestinationDivision(cityName, meta) {
+  const m = meta || getDestinationMeta(cityName);
+  const rawCountry = (m.country || '').trim();
+  const rawCity = (cityName || '').trim();
+
+  // 1. Direct US State match in country
+  const stateInCountry = US_STATES.find(s => new RegExp('\\b' + s + '\\b', 'i').test(rawCountry));
+  if (stateInCountry) return stateInCountry;
+
+  // 2. Abbreviation in country (e.g. 'CA, USA' or 'NY')
+  for (const [abbr, fullName] of Object.entries(US_STATE_ABBRS)) {
+    if (new RegExp('(^|\\W)' + abbr + '(\\W|$)', 'i').test(rawCountry)) {
+      return fullName;
+    }
+  }
+
+  // 3. State name in city string (e.g. 'Austin, Texas' or 'Savannah, Georgia')
+  const stateInCity = US_STATES.find(s => new RegExp('\\b' + s + '\\b', 'i').test(rawCity));
+  if (stateInCity) return stateInCity;
+
+  // 4. State abbreviation in city string (e.g. 'Denver, CO')
+  for (const [abbr, fullName] of Object.entries(US_STATE_ABBRS)) {
+    if (new RegExp(',\\s*' + abbr + '(\\W|$)', 'i').test(rawCity)) {
+      return fullName;
+    }
+  }
+
+  // 5. UK normalization
+  if (rawCountry === 'UK' || rawCountry.toLowerCase().includes('scotland') || rawCountry.toLowerCase().includes('england')) {
+    return 'United Kingdom';
+  }
+
+  // 6. Generic USA fallback
+  if (rawCountry === 'USA' || rawCountry === 'United States') {
+    return 'United States';
+  }
+
+  return rawCountry || 'Other Destinations';
+}
+
 export function getDestinationMeta(cityName) {
   if (!cityName) {
     return {
       code: '---',
       country: 'Destination',
+      division: 'Other Destinations',
       region: 'other',
       type: 'city',
       typeLabel: 'City'
@@ -199,20 +275,44 @@ export function getDestinationMeta(cityName) {
   if (KNOWN_CITY_META[lower]) {
     const meta = KNOWN_CITY_META[lower];
     const type = customTypes[lower] || meta.type || detectedType;
+    let country = meta.country || 'Destination';
+    const stateMatch = US_STATES.find(s => new RegExp('\\b' + s + '\\b', 'i').test(country));
+    if (stateMatch) {
+      country = stateMatch;
+    }
     return {
       code: meta.code,
-      country: meta.country,
+      country: country,
+      division: country,
       region: meta.region || 'other',
       type: type,
       typeLabel: DESTINATION_TYPE_LABELS[type] || 'Destination'
     };
   }
 
+  // Check if cityName has state info
+  let detectedCountry = 'Destination';
+  let detectedRegion = 'other';
+  const stateInCity = US_STATES.find(s => new RegExp('\\b' + s + '\\b', 'i').test(cityName));
+  if (stateInCity) {
+    detectedCountry = stateInCity;
+    detectedRegion = 'americas';
+  } else {
+    for (const [abbr, fullName] of Object.entries(US_STATE_ABBRS)) {
+      if (new RegExp(',\\s*' + abbr + '(\\W|$)', 'i').test(cityName)) {
+        detectedCountry = fullName;
+        detectedRegion = 'americas';
+        break;
+      }
+    }
+  }
+
   const code = cityName.replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase() || 'DST';
   return {
     code,
-    country: 'Destination',
-    region: 'other',
+    country: detectedCountry,
+    division: detectedCountry,
+    region: detectedRegion,
     type: detectedType,
     typeLabel: DESTINATION_TYPE_LABELS[detectedType] || 'Destination'
   };

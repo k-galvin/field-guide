@@ -41,7 +41,8 @@ import {
   getDestinationMeta,
   detectDestinationType,
   DESTINATION_TYPES,
-  DEFAULT_CITIES
+  DEFAULT_CITIES,
+  getDestinationDivision
 } from '../js/storage.js';
 import { mapOsmTagToCategory } from '../js/photon.js';
 
@@ -148,5 +149,47 @@ assert.strictEqual(detectDestinationType('Napa Valley'), 'area');
 assert.strictEqual(detectDestinationType('Amalfi Coast'), 'area');
 assert.strictEqual(detectDestinationType('Heidelberg'), 'city');
 console.log('✓ Heuristic destination type detection verified');
+
+console.log('Testing Atlas divisions (States in Americas, Countries elsewhere)...');
+// Americas: States for US destinations
+assert.strictEqual(getDestinationDivision('Los Angeles'), 'California');
+assert.strictEqual(getDestinationDivision('San Francisco'), 'California');
+assert.strictEqual(getDestinationDivision('Orange County'), 'California');
+assert.strictEqual(getDestinationDivision('New York'), 'New York');
+assert.strictEqual(getDestinationDivision('Chicago'), 'Illinois');
+assert.strictEqual(getDestinationDivision('Boston'), 'Massachusetts');
+assert.strictEqual(getDestinationDivision('Seattle'), 'Washington');
+assert.strictEqual(getDestinationDivision('Portland'), 'Oregon');
+assert.strictEqual(getDestinationDivision('Santa Fe'), 'New Mexico');
+assert.strictEqual(getDestinationDivision('Phoenix'), 'Arizona');
+assert.strictEqual(getDestinationDivision('Austin'), 'Texas');
+assert.strictEqual(getDestinationDivision('Denver, CO'), 'Colorado');
+
+// Americas: Countries for non-US
+assert.strictEqual(getDestinationDivision('Vancouver'), 'Canada');
+assert.strictEqual(getDestinationDivision('Montreal'), 'Canada');
+assert.strictEqual(getDestinationDivision('Mexico City'), 'Mexico');
+assert.strictEqual(getDestinationDivision('São Paulo'), 'Brazil');
+
+// Europe: Countries
+assert.strictEqual(getDestinationDivision('Paris'), 'France');
+assert.strictEqual(getDestinationDivision('Rome'), 'Italy');
+assert.strictEqual(getDestinationDivision('London'), 'United Kingdom');
+assert.strictEqual(getDestinationDivision('Berlin'), 'Germany');
+assert.strictEqual(getDestinationDivision('Barcelona'), 'Spain');
+assert.strictEqual(getDestinationDivision('Amsterdam'), 'Netherlands');
+
+// Asia & Pacific: Countries
+assert.strictEqual(getDestinationDivision('Tokyo'), 'Japan');
+assert.strictEqual(getDestinationDivision('Melbourne'), 'Australia');
+
+// Ensure no DEFAULT_CITIES entry uses generic "USA" as country or division
+DEFAULT_CITIES.forEach(c => {
+  const meta = getCityMeta(c);
+  const div = getDestinationDivision(c, meta);
+  assert(meta.country !== 'USA' && meta.country !== 'United States', `${c} should specify state or country, not generic USA`);
+  assert(div !== 'USA' && div !== 'United States', `${c} division should specify state or country, not generic USA`);
+});
+console.log('✓ Atlas divisions by State (Americas) and Country verified for all destinations');
 
 console.log('All Day Loop algorithms & Destination Atlas verified successfully!');
