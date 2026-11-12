@@ -469,7 +469,7 @@ async function syncWithSupabase(manual = false) {
       (localNewSpots.length > 0) ||
       spots.some(s => {
         const r = remoteMap.get(s.id);
-        return !r || r.photoUrl !== s.photoUrl || r.status !== s.status || r.name !== s.name || r.notes !== s.notes || r.hours !== s.hours || r.city !== s.city;
+        return !r || r.category !== s.category || r.photoUrl !== s.photoUrl || r.status !== s.status || r.name !== s.name || r.notes !== s.notes || r.hours !== s.hours || r.city !== s.city;
       });
     const prevActiveCity = activeCity;
 
@@ -984,9 +984,9 @@ function renderCategoryChips() {
 /**
  * Populate Category Dropdown inside modal
  */
-function renderCategoryDropdown() {
+function renderCategoryDropdown(selectedCategory = null) {
   if (!spotCategorySelect) return;
-  const currentVal = spotCategorySelect.value;
+  const currentVal = selectedCategory || spotCategorySelect.value;
   spotCategorySelect.innerHTML = CATEGORIES.map(c => `
     <option value="${c.id}">${escapeHtml(c.label)}</option>
   `).join('');
@@ -1123,8 +1123,8 @@ function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
       ? `${escapeHtml(spot.neighborhood)} · ${escapeHtml(spot.city)}`
       : escapeHtml(spot.city);
 
-    // Fingerprint of all visual content to prevent unnecessary re-renders
-    const fingerprint = `${spot.photoUrl || ''}|${spot.name}|${spot.notes || ''}|${spot.status}|${spot.favorite ? 1 : 0}|${locationLabel}|${spot.hours || ''}|${distBadge}`;
+    // Fingerprint of all visual content to prevent unnecessary re-renders (including category)
+    const fingerprint = `${spot.category || ''}|${spot.photoUrl || ''}|${spot.name}|${spot.notes || ''}|${spot.status}|${spot.favorite ? 1 : 0}|${locationLabel}|${spot.hours || ''}|${distBadge}`;
 
     let card = existingCards.get(spot.id);
 
@@ -1515,7 +1515,7 @@ function openEditSpotModal(spot) {
   if (spot) normalizeSpotCategory(spot);
   editingSpotId = spot.id;
   document.getElementById('modal-spot-title').textContent = 'Edit Spot';
-  renderCategoryDropdown();
+  renderCategoryDropdown(spot.category);
   spotIdInput.value = spot.id;
   spotNameInput.value = spot.name;
   spotCitySelect.value = spot.city;
@@ -1621,6 +1621,13 @@ function handleSpotFormSubmit(e) {
     // When editing an existing spot, stay on the spot!
     const feed = document.getElementById('spot-feed') || document.querySelector('.spot-feed');
     const savedScrollTop = feed ? feed.scrollTop : 0;
+
+    // If active category filter is currently active and the spot's category was changed,
+    // reset active category to 'all' so the edited spot remains visible in the feed
+    if (activeCategory !== 'all' && activeCategory !== category) {
+      activeCategory = 'all';
+      renderCategoryChips();
+    }
 
     applyFiltersAndRender(false, targetId);
 

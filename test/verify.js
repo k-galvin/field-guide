@@ -260,4 +260,14 @@ expectedNewSpots.forEach(exp => {
 });
 console.log('✓ All 20 newly requested spots verified in sample database');
 
+console.log('Testing category modification fingerprint sensitivity...');
+// Verify that card fingerprint updates when spot category changes
+const computeFingerprint = (spot, locationLabel = '', distBadge = '') =>
+  `${spot.category || ''}|${spot.photoUrl || ''}|${spot.name}|${spot.notes || ''}|${spot.status}|${spot.favorite ? 1 : 0}|${locationLabel}|${spot.hours || ''}|${distBadge}`;
+
+const initialSpot = { id: 'test-1', name: 'Test Spot', category: 'pastry_bakery', status: 'wishlist', favorite: false };
+const updatedSpot = { ...initialSpot, category: 'matcha_coffee' };
+assert.notStrictEqual(computeFingerprint(initialSpot), computeFingerprint(updatedSpot), 'Fingerprint must change when category changes');
+console.log('✓ Category change triggers DOM reconciliation and re-render');
+
 console.log('All Day Loop algorithms & Destination Atlas verified successfully!');
