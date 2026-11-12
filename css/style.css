@@ -1541,6 +1541,188 @@ html, body {
   color: var(--ink-muted);
 }
 
+/* --- Atlas Regional Overview & Drill-down --- */
+.atlas-grid.overview-view {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  padding-bottom: 0.75rem;
+}
+
+.atlas-region-card {
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--white);
+  padding: 1.25rem 1.35rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 175px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.atlas-region-card:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 71, 171, 0.09);
+}
+
+.atlas-region-card.has-active {
+  border-color: rgba(0, 71, 171, 0.35);
+  background: linear-gradient(180deg, rgba(0, 71, 171, 0.025) 0%, var(--white) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 71, 171, 0.15);
+}
+
+.atlas-region-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.atlas-region-code-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-blue);
+  background: rgba(0, 71, 171, 0.06);
+  border: 1px solid rgba(0, 71, 171, 0.18);
+  border-radius: 4px;
+  padding: 3px 7px;
+}
+
+.atlas-region-card-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--primary-black);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.atlas-region-card-desc {
+  font-size: 12px;
+  color: var(--ink-secondary);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.atlas-region-preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.atlas-region-preview-tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  background: var(--bg-subtle);
+  color: var(--ink-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+.atlas-region-preview-tag.is-active-city {
+  background: rgba(0, 71, 171, 0.1);
+  color: var(--accent-blue);
+  border-color: var(--accent-blue);
+  font-weight: 700;
+}
+
+.atlas-region-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+  margin-top: auto;
+  gap: 10px;
+}
+
+.atlas-region-stats {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-secondary);
+}
+
+.atlas-region-stats strong {
+  color: var(--accent-blue);
+}
+
+.atlas-region-cta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  transition: transform 0.15s ease;
+}
+
+.atlas-region-card:hover .atlas-region-cta {
+  transform: translateX(3px);
+}
+
+/* Breadcrumb Navigation Bar (when inside a region) */
+.atlas-region-breadcrumb-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.atlas-back-btn {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.atlas-back-btn:hover {
+  background: var(--accent-blue);
+  color: var(--white);
+  border-color: var(--accent-blue);
+}
+
+.atlas-breadcrumb-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.atlas-breadcrumb-title strong {
+  color: var(--primary-black);
+  font-size: 12px;
+}
+
 /* Luggage Tag Compact Grid View */
 .atlas-grid.compact-view {
   grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
@@ -2271,6 +2453,24 @@ body.readonly-mode .city-atlas-btn-add {
   .atlas-grid {
     grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
     gap: 8px;
+  }
+
+  .atlas-grid.overview-view {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .atlas-region-card {
+    padding: 1rem 1.15rem;
+    min-height: auto;
+  }
+
+  .atlas-region-card-title {
+    font-size: 17px;
+  }
+
+  .atlas-region-breadcrumb-bar {
+    padding: 7px 10px;
   }
 
   .atlas-card {

@@ -72,11 +72,32 @@ let isNearMeSorted = false;
 let pendingKmlSpots = [];
 let editingSpotId = null;
 let atlasActiveTab = 'active'; // 'active' (with spots) | 'all'
-let atlasActiveRegion = 'all'; // 'all' | 'americas' | 'europe' | 'asia_pacific'
+let atlasActiveRegion = 'overview'; // 'overview' | 'americas' | 'europe' | 'asia_pacific' | 'all'
 let atlasActiveType = 'all'; // 'all' | 'city' | 'county' | 'area'
 let atlasViewMode = localStorage.getItem('flaneur_atlas_view') || 'compact'; // 'compact' | 'cards'
 let atlasSearchQuery = '';
 let isReadOnlyGuide = false;
+
+const REGION_DEFINITIONS = [
+  {
+    id: 'americas',
+    name: 'Americas',
+    code: 'AME',
+    description: 'North, Central & South America'
+  },
+  {
+    id: 'europe',
+    name: 'Europe',
+    code: 'EUR',
+    description: 'Western, Southern & Northern Europe'
+  },
+  {
+    id: 'asia_pacific',
+    name: 'Asia & Pacific',
+    code: 'APAC',
+    description: 'East Asia, Southeast Asia & Oceania'
+  }
+];
 
 // DOM Elements
 const btnCityAtlasTrigger = document.getElementById('btn-city-atlas-trigger');
@@ -524,7 +545,7 @@ function setupEventListeners() {
   if (atlasRegionPills && atlasRegionPills.length > 0) {
     atlasRegionPills.forEach(pill => {
       pill.addEventListener('click', () => {
-        atlasActiveRegion = pill.getAttribute('data-region') || 'all';
+        atlasActiveRegion = pill.getAttribute('data-region') || 'overview';
         atlasRegionPills.forEach(p => p.classList.toggle('active', p === pill));
         renderCityManagerList();
       });
@@ -1726,11 +1747,14 @@ function renderCityDropdowns() {
 function openCityManagerModal() {
   atlasSearchQuery = '';
   if (atlasSearchInput) atlasSearchInput.value = '';
+  atlasActiveRegion = 'overview';
   renderCityManagerList();
   openModal(modalCities);
-  setTimeout(() => {
-    if (atlasSearchInput) atlasSearchInput.focus();
-  }, 100);
+  if (window.innerWidth > 768 && atlasSearchInput) {
+    setTimeout(() => {
+      atlasSearchInput.focus();
+    }, 100);
+  }
 }
 
 function renderCityManagerList() {
@@ -1761,14 +1785,138 @@ function renderCityManagerList() {
   if (atlasActiveCountEl) atlasActiveCountEl.textContent = activeCitiesCount;
   if (atlasAllCountEl) atlasAllCountEl.textContent = cities.length;
 
+  // Determine if we should show regional overview or destination list
+  const isOverview = (atlasActiveRegion === 'overview' && !atlasSearchQuery);
+
+  // Sync Regional Pills UI
+  if (atlasRegionPills && atlasRegionPills.length > 0) {
+    atlasRegionPills.forEach(p => {
+      p.classList.toggle('active', p.getAttribute('data-region') === atlasActiveRegion);
+    });
+  }
+
+  // Toggle auxiliary controls visibility
+  const typePillsWrap = document.getElementById('atlas-type-pills');
+  const subToolbarWrap = document.querySelector('.atlas-sub-toolbar');
+  const footerHintEl = document.querySelector('.atlas-footer-hint');
+
+  if (typePillsWrap) {
+    typePillsWrap.style.display = isOverview ? 'none' : 'flex';
+  }
+  if (subToolbarWrap) {
+    subToolbarWrap.style.display = isOverview ? 'none' : 'flex';
+  }
+  if (footerHintEl) {
+    footerHintEl.textContent = isOverview
+      ? 'Select a region above to explore its destinations, or search directly.'
+      : 'Tap any destination to switch guide & center map.';
+  }
+
+  // --- Regional Overview View ---
+  if (isOverview) {
+    listEl.classList.remove('compact-view');
+    listEl.classList.add('overview-view');
+
+    // Render cards for each defined region
+    const regionCardsHtml = REGION_DEFINITIONS.map(reg => {
+      const regionCities = cityStats.filter(c => c.region === reg.id);
+      const totalSpots = regionCities.reduce((sum, c) => sum + c.totalSpots, 0);
+      const visitedCount = regionCities.reduce((sum, c) => sum + c.visitedCount, 0);
+      const visitedPercent = totalSpots > 0 ? Math.round((visitedCount / totalSpots) * 100) : 0;
+      const hasActive = regionCities.some(c => c.isActive);
+      const activeCityInRegion = regionCities.find(c => c.isActive);
+
+      // Sort previews: active first, then most spots
+      const sortedPreviews = [...regionCities].sort((a, b) => {
+        if (a.isActive) return -1;
+        if (b.isActive) return 1;
+        return b.totalSpots - a.totalSpots;
+      });
+      const previewCities = sortedPreviews.slice(0, 6);
+      const remainingCount = sortedPreviews.length - previewCities.length;
+
+      return `
+        <div class="atlas-region-card ${hasActive ? 'has-active' : ''}" data-open-region="${reg.id}">
+          <div class="atlas-region-card-header">
+            <span class="atlas-region-code-badge">[ ${reg.code} ]</span>
+            ${hasActive ? `<span class="atlas-active-badge">CURRENT: ${escapeHtml(activeCityInRegion.name.toUpperCase())}</span>` : ''}
+          </div>
+          <div class="atlas-region-card-body">
+            <h3 class="atlas-region-card-title">${reg.name}</h3>
+            <div class="atlas-region-card-desc">${reg.description}</div>
+            <div class="atlas-region-preview-tags">
+              ${previewCities.map(c => `
+                <span class="atlas-region-preview-tag ${c.isActive ? 'is-active-city' : ''}">
+                  ${escapeHtml(c.name)}${c.totalSpots > 0 ? ` (${c.totalSpots})` : ''}
+                </span>
+              `).join('')}
+              ${remainingCount > 0 ? `<span class="atlas-region-preview-tag" style="opacity: 0.7;">+${remainingCount} more</span>` : ''}
+            </div>
+          </div>
+          <div class="atlas-region-card-footer">
+            <div class="atlas-region-stats">
+              <strong>${regionCities.length}</strong> destinations · <strong>${totalSpots}</strong> spots · ${visitedPercent}% visited
+            </div>
+            <span class="atlas-region-cta">Explore Region →</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Global All Destinations Overview Card
+    const totalGlobalSpots = spots.length;
+    const totalGlobalVisited = spots.filter(s => s.status === 'visited').length;
+    const globalPercent = totalGlobalSpots > 0 ? Math.round((totalGlobalVisited / totalGlobalSpots) * 100) : 0;
+    const globalCardHtml = `
+      <div class="atlas-region-card ${activeCity === 'all' ? 'has-active' : ''}" data-open-region="all">
+        <div class="atlas-region-card-header">
+          <span class="atlas-region-code-badge">[ ALL ]</span>
+          ${activeCity === 'all' ? '<span class="atlas-active-badge">CURRENT: GLOBAL</span>' : ''}
+        </div>
+        <div class="atlas-region-card-body">
+          <h3 class="atlas-region-card-title">All Destinations</h3>
+          <div class="atlas-region-card-desc">Browse complete archival index of all world destinations</div>
+          <div class="atlas-region-preview-tags">
+            <span class="atlas-region-preview-tag">Worldwide</span>
+            <span class="atlas-region-preview-tag">${cities.length} Curated Guides</span>
+            <span class="atlas-region-preview-tag">${spots.length} Total Spots</span>
+          </div>
+        </div>
+        <div class="atlas-region-card-footer">
+          <div class="atlas-region-stats">
+            <strong>${cities.length}</strong> destinations · <strong>${spots.length}</strong> spots · ${globalPercent}% visited
+          </div>
+          <span class="atlas-region-cta">View All Destinations →</span>
+        </div>
+      </div>
+    `;
+
+    listEl.innerHTML = regionCardsHtml + globalCardHtml;
+
+    // Attach click listeners to region cards
+    listEl.querySelectorAll('[data-open-region]').forEach(card => {
+      card.addEventListener('click', () => {
+        const targetRegion = card.getAttribute('data-open-region');
+        atlasActiveRegion = targetRegion;
+        renderCityManagerList();
+      });
+    });
+
+    return;
+  }
+
+  // --- Destination Drill-down View (or Search Results View) ---
+  listEl.classList.remove('overview-view');
+  listEl.classList.toggle('compact-view', atlasViewMode === 'compact');
+
   // Filter by tab
   let displayCities = cityStats;
-  if (atlasActiveTab === 'active') {
+  if (atlasActiveTab === 'active' && !atlasSearchQuery) {
     displayCities = displayCities.filter(c => c.totalSpots > 0 || c.isActive);
   }
 
   // Filter by region macro tab
-  if (atlasActiveRegion !== 'all') {
+  if (atlasActiveRegion !== 'all' && atlasActiveRegion !== 'overview') {
     displayCities = displayCities.filter(c => c.region === atlasActiveRegion);
   }
 
@@ -1784,7 +1932,8 @@ function renderCityManagerList() {
         c.name.toLowerCase().includes(atlasSearchQuery) ||
         c.country.toLowerCase().includes(atlasSearchQuery) ||
         c.code.toLowerCase().includes(atlasSearchQuery) ||
-        c.typeLabel.toLowerCase().includes(atlasSearchQuery)
+        c.typeLabel.toLowerCase().includes(atlasSearchQuery) ||
+        c.region.toLowerCase().includes(atlasSearchQuery)
       );
     });
   }
@@ -1797,21 +1946,50 @@ function renderCityManagerList() {
     return a.name.localeCompare(b.name);
   });
 
-  listEl.classList.toggle('compact-view', atlasViewMode === 'compact');
+  // Breadcrumb bar HTML (when viewing a specific region or all without search)
+  let breadcrumbHtml = '';
+  if (!atlasSearchQuery) {
+    const currentRegionDef = REGION_DEFINITIONS.find(r => r.id === atlasActiveRegion);
+    const regionName = currentRegionDef ? currentRegionDef.name : (atlasActiveRegion === 'all' ? 'All Destinations' : atlasActiveRegion);
+    const regionSpotsTotal = displayCities.reduce((sum, c) => sum + c.totalSpots, 0);
+
+    breadcrumbHtml = `
+      <div class="atlas-region-breadcrumb-bar">
+        <button type="button" class="atlas-back-btn" data-back-to-overview>
+          ← All Regions
+        </button>
+        <div class="atlas-breadcrumb-title">
+          <strong>${escapeHtml(regionName)}</strong> · ${displayCities.length} ${displayCities.length === 1 ? 'Destination' : 'Destinations'} · ${regionSpotsTotal} Spots
+        </div>
+      </div>
+    `;
+  }
 
   if (displayCities.length === 0) {
     listEl.innerHTML = `
+      ${breadcrumbHtml}
       <div style="grid-column: 1 / -1; padding: 2.5rem 1rem; text-align: center; color: var(--ink-secondary); font-family: var(--font-mono); font-size: 13px;">
         No destinations found matching your filters.
-        <div style="margin-top: 8px; color: var(--ink-muted);">Try selecting another category, region or search query!</div>
+        <div style="margin-top: 8px; color: var(--ink-muted);">Try selecting another category, clearing your search, or returning to regions overview.</div>
+        <div style="margin-top: 14px;">
+          <button type="button" class="atlas-back-btn" data-back-to-overview>← Back to Regions Overview</button>
+        </div>
       </div>
     `;
+    listEl.querySelectorAll('[data-back-to-overview]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        atlasActiveRegion = 'overview';
+        renderCityManagerList();
+      });
+    });
     return;
   }
 
   if (atlasViewMode === 'compact') {
     // Luggage Tag Compact Grid
     listEl.innerHTML = `
+      ${breadcrumbHtml}
+
       ${(!atlasSearchQuery && atlasActiveRegion === 'all' && atlasActiveType === 'all') ? `
         <div class="atlas-luggage-tag ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
           <div class="tag-code-block">
@@ -1836,7 +2014,7 @@ function renderCityManagerList() {
           </div>
           <div class="tag-body-block">
             <div class="tag-city-title">${escapeHtml(c.name)}</div>
-            <div class="tag-country-subtitle">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}</div>
+            <div class="tag-country-subtitle">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}${atlasSearchQuery ? ` · ${c.region.toUpperCase()}` : ''}</div>
           </div>
           <div class="tag-badge-block">
             <span class="tag-count-pill">${c.totalSpots} ${c.totalSpots === 1 ? 'spot' : 'spots'}</span>
@@ -1850,6 +2028,8 @@ function renderCityManagerList() {
   } else {
     // Detailed Cards View
     listEl.innerHTML = `
+      ${breadcrumbHtml}
+
       <!-- "All Destinations" Card -->
       ${(!atlasSearchQuery && atlasActiveRegion === 'all' && atlasActiveType === 'all') ? `
         <div class="atlas-card ${activeCity === 'all' ? 'active' : ''}" data-select-city="all">
@@ -1892,7 +2072,7 @@ function renderCityManagerList() {
           </div>
           <div class="atlas-card-body">
             <h3 class="atlas-card-title">${escapeHtml(c.name)}</h3>
-            <span class="atlas-card-country">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}</span>
+            <span class="atlas-card-country">${escapeHtml(c.country)} · ${escapeHtml(c.typeLabel)}${atlasSearchQuery ? ` · ${c.region.toUpperCase()}` : ''}</span>
           </div>
           <div class="atlas-card-footer">
             ${c.totalSpots > 0 ? `
@@ -1912,7 +2092,15 @@ function renderCityManagerList() {
     `;
   }
 
-  // Attach card click handlers
+  // Attach back to overview handlers
+  listEl.querySelectorAll('[data-back-to-overview]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      atlasActiveRegion = 'overview';
+      renderCityManagerList();
+    });
+  });
+
+  // Attach card click handlers to select destination
   listEl.querySelectorAll('[data-select-city]').forEach(card => {
     card.addEventListener('click', (e) => {
       if (e.target.closest('[data-delete-city]')) return;
