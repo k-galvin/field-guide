@@ -907,7 +907,7 @@ const SAMPLE_SPOTS = [
     hours: 'Check-in 15:00 · Dinner 18:30 - 21:00',
     notes: 'Historic 17th-century country house hotel and birthplace of modern Irish farm-to-table cuisine founded by Myrtle Allen. Surrounded by rolling East Cork farmland, herb gardens, and walled orchards.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/38/Ballymaloe_House.jpg'
+    photoUrl: 'images/spots/irish-countryside-ballymaloe.jpg'
   },
   {
     id: 'irish-countryside-dingle-fish',
@@ -923,7 +923,7 @@ const SAMPLE_SPOTS = [
     hours: '12:00 - 20:30',
     notes: 'Legendary Dingle Peninsula seafood bar run by the Flannery fishing family. Haddock, monkfish, and prawns caught fresh on their own trawler Cú Na Mara, served with twice-cooked chips.',
     visitDate: '',
-    photoUrl: 'https://images.squarespace-cdn.com/content/v1/5ec6700a8c6c3903c4ccdccb/ff734877-c2ea-4f66-a819-fd4b97e36303/DSC00169.jpg'
+    photoUrl: 'images/spots/irish-countryside-dingle-fish.jpg'
   },
   {
     id: 'irish-countryside-powerscourt',
@@ -939,7 +939,7 @@ const SAMPLE_SPOTS = [
     hours: '09:30 - 17:30',
     notes: 'Voted one of National Geographic top 3 gardens in the world. 47 acres of terraced Italian gardens, Japanese gardens, Triton Lake fountain, and breathtaking views of the Sugarloaf Mountain.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Enniskerry_-_Powerscourt_Estate_-_20130224152008.jpg/1280px-Enniskerry_-_Powerscourt_Estate_-_20130224152008.jpg'
+    photoUrl: 'images/spots/irish-countryside-powerscourt.jpg'
   },
   // --- DUBLIN ---
   {
@@ -956,7 +956,7 @@ const SAMPLE_SPOTS = [
     hours: '12:00 - 22:00',
     notes: 'Beloved Dublin institution founded by Eileen Dunne and Stefano Crescenzi. Renowned for authentic rustic Italian trattoria dining, walls stacked with boutique Italian vintages, handmade pasta, and aged prosciutto.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Frederick_St%2C_South_-_geograph.org.uk_-_6411328.jpg'
+    photoUrl: 'images/spots/dublin-dunne-crescenzi.jpg'
   },
   // --- SCOTTISH COUNTRYSIDE ---
   {
@@ -973,7 +973,7 @@ const SAMPLE_SPOTS = [
     hours: '10:00 - 17:00',
     notes: 'National Trust for Scotland showcase estate and School of Heritage Gardening. Features sweeping landscaped grounds, rock garden with cascading water, walled garden, and tranquil views toward Threave Castle.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Threave_Estate_Garden_-_geograph.org.uk_-_5051691.jpg/1280px-Threave_Estate_Garden_-_geograph.org.uk_-_5051691.jpg'
+    photoUrl: 'images/spots/scottish-countryside-threave-garden.jpg'
   },
   // --- ENGLISH COUNTRYSIDE ---
   {
@@ -990,7 +990,7 @@ const SAMPLE_SPOTS = [
     hours: '10:00 - 17:00',
     notes: 'Masterpiece Arts and Crafts garden created by Lawrence Johnston. Famed for its series of intimate outdoor garden rooms framed by hornbeam and yew hedges, rare exotic species, and sculpted topiary.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/Hidcote_Manor_Garden_-_geograph.org.uk_-_4299001.jpg/1280px-Hidcote_Manor_Garden_-_geograph.org.uk_-_4299001.jpg'
+    photoUrl: 'images/spots/english-countryside-hidcote-gardens.jpg'
   },
   {
     id: 'english-countryside-leeds-castle',
@@ -1006,7 +1006,7 @@ const SAMPLE_SPOTS = [
     hours: '10:00 - 17:00',
     notes: 'The loveliest castle in the world, rising on two islands in a magnificent lake. Former royal residence of six medieval queens of England and Henry VIII, surrounded by 500 acres of landscaped parkland.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Leeds_Castle%2C_Kent%2C_England_3_-_May_09.jpg/1280px-Leeds_Castle%2C_Kent%2C_England_3_-_May_09.jpg'
+    photoUrl: 'images/spots/english-countryside-leeds-castle.jpg'
   },
   {
     id: 'english-countryside-hever-castle',
@@ -1022,7 +1022,7 @@ const SAMPLE_SPOTS = [
     hours: '10:30 - 18:00',
     notes: 'Romantic 13th-century double-moated castle and childhood home of Anne Boleyn. Houses Tudor portraits, tapestries, and award-winning Italianate gardens overlooking a 38-acre lake.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Hever_Castle_across_Church_Field_2.jpg/1280px-Hever_Castle_across_Church_Field_2.jpg'
+    photoUrl: 'images/spots/english-countryside-hever-castle.jpg'
   },
   {
     id: 'english-countryside-sissinghurst-gardens',
@@ -1038,7 +1038,7 @@ const SAMPLE_SPOTS = [
     hours: '10:00 - 17:00',
     notes: 'One of England most celebrated 20th-century gardens, created by poet Vita Sackville-West and Harold Nicolson. Famous for its monochromatic White Garden, Rose Garden, and historic Elizabethan tower.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Statue_in_the_Gardens_at_Sissinghurst_Castle.jpg/1280px-Statue_in_the_Gardens_at_Sissinghurst_Castle.jpg'
+    photoUrl: 'images/spots/english-countryside-sissinghurst-gardens.jpg'
   },
   // --- FRENCH COUNTRYSIDE ---
   {
@@ -1055,7 +1055,7 @@ const SAMPLE_SPOTS = [
     hours: 'Tue-Sun 07:30 - 19:30, Mon Closed',
     notes: 'Beloved family-run tearoom and confectionery operating since 1913 at the foot of Château d\'Amboise, legendary for artisanal macarons, nougat, tarte Tatin, and rich hot chocolate.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/La_tour_de_l%27Horloge%2C_vue_prise_%C3%A0_l%27angle_de_l%27actuelle_rue_Nationale_et_la_rue_Victor_Hugo_%28actuelle_place_Michel_Debr%C3%A9%29_-_A72220.jpg/1280px-La_tour_de_l%27Horloge%2C_vue_prise_%C3%A0_l%27angle_de_l%27actuelle_rue_Nationale_et_la_rue_Victor_Hugo_%28actuelle_place_Michel_Debr%C3%A9%29_-_A72220.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728164-06986.jpg'
   },
   {
     id: 'spot-1794432728158-82508',
@@ -1071,7 +1071,7 @@ const SAMPLE_SPOTS = [
     hours: 'Daily 09:00 - 17:00',
     notes: 'Monumental French Renaissance hunting lodge built for Francis I with Leonardo da Vinci\'s famed central double-helix staircase, crowned by an intricate rooftop forest of lantern towers and chimneys.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Aerial_image_of_Ch%C3%A2teau_de_Chambord_%28view_from_the_southeast%29.jpg/1280px-Aerial_image_of_Ch%C3%A2teau_de_Chambord_%28view_from_the_southeast%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728158-82508.jpg'
   },
   {
     id: 'spot-1794432728155-07260',
@@ -1087,7 +1087,7 @@ const SAMPLE_SPOTS = [
     hours: 'Daily 09:00 - 18:00',
     notes: 'The iconic \'Ladies\' Château\' gracefully arched across the Cher River. Exceptional French formal parterres planted by Diane de Poitiers and Catherine de\' Medici, alongside magnificent Renaissance grand galleries.',
     visitDate: '2026-11-12',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Chateau_de_Chenonceau_2008E_%28adjusted2%29.jpg/1280px-Chateau_de_Chenonceau_2008E_%28adjusted2%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728155-07260.jpg'
   },
   {
     id: 'loire-valley-villandry',
@@ -1103,7 +1103,7 @@ const SAMPLE_SPOTS = [
     hours: '09:00 - 18:00 (Gardens from 09:00)',
     notes: 'World-renowned Renaissance château famous for its elaborate formal terraced gardens: geometric water garden, ornamental flower salons of love and music, Renaissance kitchen vegetable parterres, and herb garden.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/16_Villandry_%2896%29_%2813197365114%29.jpg/1280px-16_Villandry_%2896%29_%2813197365114%29.jpg'
+    photoUrl: 'images/spots/loire-valley-villandry.jpg'
   },
   {
     id: 'spot-1794432728276-62974',
@@ -1119,7 +1119,7 @@ const SAMPLE_SPOTS = [
     hours: 'Daily (Apr-Nov) 09:30 - 18:00',
     notes: 'Monet\'s radiant pink-stucco home and iconic Japanese water garden with the green arched bridge, weeping willows, and floating water lilies that inspired the Nymphéas masterpieces.',
     visitDate: '2026-11-12',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/La_maison_de_Claude_Monet_%28Giverny%29_%2848744281997%29.jpg/1280px-La_maison_de_Claude_Monet_%28Giverny%29_%2848744281997%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728276-62974.jpg'
   },
   {
     id: 'spot-1794432728161-69906',
@@ -1135,7 +1135,7 @@ const SAMPLE_SPOTS = [
     hours: 'Daily 10:00 - 19:00',
     notes: 'Historic cliffside fortress overlooking the Loire, world-famous for its annual International Garden Festival featuring avant-garde landscape architecture and contemporary botanical installations.',
     visitDate: '2026-11-12',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Chateau_de_Chaumont%2C_2008.jpg/1280px-Chateau_de_Chaumont%2C_2008.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728161-69906.jpg'
   },
   {
     id: 'spot-1794432728282-57507',
@@ -1151,7 +1151,7 @@ const SAMPLE_SPOTS = [
     hours: 'Tue-Sun 10:00 - 21:00',
     notes: 'Historic gathering haunt for Cézanne, Rodin, and American Impressionists in the 1890s, retaining its original artist studio in the garden behind the terraced bistro.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Ancien_Hotel_Baudy_-_Giverny_%283746435669%29.jpg/1280px-Ancien_Hotel_Baudy_-_Giverny_%283746435669%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728282-57507.jpg'
   },
   {
     id: 'normandy-mont-saint-michel',
@@ -1167,7 +1167,7 @@ const SAMPLE_SPOTS = [
     hours: 'Island open 24/7 · Abbey 09:30 - 18:00',
     notes: 'Sublime UNESCO World Heritage tidal island commune crowned by a soaring 8th-century Gothic-Romanesque Benedictine abbey. Famous for Europe’s highest tidal range, medieval ramparts, winding cobblestone streets, and the dramatic causeway approach.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Mont_St_Michel_at_sunrise.jpg/1280px-Mont_St_Michel_at_sunrise.jpg'
+    photoUrl: 'images/spots/normandy-mont-saint-michel.jpg'
   },
   {
     id: 'normandy-bayeux-museum',
@@ -1183,7 +1183,7 @@ const SAMPLE_SPOTS = [
     hours: '09:00 - 18:30 (seasonal)',
     notes: 'Home of the legendary 11th-century Bayeux Tapestry (UNESCO Memory of the World), an embroidered linen masterpiece nearly 70 meters long depicting William the Conqueror, the Norman Conquest, and the Battle of Hastings in 1066.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Bayeux_Centre_Guillaume_le_Conqu%C3%A9rant_Tapisserie_de_Bayeux_1.jpg/1280px-Bayeux_Centre_Guillaume_le_Conqu%C3%A9rant_Tapisserie_de_Bayeux_1.jpg'
+    photoUrl: 'images/spots/normandy-bayeux-museum.jpg'
   },
   {
     id: 'spot-1794432728279-31993',
@@ -1199,7 +1199,7 @@ const SAMPLE_SPOTS = [
     hours: 'Daily 10:00 - 18:00',
     notes: 'Contemporary museum dedicated to the global history and evolution of Impressionism, surrounded by breathtaking garden terraces designed by Mark Rudkin.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Mus%C3%A9e_des_impressionnismes_Giverny_01.jpg/1280px-Mus%C3%A9e_des_impressionnismes_Giverny_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728279-31993.jpg'
   },
   {
     id: 'spot-1794432728258-41131',
@@ -1215,7 +1215,7 @@ const SAMPLE_SPOTS = [
     hours: 'Wed-Sun 09:00 - 17:00',
     notes: 'Chic specialty coffee roaster and brunch haven tucked in the heart of the ramparts, serving precise flat whites, matcha, and seasonal tartines under stone arches.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Avignon_-_Place_du_Clo%C3%AEtre-Saint-Pierre_-_View_South_02.jpg/1280px-Avignon_-_Place_du_Clo%C3%AEtre-Saint-Pierre_-_View_South_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728258-41131.jpg'
   },
   {
     id: 'spot-1794432728255-18062',
@@ -1231,7 +1231,7 @@ const SAMPLE_SPOTS = [
     hours: 'Tue-Sun 11:00 - 18:00, Mon Closed',
     notes: 'World-class contemporary art museum housed within two aristocratic 18th-century mansions, displaying works by Cy Twombly, Basquiat, Sol LeWitt, and Christian Boltanski.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_Caumont_2.JPG/1280px-Hotel_Caumont_2.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728255-18062.jpg'
   },
   {
     id: 'spot-1794432728252-63521',
@@ -1247,7 +1247,7 @@ const SAMPLE_SPOTS = [
     hours: 'Daily 09:00 - 19:00',
     notes: 'The largest Gothic palace in the world and seat of Western Christianity during the 14th century, featuring colossal stone halls, papal bedchambers, and Matteo Giovannetti\'s frescoes.',
     visitDate: '2026-11-12',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Avignon_Palais_des_Papes_2013.jpg/1280px-Avignon_Palais_des_Papes_2013.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728252-63521.jpg'
   },
   {
     id: 'spot-1794432728261-55366',
@@ -1263,7 +1263,7 @@ const SAMPLE_SPOTS = [
     hours: 'Daily 09:00 - 19:00',
     notes: 'Historic 12th-century medieval bridge projecting out halfway over the Rhône river toward Villeneuve-lès-Avignon, immortalized in the French nursery song.',
     visitDate: '',
-    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/%22Sur_le_Pont_d%27Avignon_on_y_danse%22_is_the_famous_song%2C_but_now_we_see_only_many_tourist_just_standing_there_-_panoramio.jpg/1280px-%22Sur_le_Pont_d%27Avignon_on_y_danse%22_is_the_famous_song%2C_but_now_we_see_only_many_tourist_just_standing_there_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail'
+    photoUrl: 'images/spots/spot-1794432728261-55366.jpg'
   },
   // --- IRISH COUNTRYSIDE ---
   {
@@ -1280,7 +1280,7 @@ const SAMPLE_SPOTS = [
     hours: 'Boat departures seasonal from Dingle & Dunquin',
     notes: 'The westernmost of the Blasket Islands and the most westerly point of Ireland. Towering pyramidal rock pinnacle rising 200m from the Atlantic Ocean with a historic 1870 lighthouse and Ireland’s steepest funicular incline railway.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/1987._Tearaght_Island_aka_Inishtearaght_aka_An_Tiaracht_01.jpg/1280px-1987._Tearaght_Island_aka_Inishtearaght_aka_An_Tiaracht_01.jpg'
+    photoUrl: 'images/spots/irish-countryside-tearaght-island.jpg'
   },
   // --- SCOTTISH COUNTRYSIDE ---
   {
@@ -1297,7 +1297,7 @@ const SAMPLE_SPOTS = [
     hours: 'Estate 10:00 - 17:00 · Castle seasonal',
     notes: 'Magnificent 14th-century Scottish baronial fortress in the East Neuk of Fife, restored by the artistic Lorimer family. Features Scotland’s oldest decorative plaster ceilings, painted paneling, and an organic Arts & Crafts walled garden.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Kellie_Castle%2C_East_Neuk_of_Fife.jpg/1280px-Kellie_Castle%2C_East_Neuk_of_Fife.jpg'
+    photoUrl: 'images/spots/scottish-countryside-kellie-castle.jpg'
   },
   // --- ENGLISH COUNTRYSIDE ---
   {
@@ -1314,7 +1314,7 @@ const SAMPLE_SPOTS = [
     hours: '10:00 - 17:00',
     notes: 'Romantic National Trust estate created by Ludwig Messel in the Sussex High Weald. Renowned for its theatrical stone house ruins draped in wisteria, vibrant summer borders, rare botanical collection, and tranquil woodland walks.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Nymans_West-Sussex-UK.jpg/1280px-Nymans_West-Sussex-UK.jpg'
+    photoUrl: 'images/spots/english-countryside-nymans.jpg'
   },
   {
     id: 'english-countryside-grasmere-gingerbread',
@@ -1330,7 +1330,7 @@ const SAMPLE_SPOTS = [
     hours: '09:30 - 17:00',
     notes: "Iconic Lake District bakery founded in 1854 by Victorian cook Sarah Nelson in Church Cottage, a tiny former village schoolhouse beside St Oswald's Church. World-famous secret-recipe gingerbread cross between cake and biscuit, hand-wrapped in greaseproof parchment.",
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Grasmere_%2C_Sarah_Nelson%27s_Grasmere_Gingerbread_-_geograph.org.uk_-_6357655.jpg/1280px-Grasmere_%2C_Sarah_Nelson%27s_Grasmere_Gingerbread_-_geograph.org.uk_-_6357655.jpg'
+    photoUrl: 'images/spots/english-countryside-grasmere-gingerbread.jpg'
   },
   {
     id: 'english-countryside-arundel-castle',
@@ -1346,7 +1346,7 @@ const SAMPLE_SPOTS = [
     hours: '10:00 - 17:00',
     notes: "Dramatic nearly 1,000-year-old medieval castle and ancestral seat of the Duke of Norfolk, overlooking the River Arun and South Downs. Highlights include the Norman keep, Baron's Hall, Collector Earl's Italianate Garden, and extensive armory.",
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Arundel-Castle.jpg/1280px-Arundel-Castle.jpg'
+    photoUrl: 'images/spots/english-countryside-arundel-castle.jpg'
   },
   {
     id: 'english-countryside-swanbourne-lake',
@@ -1362,7 +1362,7 @@ const SAMPLE_SPOTS = [
     hours: 'Dawn to dusk · Tea Room 10:00 - 16:30',
     notes: 'Picturesque spring-fed chalk lake situated directly beneath Arundel Castle and the wooded slopes of Arundel Park. Popular for quiet woodland perimeter walks, wild waterfowl watching, rowing boat rentals, and the traditional Swanbourne Lake Tea Room.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Swanbourne_Lake%2C_Arundel_-_geograph.org.uk_-_3985489.jpg/1280px-Swanbourne_Lake%2C_Arundel_-_geograph.org.uk_-_3985489.jpg'
+    photoUrl: 'images/spots/english-countryside-swanbourne-lake.jpg'
   },
   {
     id: 'english-countryside-seven-sisters',
@@ -1378,7 +1378,7 @@ const SAMPLE_SPOTS = [
     hours: 'Open 24 hours · Visitor Centre 10:00 - 16:30',
     notes: 'Iconic series of undulating chalk sea cliffs along the English Channel between Seaford and Eastbourne. Pristine natural shoreline within the South Downs National Park offering dramatic coastal clifftop hiking from Cuckmere Haven to Birling Gap and Beachy Head.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Seven_Sisters_4.jpg/1280px-Seven_Sisters_4.jpg'
+    photoUrl: 'images/spots/english-countryside-seven-sisters.jpg'
   },
   {
     id: 'english-countryside-lamb-house',
@@ -1394,7 +1394,7 @@ const SAMPLE_SPOTS = [
     hours: '11:00 - 16:30',
     notes: 'Charming Grade II* listed Georgian red-brick house in the historic hilltop citadel of Rye. Rich literary heritage as the home of American author Henry James from 1898 to 1916 (where he wrote The Wings of the Dove and The Ambassadors) and later E.F. Benson.',
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/LAMB_HOUSE%2C_RYE%2C_ENGLAND.jpg/1280px-LAMB_HOUSE%2C_RYE%2C_ENGLAND.jpg'
+    photoUrl: 'images/spots/english-countryside-lamb-house.jpg'
   },
   // --- PARIS ---
   {
@@ -1411,7 +1411,7 @@ const SAMPLE_SPOTS = [
     hours: '12:00 - 23:00',
     notes: "Historic 17th-century wooden windmill and celebrated Montmartre guinguette immortalized in Renoir's 1876 masterpiece and paintings by Van Gogh. Now an atmospheric bistro on Rue Lepic serving refined seasonal French cuisine and wine in a romantic garden courtyard.",
     visitDate: '',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Moulin_de_la_Galette%2C_Montmartre%2C_Paris_October_2016_001.jpg/1280px-Moulin_de_la_Galette%2C_Montmartre%2C_Paris_October_2016_001.jpg'
+    photoUrl: 'images/spots/paris-le-moulin-de-la-galette.jpg'
   }
 ];
 
@@ -3687,7 +3687,7 @@ function renderSpotCards(allSpots, maxVisibleCount = SPOTS_PAGE_SIZE) {
 
     const mediaHtml = spot.photoUrl ? `
       <div class="card-media">
-        <img src="${escapeHtml(spot.photoUrl)}" alt="${escapeHtml(spot.name)}" class="card-photo" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none';">
+        <img src="${escapeHtml(spot.photoUrl)}" alt="${escapeHtml(spot.name)}" class="card-photo" loading="lazy" onerror="this.parentElement.style.display='none';">
         <span class="card-media-cat-badge">
           ${cat.iconSvg ? `<span class="badge-icon">${cat.iconSvg}</span>` : ''}
           ${escapeHtml(cat.label.toLowerCase())}
