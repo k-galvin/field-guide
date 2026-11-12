@@ -400,9 +400,15 @@ function getStoredSpots() {
   }
 }
 
+let lastSavedSpotsLength = -1;
+let lastSavedFirstId = '';
+
 function saveStoredSpots(spots) {
   try {
     if (!Array.isArray(spots)) return;
+    if (spots.length === lastSavedSpotsLength && spots.length > 0 && spots[0].id === lastSavedFirstId) {
+      return; // Skip redundant serialization and localStorage write
+    }
     const sorted = sortSpotsDeterministically(spots);
     // Sanitize any massive data URLs to safeguard localStorage quota
     const sanitized = sorted.map(s => {
@@ -413,6 +419,8 @@ function saveStoredSpots(spots) {
       return s;
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+    lastSavedSpotsLength = sorted.length;
+    lastSavedFirstId = sorted.length > 0 ? sorted[0].id : '';
   } catch (e) {
     console.error('Failed to save spots to localStorage', e);
   }
@@ -1160,6 +1168,9 @@ let loopPolyline = null;
 let onMapClickCallback = null;
 let onSpotSelectCallback = null;
 let currentMapRenderToken = 0;
+let allSpotsCache = [];
+let activeSpotIdCache = null;
+let mapMoveDebounceTimer = null;
 
 /**
  * Creates custom styled HTML marker for Leaflet with category icons
@@ -1246,16 +1257,8 @@ function centerCityOnMap(cityName, allSpots = []) {
   if (!mapInstance) return;
 
   if (!cityName || cityName === 'all') {
-    const validSpots = (allSpots || []).filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
-    if (validSpots.length > 0) {
-      try {
-        const bounds = validSpots.map(s => [s.lat, s.lng]);
-        mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: 12, animate: true });
-        return;
-      } catch (e) {
-        // ignore
-      }
-    }
+    // Instant global overview with zero animated fitBounds thrash on 900+ points
+    mapInstance.setView([28, 0], 2, { animate: false });
     return;
   }
 
@@ -1328,6 +1331,14 @@ function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 
   }).addTo(mapInstance);
 
   markersLayer = L.layerGroup().addTo(mapInstance);
+
+  // Viewport-based marker virtualization when panning or zooming on large collections
+  mapInstance.on('moveend', () => {
+    if (allSpotsCache && allSpotsCache.length > 80) {
+      clearTimeout(mapMoveDebounceTimer);
+      mapMoveDebounceTimer = setTimeout(updateVisibleMarkers, 80);
+    }
+  });
 
   // Map click for dropping pins
   mapInstance.on('click', (e) => {
@@ -1412,9 +1423,9 @@ function createSingleMarker(spot, activeSpotId) {
 }
 
 /**
- * Renders spots on the map with non-blocking progressive chunking and lazy popups
+ * Updates visible map markers based on viewport and zoom level (eliminates freezes on 900+ spots)
  */
-function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = false) {
+function updateVisibleMarkers() {
   if (!mapInstance || !markersLayer) return;
 
   currentMapRenderToken++;
@@ -1422,60 +1433,67 @@ function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = false) {
 
   markersLayer.clearLayers();
 
-  if (!spots || spots.length === 0) return;
+  if (!allSpotsCache || allSpotsCache.length === 0) return;
 
-  const validSpots = spots.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+  const validSpots = allSpotsCache.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
   if (validSpots.length === 0) return;
 
-  if (shouldFitBounds && !activeSpotId) {
-    try {
-      const lats = validSpots.map(b => b.lat);
-      const lngs = validSpots.map(b => b.lng);
-      const latSpan = Math.max(...lats) - Math.min(...lats);
-      const lngSpan = Math.max(...lngs) - Math.min(...lngs);
+  let spotsToDisplay;
+  if (validSpots.length <= 80) {
+    // Single destination (e.g. Orange County, Paris, London): render all directly in 1 frame
+    spotsToDisplay = validSpots;
+  } else {
+    // Large global set (e.g. All Destinations with 900+ spots):
+    const zoom = mapInstance.getZoom();
+    const currentBounds = mapInstance.getBounds().pad(0.35); // 35% margin for smooth panning
 
-      let targetMaxZoom = 13;
-      if (latSpan > 0.35 || lngSpan > 0.35) {
-        targetMaxZoom = 11;
-      } else if (latSpan > 0.15 || lngSpan > 0.15) {
-        targetMaxZoom = 12;
+    if (zoom <= 3) {
+      // At world zoom, rendering hundreds of overlapping pins creates an unreadable blob and lags Safari.
+      // Show prioritized starred/featured spots (max 65 pins) for crystal-clear 60fps performance.
+      const starred = validSpots.filter(s => s.favorite);
+      const remaining = validSpots.filter(s => !s.favorite);
+      spotsToDisplay = starred.slice(0, 45).concat(remaining.slice(0, 20));
+    } else {
+      // When zoomed into a continent, country or city: strictly render markers within the viewport
+      spotsToDisplay = validSpots.filter(s => currentBounds.contains([s.lat, s.lng]));
+      // Ensure the actively selected spot's pin is always present
+      if (activeSpotIdCache) {
+        const activeSpot = validSpots.find(s => s.id === activeSpotIdCache);
+        if (activeSpot && !spotsToDisplay.includes(activeSpot)) {
+          spotsToDisplay.push(activeSpot);
+        }
       }
-
-      const bounds = validSpots.map(s => [s.lat, s.lng]);
-      mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: targetMaxZoom });
-    } catch (e) {
-      // ignore
     }
   }
 
-  // Small sets (<= 50 spots) are rendered synchronously in a single instant frame
-  const CHUNK_SIZE = 50;
-  if (validSpots.length <= CHUNK_SIZE) {
-    validSpots.forEach(s => {
-      const marker = createSingleMarker(s, activeSpotId);
-      if (marker) marker.addTo(markersLayer);
-    });
-    return;
+  // Render visible markers (typically 15-50 markers max)
+  spotsToDisplay.forEach(s => {
+    if (thisToken !== currentMapRenderToken) return;
+    const marker = createSingleMarker(s, activeSpotIdCache);
+    if (marker) marker.addTo(markersLayer);
+  });
+}
+
+/**
+ * Renders spots on the map with viewport virtualization and lazy popups
+ */
+function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = false) {
+  allSpotsCache = spots || [];
+  activeSpotIdCache = activeSpotId;
+
+  if (mapInstance && shouldFitBounds && !activeSpotId) {
+    const validSpots = allSpotsCache.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+    if (validSpots.length > 0 && validSpots.length <= 80) {
+      try {
+        const bounds = validSpots.map(s => [s.lat, s.lng]);
+        mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: 13, animate: true });
+      } catch (e) {
+        // ignore
+      }
+    }
   }
 
-  // Large sets (e.g. 900+ on "All Destinations") stream markers progressively using requestAnimationFrame
-  let index = 0;
-  function processChunk() {
-    if (thisToken !== currentMapRenderToken) return; // Stale render superseded
-
-    const end = Math.min(index + CHUNK_SIZE, validSpots.length);
-    for (let i = index; i < end; i++) {
-      const marker = createSingleMarker(validSpots[i], activeSpotId);
-      if (marker) marker.addTo(markersLayer);
-    }
-    index = end;
-
-    if (index < validSpots.length) {
-      requestAnimationFrame(processChunk);
-    }
-  }
-
-  processChunk();
+  updateVisibleMarkers();
 }
 
 /**
@@ -2350,7 +2368,8 @@ function init() {
   if (storedSpots && storedSpots.length > 0) {
     spots = storedSpots;
   } else {
-    spots = [];
+    // If local storage is empty, preload SAMPLE_SPOTS so the app is never empty while awaiting cloud sync
+    spots = [...SAMPLE_SPOTS];
   }
 
   // Sanitize stored cities: only keep cities that are in DEFAULT_CITIES or currently have spots
@@ -2365,15 +2384,23 @@ function init() {
   }
 
   // Restore active city preference if available and valid in Field Guide
-  const savedActiveCity = localStorage.getItem('flaneur_active_city');
+  let savedActiveCity = localStorage.getItem('flaneur_active_city');
+  // Auto-migrate legacy 'Costa Mesa' selection to 'Orange County'
+  if (savedActiveCity && savedActiveCity.toLowerCase() === 'costa mesa') {
+    savedActiveCity = 'Orange County';
+    localStorage.setItem('flaneur_active_city', 'Orange County');
+  }
+
   if (savedActiveCity && (savedActiveCity === 'all' || cities.some(c => c.toLowerCase() === savedActiveCity.toLowerCase()))) {
     activeCity = savedActiveCity;
+  } else if (cities.some(c => c.toLowerCase() === 'orange county')) {
+    activeCity = 'Orange County';
   } else if (spots.length > 0 && spots[0].city) {
     activeCity = spots[0].city;
   } else if (cities.length > 0) {
     activeCity = cities[0];
   } else {
-    activeCity = 'Costa Mesa';
+    activeCity = 'Orange County';
   }
 
   // Check URL parameters for shareable read-only guide mode
@@ -2482,8 +2509,13 @@ async function syncWithSupabase(manual = false) {
     }
 
     // Remote Supabase is source of truth
+    const isDataDifferent = (spots.length !== remote.length) || (localNewSpots.length > 0);
+    const prevActiveCity = activeCity;
+
     spots = remote;
-    saveStoredSpots(spots);
+    if (isDataDifferent) {
+      saveStoredSpots(spots);
+    }
 
     // 4. Synchronize cities strictly from dedicated field_guide_cities and spots
     const remoteCities = await fetchRemoteCities();
@@ -2517,14 +2549,25 @@ async function syncWithSupabase(manual = false) {
       if (readonlyCityName) {
         readonlyCityName.textContent = activeCity === 'all' ? 'All Destinations' : activeCity;
       }
+    } else if (activeCity.toLowerCase() === 'costa mesa') {
+      activeCity = 'Orange County';
+      localStorage.setItem('flaneur_active_city', activeCity);
     } else if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
-      // If activeCity is no longer in Field Guide's cities list, fallback gracefully
-      activeCity = cities[0] || 'all';
+      // If activeCity is no longer in Field Guide's cities list, fallback safely to Orange County
+      activeCity = cities.find(c => c.toLowerCase() === 'orange county') || cities[0] || 'Orange County';
       localStorage.setItem('flaneur_active_city', activeCity);
     }
+
     updateCityTriggerButton();
-    centerCityOnMap(activeCity, spots);
-    applyFiltersAndRender();
+
+    // Only trigger re-render if data actually changed or active city switched!
+    if (isDataDifferent || activeCity !== prevActiveCity) {
+      if (activeCity !== prevActiveCity) {
+        centerCityOnMap(activeCity, spots);
+      }
+      applyFiltersAndRender(false);
+    }
+
     updateSyncStatus('synced', `synced (${spots.length})`);
 
     if (manual) {

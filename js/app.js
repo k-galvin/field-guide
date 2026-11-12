@@ -224,7 +224,8 @@ function init() {
   if (storedSpots && storedSpots.length > 0) {
     spots = storedSpots;
   } else {
-    spots = [];
+    // If local storage is empty, preload SAMPLE_SPOTS so the app is never empty while awaiting cloud sync
+    spots = [...SAMPLE_SPOTS];
   }
 
   // Sanitize stored cities: only keep cities that are in DEFAULT_CITIES or currently have spots
@@ -239,15 +240,23 @@ function init() {
   }
 
   // Restore active city preference if available and valid in Field Guide
-  const savedActiveCity = localStorage.getItem('flaneur_active_city');
+  let savedActiveCity = localStorage.getItem('flaneur_active_city');
+  // Auto-migrate legacy 'Costa Mesa' selection to 'Orange County'
+  if (savedActiveCity && savedActiveCity.toLowerCase() === 'costa mesa') {
+    savedActiveCity = 'Orange County';
+    localStorage.setItem('flaneur_active_city', 'Orange County');
+  }
+
   if (savedActiveCity && (savedActiveCity === 'all' || cities.some(c => c.toLowerCase() === savedActiveCity.toLowerCase()))) {
     activeCity = savedActiveCity;
+  } else if (cities.some(c => c.toLowerCase() === 'orange county')) {
+    activeCity = 'Orange County';
   } else if (spots.length > 0 && spots[0].city) {
     activeCity = spots[0].city;
   } else if (cities.length > 0) {
     activeCity = cities[0];
   } else {
-    activeCity = 'Costa Mesa';
+    activeCity = 'Orange County';
   }
 
   // Check URL parameters for shareable read-only guide mode
@@ -356,8 +365,13 @@ async function syncWithSupabase(manual = false) {
     }
 
     // Remote Supabase is source of truth
+    const isDataDifferent = (spots.length !== remote.length) || (localNewSpots.length > 0);
+    const prevActiveCity = activeCity;
+
     spots = remote;
-    saveStoredSpots(spots);
+    if (isDataDifferent) {
+      saveStoredSpots(spots);
+    }
 
     // 4. Synchronize cities strictly from dedicated field_guide_cities and spots
     const remoteCities = await fetchRemoteCities();
@@ -391,14 +405,25 @@ async function syncWithSupabase(manual = false) {
       if (readonlyCityName) {
         readonlyCityName.textContent = activeCity === 'all' ? 'All Destinations' : activeCity;
       }
+    } else if (activeCity.toLowerCase() === 'costa mesa') {
+      activeCity = 'Orange County';
+      localStorage.setItem('flaneur_active_city', activeCity);
     } else if (activeCity !== 'all' && !cities.some(c => c.toLowerCase() === activeCity.toLowerCase())) {
-      // If activeCity is no longer in Field Guide's cities list, fallback gracefully
-      activeCity = cities[0] || 'all';
+      // If activeCity is no longer in Field Guide's cities list, fallback safely to Orange County
+      activeCity = cities.find(c => c.toLowerCase() === 'orange county') || cities[0] || 'Orange County';
       localStorage.setItem('flaneur_active_city', activeCity);
     }
+
     updateCityTriggerButton();
-    centerCityOnMap(activeCity, spots);
-    applyFiltersAndRender();
+
+    // Only trigger re-render if data actually changed or active city switched!
+    if (isDataDifferent || activeCity !== prevActiveCity) {
+      if (activeCity !== prevActiveCity) {
+        centerCityOnMap(activeCity, spots);
+      }
+      applyFiltersAndRender(false);
+    }
+
     updateSyncStatus('synced', `synced (${spots.length})`);
 
     if (manual) {

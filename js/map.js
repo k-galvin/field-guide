@@ -10,6 +10,9 @@ let loopPolyline = null;
 let onMapClickCallback = null;
 let onSpotSelectCallback = null;
 let currentMapRenderToken = 0;
+let allSpotsCache = [];
+let activeSpotIdCache = null;
+let mapMoveDebounceTimer = null;
 
 /**
  * Creates custom styled HTML marker for Leaflet with category icons
@@ -96,16 +99,8 @@ export function centerCityOnMap(cityName, allSpots = []) {
   if (!mapInstance) return;
 
   if (!cityName || cityName === 'all') {
-    const validSpots = (allSpots || []).filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
-    if (validSpots.length > 0) {
-      try {
-        const bounds = validSpots.map(s => [s.lat, s.lng]);
-        mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: 12, animate: true });
-        return;
-      } catch (e) {
-        // ignore
-      }
-    }
+    // Instant global overview with zero animated fitBounds thrash on 900+ points
+    mapInstance.setView([28, 0], 2, { animate: false });
     return;
   }
 
@@ -178,6 +173,14 @@ export function initMap(elementId, initialCenter = [33.6411, -117.9187], initial
   }).addTo(mapInstance);
 
   markersLayer = L.layerGroup().addTo(mapInstance);
+
+  // Viewport-based marker virtualization when panning or zooming on large collections
+  mapInstance.on('moveend', () => {
+    if (allSpotsCache && allSpotsCache.length > 80) {
+      clearTimeout(mapMoveDebounceTimer);
+      mapMoveDebounceTimer = setTimeout(updateVisibleMarkers, 80);
+    }
+  });
 
   // Map click for dropping pins
   mapInstance.on('click', (e) => {
@@ -262,9 +265,9 @@ function createSingleMarker(spot, activeSpotId) {
 }
 
 /**
- * Renders spots on the map with non-blocking progressive chunking and lazy popups
+ * Updates visible map markers based on viewport and zoom level (eliminates freezes on 900+ spots)
  */
-export function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = false) {
+function updateVisibleMarkers() {
   if (!mapInstance || !markersLayer) return;
 
   currentMapRenderToken++;
@@ -272,60 +275,67 @@ export function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = fal
 
   markersLayer.clearLayers();
 
-  if (!spots || spots.length === 0) return;
+  if (!allSpotsCache || allSpotsCache.length === 0) return;
 
-  const validSpots = spots.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+  const validSpots = allSpotsCache.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
   if (validSpots.length === 0) return;
 
-  if (shouldFitBounds && !activeSpotId) {
-    try {
-      const lats = validSpots.map(b => b.lat);
-      const lngs = validSpots.map(b => b.lng);
-      const latSpan = Math.max(...lats) - Math.min(...lats);
-      const lngSpan = Math.max(...lngs) - Math.min(...lngs);
+  let spotsToDisplay;
+  if (validSpots.length <= 80) {
+    // Single destination (e.g. Orange County, Paris, London): render all directly in 1 frame
+    spotsToDisplay = validSpots;
+  } else {
+    // Large global set (e.g. All Destinations with 900+ spots):
+    const zoom = mapInstance.getZoom();
+    const currentBounds = mapInstance.getBounds().pad(0.35); // 35% margin for smooth panning
 
-      let targetMaxZoom = 13;
-      if (latSpan > 0.35 || lngSpan > 0.35) {
-        targetMaxZoom = 11;
-      } else if (latSpan > 0.15 || lngSpan > 0.15) {
-        targetMaxZoom = 12;
+    if (zoom <= 3) {
+      // At world zoom, rendering hundreds of overlapping pins creates an unreadable blob and lags Safari.
+      // Show prioritized starred/featured spots (max 65 pins) for crystal-clear 60fps performance.
+      const starred = validSpots.filter(s => s.favorite);
+      const remaining = validSpots.filter(s => !s.favorite);
+      spotsToDisplay = starred.slice(0, 45).concat(remaining.slice(0, 20));
+    } else {
+      // When zoomed into a continent, country or city: strictly render markers within the viewport
+      spotsToDisplay = validSpots.filter(s => currentBounds.contains([s.lat, s.lng]));
+      // Ensure the actively selected spot's pin is always present
+      if (activeSpotIdCache) {
+        const activeSpot = validSpots.find(s => s.id === activeSpotIdCache);
+        if (activeSpot && !spotsToDisplay.includes(activeSpot)) {
+          spotsToDisplay.push(activeSpot);
+        }
       }
-
-      const bounds = validSpots.map(s => [s.lat, s.lng]);
-      mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: targetMaxZoom });
-    } catch (e) {
-      // ignore
     }
   }
 
-  // Small sets (<= 50 spots) are rendered synchronously in a single instant frame
-  const CHUNK_SIZE = 50;
-  if (validSpots.length <= CHUNK_SIZE) {
-    validSpots.forEach(s => {
-      const marker = createSingleMarker(s, activeSpotId);
-      if (marker) marker.addTo(markersLayer);
-    });
-    return;
+  // Render visible markers (typically 15-50 markers max)
+  spotsToDisplay.forEach(s => {
+    if (thisToken !== currentMapRenderToken) return;
+    const marker = createSingleMarker(s, activeSpotIdCache);
+    if (marker) marker.addTo(markersLayer);
+  });
+}
+
+/**
+ * Renders spots on the map with viewport virtualization and lazy popups
+ */
+export function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = false) {
+  allSpotsCache = spots || [];
+  activeSpotIdCache = activeSpotId;
+
+  if (mapInstance && shouldFitBounds && !activeSpotId) {
+    const validSpots = allSpotsCache.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+    if (validSpots.length > 0 && validSpots.length <= 80) {
+      try {
+        const bounds = validSpots.map(s => [s.lat, s.lng]);
+        mapInstance.fitBounds(bounds, { padding: [48, 48], maxZoom: 13, animate: true });
+      } catch (e) {
+        // ignore
+      }
+    }
   }
 
-  // Large sets (e.g. 900+ on "All Destinations") stream markers progressively using requestAnimationFrame
-  let index = 0;
-  function processChunk() {
-    if (thisToken !== currentMapRenderToken) return; // Stale render superseded
-
-    const end = Math.min(index + CHUNK_SIZE, validSpots.length);
-    for (let i = index; i < end; i++) {
-      const marker = createSingleMarker(validSpots[i], activeSpotId);
-      if (marker) marker.addTo(markersLayer);
-    }
-    index = end;
-
-    if (index < validSpots.length) {
-      requestAnimationFrame(processChunk);
-    }
-  }
-
-  processChunk();
+  updateVisibleMarkers();
 }
 
 /**
