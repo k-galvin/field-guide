@@ -3063,4 +3063,36 @@ export const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Bukchon-ro_11-gil_street_with_hanok_houses_at_blue_hour_in_Bukchon_Hanok_Village_Seoul.jpg/1280px-Bukchon-ro_11-gil_street_with_hanok_houses_at_blue_hour_in_Bukchon_Hanok_Village_Seoul.jpg'
   },
+  {
+    id: 'spot-1793763867948',
+    name: 'Amanda Manda',
+    city: 'Mexico City',
+    neighborhood: 'Condesa',
+    category: 'food_dining',
+    status: 'visited',
+    favorite: false,
+    lat: 19.420567,
+    lng: -99.174572,
+    daysOpen: 'Daily',
+    hours: '11:00 - 19:00',
+    notes: 'Intimate neighborhood restaurant and daytime cafe created by chef Amanda Mariano. Specializes in comforting, soulful Mexican home cooking: house-made chilaquiles with cochinita pibil, tlacoyos, fresh heirloom corn tacos, and daily pan dulce, served on artisanal Mexican ceramics.',
+    visitDate: '2026-11-04',
+    photoUrl: 'https://images.squarespace-cdn.com/content/v1/5d4a5dd14395b30001c20a44/d4f74523-6297-4ede-a901-6bced347316f/Amanda+Manda+interior.jpg?format=1500w'
+  },
+  {
+    id: 'kml-1793762656196-d7trd4',
+    name: 'Gem Home',
+    city: 'New York',
+    neighborhood: 'Lower East Side',
+    category: 'matcha_coffee',
+    status: 'visited',
+    favorite: false,
+    lat: 40.7206977,
+    lng: -73.996087,
+    daysOpen: 'Daily',
+    hours: '11:00 - 19:00',
+    notes: 'Chef Flynn McGarry\'s charming Nolita hybrid cafe and design shop, operating mostly as an intimate neighborhood daytime cafe. Serves exceptional coffee, house-baked cardamom buns, sourdough breads, and seasonal breakfast plates, surrounded by curated handmade ceramics, pantry goods, and vintage tableware for purchase.',
+    visitDate: '2026-11-04',
+    photoUrl: 'https://images.squarespace-cdn.com/content/v1/6761938d21d7a73b046e2f4f/ddbf3e18-c350-40ae-b6b9-bfe707ddc19d/seandavidson_gemhome_60.jpg?format=1500w'
+  }
 ];
