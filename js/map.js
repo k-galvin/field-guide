@@ -218,6 +218,7 @@ export function initMap(elementId, initialCenter = [33.6411, -117.9187], initial
 
   // Map click for unfocusing active selection and smooth navigation
   mapInstance.on('click', (e) => {
+    mapInstance.closePopup();
     if (activeSpotIdCache && !isProgrammaticFocusing) {
       const prevSpotId = activeSpotIdCache;
       activeSpotIdCache = null;
@@ -268,6 +269,10 @@ function handleMarkerSelection(spot) {
   const prevSpotId = activeSpotIdCache;
   activeSpotIdCache = spot.id;
 
+  if (mapInstance) {
+    mapInstance.closePopup();
+  }
+
   if (prevSpotId && prevSpotId !== spot.id && markerMap.has(prevSpotId)) {
     const prevMarker = markerMap.get(prevSpotId);
     const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
@@ -275,6 +280,7 @@ function handleMarkerSelection(spot) {
       prevMarker._flaneurIsActive = false;
       prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
       prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+      prevMarker.closePopup();
     }
   }
 
@@ -456,6 +462,9 @@ function updateVisibleMarkers() {
   // 1. Remove markers that are no longer in spotsToDisplay (preserve active spot marker)
   for (const [id, marker] of markerMap.entries()) {
     if (!newSpotIds.has(id) && id !== activeSpotIdCache) {
+      if (marker.isPopupOpen()) {
+        marker.closePopup();
+      }
       markersLayer.removeLayer(marker);
       markerMap.delete(id);
     }
@@ -516,6 +525,9 @@ export function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = fal
  * Clears active spot selection and resets all markers to default styling
  */
 export function clearActiveSpot() {
+  if (mapInstance) {
+    mapInstance.closePopup();
+  }
   if (activeSpotIdCache && markerMap.has(activeSpotIdCache)) {
     const prevMarker = markerMap.get(activeSpotIdCache);
     const prevSpot = allSpotsCache.find(s => s.id === activeSpotIdCache);
@@ -541,6 +553,10 @@ export function focusSpot(spot) {
   const prevSpotId = activeSpotIdCache;
   activeSpotIdCache = spot.id;
 
+  if (mapInstance) {
+    mapInstance.closePopup();
+  }
+
   if (prevSpotId && prevSpotId !== spot.id && markerMap.has(prevSpotId)) {
     const prevMarker = markerMap.get(prevSpotId);
     const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
@@ -548,6 +564,7 @@ export function focusSpot(spot) {
       prevMarker._flaneurIsActive = false;
       prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
       prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+      prevMarker.closePopup();
     }
   }
 

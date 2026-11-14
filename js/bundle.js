@@ -4167,6 +4167,7 @@ function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 
 
   // Map click for unfocusing active selection and smooth navigation
   mapInstance.on('click', (e) => {
+    mapInstance.closePopup();
     if (activeSpotIdCache && !isProgrammaticFocusing) {
       const prevSpotId = activeSpotIdCache;
       activeSpotIdCache = null;
@@ -4217,6 +4218,10 @@ function handleMarkerSelection(spot) {
   const prevSpotId = activeSpotIdCache;
   activeSpotIdCache = spot.id;
 
+  if (mapInstance) {
+    mapInstance.closePopup();
+  }
+
   if (prevSpotId && prevSpotId !== spot.id && markerMap.has(prevSpotId)) {
     const prevMarker = markerMap.get(prevSpotId);
     const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
@@ -4224,6 +4229,7 @@ function handleMarkerSelection(spot) {
       prevMarker._flaneurIsActive = false;
       prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
       prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+      prevMarker.closePopup();
     }
   }
 
@@ -4405,6 +4411,9 @@ function updateVisibleMarkers() {
   // 1. Remove markers that are no longer in spotsToDisplay (preserve active spot marker)
   for (const [id, marker] of markerMap.entries()) {
     if (!newSpotIds.has(id) && id !== activeSpotIdCache) {
+      if (marker.isPopupOpen()) {
+        marker.closePopup();
+      }
       markersLayer.removeLayer(marker);
       markerMap.delete(id);
     }
@@ -4465,6 +4474,9 @@ function renderMapSpots(spots, activeSpotId = null, shouldFitBounds = false) {
  * Clears active spot selection and resets all markers to default styling
  */
 function clearActiveSpot() {
+  if (mapInstance) {
+    mapInstance.closePopup();
+  }
   if (activeSpotIdCache && markerMap.has(activeSpotIdCache)) {
     const prevMarker = markerMap.get(activeSpotIdCache);
     const prevSpot = allSpotsCache.find(s => s.id === activeSpotIdCache);
@@ -4490,6 +4502,10 @@ function focusSpot(spot) {
   const prevSpotId = activeSpotIdCache;
   activeSpotIdCache = spot.id;
 
+  if (mapInstance) {
+    mapInstance.closePopup();
+  }
+
   if (prevSpotId && prevSpotId !== spot.id && markerMap.has(prevSpotId)) {
     const prevMarker = markerMap.get(prevSpotId);
     const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
@@ -4497,6 +4513,7 @@ function focusSpot(spot) {
       prevMarker._flaneurIsActive = false;
       prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
       prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+      prevMarker.closePopup();
     }
   }
 
@@ -5624,13 +5641,80 @@ function init() {
     }
   });
 
+/**
+ * Smoothly scrolls a spot card into view within the sidebar feed without thrashing or scrolling the main window/page
+ */
+function scrollCardIntoFeed(targetCard) {
+  if (!targetCard) return;
+  const feed = document.getElementById('spot-feed');
+  if (!feed) return;
+
+  const feedRect = feed.getBoundingClientRect();
+  const cardRect = targetCard.getBoundingClientRect();
+
+  // If card is already comfortably inside the visible viewport of the feed, skip scroll
+  if (cardRect.top >= feedRect.top + 20 && cardRect.bottom <= feedRect.bottom - 20) {
+    return;
+  }
+
+  const relativeTop = cardRect.top - feedRect.top;
+  const targetScrollTop = feed.scrollTop + relativeTop - 20;
+
+  feed.scrollTo({
+    top: Math.max(0, targetScrollTop),
+    behavior: 'smooth'
+  });
+}
+
   // Set Spot marker click handler (when marker on map is clicked)
   setOnSpotSelectMarkerListener((spot) => {
+    if (!spot) return;
+
+    // 1. Check if spot exists in currentFilteredSpotsCache
+    let targetIdx = currentFilteredSpotsCache.findIndex(s => s.id === spot.id);
+
+    // If spot was filtered out by active city or category/status, clear filter to make it visible
+    if (targetIdx === -1) {
+      if (activeCity !== 'all') {
+        activeCity = 'all';
+        updateCityTriggerDisplay('all');
+      }
+      if (searchInput && searchInput.value.trim() !== '') {
+        searchInput.value = '';
+        if (searchClearBtn) searchClearBtn.style.display = 'none';
+      }
+      if (activeStatusFilter !== 'all') {
+        activeStatusFilter = 'all';
+        statusFilterButtons.forEach(b => b.classList.toggle('active', b.dataset.status === 'all'));
+      }
+      if (activeCategoryFilter !== 'all') {
+        activeCategoryFilter = 'all';
+        categoryPillsContainer.querySelectorAll('.cat-pill').forEach(p => p.classList.toggle('active', p.dataset.category === 'all'));
+      }
+      applyFiltersAndRender(false, spot.id);
+      targetIdx = currentFilteredSpotsCache.findIndex(s => s.id === spot.id);
+    } else if (targetIdx >= currentVisibleSpotsCount) {
+      // Spot is in list but beyond current pagination window: expand visible cards to render it
+      currentVisibleSpotsCount = Math.max(currentVisibleSpotsCount, Math.ceil((targetIdx + 1) / SPOTS_PAGE_SIZE) * SPOTS_PAGE_SIZE);
+      renderSpotCards(currentFilteredSpotsCache, currentVisibleSpotsCount);
+
+      const visibleCount = Math.min(currentVisibleSpotsCount, currentFilteredSpotsCache.length);
+      if (visibleCount < currentFilteredSpotsCache.length) {
+        spotsCountLabel.textContent = `Showing ${visibleCount} of ${currentFilteredSpotsCache.length} spots`;
+      } else {
+        const cityFiltered = activeCity === 'all'
+          ? (spots || [])
+          : (spots || []).filter(s => s.city && s.city.trim().toLowerCase() === activeCity.trim().toLowerCase());
+        spotsCountLabel.textContent = `Showing ${currentFilteredSpotsCache.length} of ${cityFiltered.length} spots`;
+      }
+    }
+
+    // Highlight active spot in list and scroll cleanly without thrashing the page
     document.querySelectorAll('.spot-card').forEach(c => c.classList.remove('active-spot'));
     const targetCard = document.querySelector(`.spot-card[data-id="${spot.id}"]`);
     if (targetCard) {
       targetCard.classList.add('active-spot');
-      targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      scrollCardIntoFeed(targetCard);
     }
   });
 
@@ -6654,7 +6738,7 @@ function deleteSpot(id) {
   if (anchorId) {
     const anchorCard = spotsListContainer ? spotsListContainer.querySelector(`.spot-card[data-id="${anchorId}"]`) : null;
     if (anchorCard) {
-      anchorCard.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+      scrollCardIntoFeed(anchorCard);
     }
   }
 
@@ -6863,7 +6947,7 @@ function handleSpotFormSubmit(e) {
 
     const editedCard = spotsListContainer ? spotsListContainer.querySelector(`.spot-card[data-id="${targetId}"]`) : null;
     if (editedCard) {
-      editedCard.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+      scrollCardIntoFeed(editedCard);
       editedCard.classList.add('spot-card-updated');
       setTimeout(() => editedCard.classList.remove('spot-card-updated'), 1500);
     }
