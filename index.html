@@ -154,7 +154,7 @@
         <h2 class="modal-title" id="modal-spot-title">Add New Spot</h2>
         <button type="button" class="modal-close-btn" data-close-modal="modal-spot">&times;</button>
       </div>
-      <form id="form-spot">
+      <form id="form-spot" novalidate>
         <div class="modal-body">
           <input type="hidden" id="spot-id">
 
@@ -230,7 +230,7 @@
           <div class="form-group">
             <label class="form-label" for="spot-photo-url">Spot Photo (Step Visual Guide)</label>
             <div style="display: flex; gap: 8px;">
-              <input type="url" id="spot-photo-url" class="form-input" placeholder="Paste photo URL (Unsplash, web image)...">
+              <input type="text" id="spot-photo-url" class="form-input" placeholder="Paste photo URL (Unsplash, web image, or relative path)...">
               <label for="spot-photo-file" class="btn" style="white-space: nowrap; cursor: pointer; margin: 0;">Upload</label>
               <input type="file" id="spot-photo-file" accept="image/*" style="display: none;">
             </div>
@@ -487,6 +487,6 @@
   <!-- Vendor & Application Scripts -->
   <script src="vendor/leaflet.js"></script>
   <script src="vendor/supabase.js"></script>
-  <script src="js/bundle.js?v=36"></script>
+  <script src="js/bundle.js?v=37"></script>
 </body>
 </html>
