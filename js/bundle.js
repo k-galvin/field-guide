@@ -4165,7 +4165,7 @@ function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 
     }
   });
 
-  // Map click for dropping pins and unfocusing active selection
+  // Map click for unfocusing active selection and smooth navigation
   mapInstance.on('click', (e) => {
     if (activeSpotIdCache && !isProgrammaticFocusing) {
       const prevSpotId = activeSpotIdCache;
@@ -4174,13 +4174,16 @@ function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 
         const prevMarker = markerMap.get(prevSpotId);
         const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
         if (prevMarker && prevSpot) {
+          prevMarker._flaneurIsActive = false;
           prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
           prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+          prevMarker.closePopup();
         }
       }
       if (onSpotUnfocusCallback) {
         onSpotUnfocusCallback();
       }
+      return;
     }
     if (onMapClickCallback) {
       onMapClickCallback(e.latlng.lat, e.latlng.lng);
@@ -5613,13 +5616,6 @@ function init() {
   // Initialize Map
   initMap('map', initialCenter, 13);
   centerCityOnMap(activeCity, spots);
-
-  // Set Map click handler to easily add spots (if not read-only)
-  setOnMapClickListener((lat, lng) => {
-    if (!isReadOnlyGuide) {
-      openAddSpotModalWithCoords(lat, lng);
-    }
-  });
 
   // Set Spot click handler from popup
   setOnSpotSelectListener((spot) => {

@@ -216,7 +216,7 @@ export function initMap(elementId, initialCenter = [33.6411, -117.9187], initial
     }
   });
 
-  // Map click for dropping pins and unfocusing active selection
+  // Map click for unfocusing active selection and smooth navigation
   mapInstance.on('click', (e) => {
     if (activeSpotIdCache && !isProgrammaticFocusing) {
       const prevSpotId = activeSpotIdCache;
@@ -225,13 +225,16 @@ export function initMap(elementId, initialCenter = [33.6411, -117.9187], initial
         const prevMarker = markerMap.get(prevSpotId);
         const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
         if (prevMarker && prevSpot) {
+          prevMarker._flaneurIsActive = false;
           prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
           prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
+          prevMarker.closePopup();
         }
       }
       if (onSpotUnfocusCallback) {
         onSpotUnfocusCallback();
       }
+      return;
     }
     if (onMapClickCallback) {
       onMapClickCallback(e.latlng.lat, e.latlng.lng);

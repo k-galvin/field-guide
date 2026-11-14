@@ -28,7 +28,6 @@ import {
   setUserLocation,
   drawLoopPolyline,
   clearLoopPolyline,
-  setOnMapClickListener,
   setOnSpotSelectListener,
   setOnSpotSelectMarkerListener,
   setOnSpotUnfocusListener,
@@ -389,13 +388,6 @@ function init() {
   // Initialize Map
   initMap('map', initialCenter, 13);
   centerCityOnMap(activeCity, spots);
-
-  // Set Map click handler to easily add spots (if not read-only)
-  setOnMapClickListener((lat, lng) => {
-    if (!isReadOnlyGuide) {
-      openAddSpotModalWithCoords(lat, lng);
-    }
-  });
 
   // Set Spot click handler from popup
   setOnSpotSelectListener((spot) => {
