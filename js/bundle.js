@@ -3961,12 +3961,27 @@ let onSpotSelectCallback = null;
 let onSpotSelectMarkerCallback = null;
 let onSpotUnfocusCallback = null;
 let isProgrammaticFocusing = false;
+let isPopupAutoPanning = false;
+let autoPanTimer = null;
 let isClearingMarkers = false;
 let currentMapRenderToken = 0;
 let allSpotsCache = [];
 let activeSpotIdCache = null;
 let mapMoveDebounceTimer = null;
 const markerMap = new Map();
+
+/**
+ * Safely opens a marker popup with autoPan guard to prevent recursive moveend loops
+ */
+function openMarkerPopupSafely(marker) {
+  if (!marker || marker.isPopupOpen()) return;
+  isPopupAutoPanning = true;
+  clearTimeout(autoPanTimer);
+  autoPanTimer = setTimeout(() => {
+    isPopupAutoPanning = false;
+  }, 450);
+  marker.openPopup();
+}
 
 /**
  * Creates custom styled HTML marker for Leaflet with category icons
@@ -4143,7 +4158,7 @@ function initMap(elementId, initialCenter = [33.6411, -117.9187], initialZoom = 
 
   // Viewport-based marker virtualization when panning or zooming on large collections
   mapInstance.on('moveend', () => {
-    if (isProgrammaticFocusing) return;
+    if (isProgrammaticFocusing || isPopupAutoPanning) return;
     if (allSpotsCache && allSpotsCache.length > 80) {
       clearTimeout(mapMoveDebounceTimer);
       mapMoveDebounceTimer = setTimeout(updateVisibleMarkers, 80);
@@ -4203,6 +4218,7 @@ function handleMarkerSelection(spot) {
     const prevMarker = markerMap.get(prevSpotId);
     const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
     if (prevMarker && prevSpot) {
+      prevMarker._flaneurIsActive = false;
       prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
       prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
     }
@@ -4210,10 +4226,11 @@ function handleMarkerSelection(spot) {
 
   const currentMarker = markerMap.get(spot.id);
   if (currentMarker) {
+    currentMarker._flaneurIsActive = true;
     currentMarker.setIcon(createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', true));
     currentMarker.setZIndexOffset(2500);
     if (!currentMarker.isPopupOpen()) {
-      currentMarker.openPopup();
+      openMarkerPopupSafely(currentMarker);
     }
   }
 
@@ -4275,6 +4292,8 @@ function createSingleMarker(spot, activeSpotId) {
     zIndexOffset: isActive ? 2500 : (spot.favorite ? 50 : 0),
     riseOnHover: true
   });
+  marker._flaneurSpotId = spot.id;
+  marker._flaneurIsActive = isActive;
 
   markerMap.set(spot.id, marker);
 
@@ -4293,6 +4312,11 @@ function createSingleMarker(spot, activeSpotId) {
 
   marker.on('popupopen', () => {
     if (isClearingMarkers) return;
+    isPopupAutoPanning = true;
+    clearTimeout(autoPanTimer);
+    autoPanTimer = setTimeout(() => {
+      isPopupAutoPanning = false;
+    }, 450);
     if (activeSpotIdCache !== spot.id) {
       handleMarkerSelection(spot);
     }
@@ -4302,6 +4326,7 @@ function createSingleMarker(spot, activeSpotId) {
     if (isClearingMarkers || isProgrammaticFocusing) return;
     if (activeSpotIdCache === spot.id) {
       activeSpotIdCache = null;
+      marker._flaneurIsActive = false;
       marker.setIcon(createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', false));
       marker.setZIndexOffset(spot.favorite ? 50 : 0);
       if (onSpotUnfocusCallback) {
@@ -4322,15 +4347,26 @@ function updateVisibleMarkers() {
   currentMapRenderToken++;
   const thisToken = currentMapRenderToken;
 
-  isClearingMarkers = true;
-  markersLayer.clearLayers();
-  markerMap.clear();
-  isClearingMarkers = false;
-
-  if (!allSpotsCache || allSpotsCache.length === 0) return;
+  if (!allSpotsCache || allSpotsCache.length === 0) {
+    isClearingMarkers = true;
+    markersLayer.clearLayers();
+    markerMap.clear();
+    isClearingMarkers = false;
+    return;
+  }
 
   const validSpots = allSpotsCache.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
-  if (validSpots.length === 0) return;
+  if (validSpots.length === 0) {
+    isClearingMarkers = true;
+    markersLayer.clearLayers();
+    markerMap.clear();
+    isClearingMarkers = false;
+    return;
+  }
+
+  if (activeSpotIdCache && !validSpots.some(s => s.id === activeSpotIdCache)) {
+    activeSpotIdCache = null;
+  }
 
   let spotsToDisplay;
   if (validSpots.length <= 80) {
@@ -4354,27 +4390,48 @@ function updateVisibleMarkers() {
   }
 
   // CRITICAL: Always ensure active spot's pin is present, regardless of zoom or bounds!
-  // Sort active spot to the END of array so it renders last in DOM order (on top of any overlapping pins)
   if (activeSpotIdCache) {
     const activeSpot = validSpots.find(s => s.id === activeSpotIdCache);
-    if (activeSpot) {
-      spotsToDisplay = spotsToDisplay.filter(s => s.id !== activeSpotIdCache);
+    if (activeSpot && !spotsToDisplay.some(s => s.id === activeSpotIdCache)) {
       spotsToDisplay.push(activeSpot);
     }
   }
 
-  // Render visible markers (typically 15-50 markers max)
+  const newSpotIds = new Set(spotsToDisplay.map(s => s.id));
+
+  // 1. Remove markers that are no longer in spotsToDisplay (preserve active spot marker)
+  for (const [id, marker] of markerMap.entries()) {
+    if (!newSpotIds.has(id) && id !== activeSpotIdCache) {
+      markersLayer.removeLayer(marker);
+      markerMap.delete(id);
+    }
+  }
+
+  // 2. Add new markers or update existing markers in place
   spotsToDisplay.forEach(s => {
     if (thisToken !== currentMapRenderToken) return;
-    const marker = createSingleMarker(s, activeSpotIdCache);
-    if (marker) marker.addTo(markersLayer);
+    const isActive = Boolean(activeSpotIdCache && s.id === activeSpotIdCache);
+    let marker = markerMap.get(s.id);
+    if (!marker) {
+      marker = createSingleMarker(s, activeSpotIdCache);
+      if (marker) {
+        marker.addTo(markersLayer);
+      }
+    } else {
+      // Marker already exists in DOM: update active state if changed
+      if (marker._flaneurIsActive !== isActive) {
+        marker._flaneurIsActive = isActive;
+        marker.setIcon(createMarkerIcon(s.category, s.favorite, s.status === 'visited', isActive));
+        marker.setZIndexOffset(isActive ? 2500 : (s.favorite ? 50 : 0));
+      }
+    }
   });
 
-  // Keep popup open for active spot if not mid-flight
-  if (activeSpotIdCache && !isProgrammaticFocusing) {
+  // 3. Keep popup open for active spot if not mid-flight and not auto-panning
+  if (activeSpotIdCache && !isProgrammaticFocusing && !isPopupAutoPanning) {
     const activeMarker = markerMap.get(activeSpotIdCache);
     if (activeMarker && !activeMarker.isPopupOpen()) {
-      activeMarker.openPopup();
+      openMarkerPopupSafely(activeMarker);
     }
   }
 }
@@ -4409,6 +4466,7 @@ function clearActiveSpot() {
     const prevMarker = markerMap.get(activeSpotIdCache);
     const prevSpot = allSpotsCache.find(s => s.id === activeSpotIdCache);
     if (prevMarker && prevSpot) {
+      prevMarker._flaneurIsActive = false;
       prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
       prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
       prevMarker.closePopup();
@@ -4433,6 +4491,7 @@ function focusSpot(spot) {
     const prevMarker = markerMap.get(prevSpotId);
     const prevSpot = allSpotsCache.find(s => s.id === prevSpotId);
     if (prevMarker && prevSpot) {
+      prevMarker._flaneurIsActive = false;
       prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
       prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
     }
@@ -4448,9 +4507,10 @@ function focusSpot(spot) {
     updateVisibleMarkers();
     const marker = markerMap.get(spot.id);
     if (marker) {
+      marker._flaneurIsActive = true;
       marker.setIcon(createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', true));
       marker.setZIndexOffset(2500);
-      marker.openPopup();
+      openMarkerPopupSafely(marker);
     }
     return;
   }
@@ -4465,9 +4525,10 @@ function focusSpot(spot) {
     updateVisibleMarkers();
     const marker = markerMap.get(spot.id);
     if (marker) {
+      marker._flaneurIsActive = true;
       marker.setIcon(createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', true));
       marker.setZIndexOffset(2500);
-      marker.openPopup();
+      openMarkerPopupSafely(marker);
     }
   };
 
