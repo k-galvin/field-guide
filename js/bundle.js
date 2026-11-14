@@ -566,15 +566,9 @@ function getStoredSpots() {
   }
 }
 
-let lastSavedSpotsLength = -1;
-let lastSavedFirstId = '';
-
 function saveStoredSpots(spots) {
   try {
     if (!Array.isArray(spots)) return;
-    if (spots.length === lastSavedSpotsLength && spots.length > 0 && spots[0].id === lastSavedFirstId) {
-      return; // Skip redundant serialization and localStorage write
-    }
     const sorted = sortSpotsDeterministically(spots);
     // Sanitize any massive data URLs to safeguard localStorage quota
     const sanitized = sorted.map(s => {
@@ -585,8 +579,6 @@ function saveStoredSpots(spots) {
       return s;
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
-    lastSavedSpotsLength = sorted.length;
-    lastSavedFirstId = sorted.length > 0 ? sorted[0].id : '';
   } catch (e) {
     console.error('Failed to save spots to localStorage', e);
   }
@@ -4303,6 +4295,9 @@ function createSingleMarker(spot, activeSpotId) {
   });
   marker._flaneurSpotId = spot.id;
   marker._flaneurIsActive = isActive;
+  marker._flaneurCategory = spot.category;
+  marker._flaneurFavorite = spot.favorite;
+  marker._flaneurStatus = spot.status;
 
   markerMap.set(spot.id, marker);
 
@@ -4430,11 +4425,20 @@ function updateVisibleMarkers() {
         marker.addTo(markersLayer);
       }
     } else {
-      // Marker already exists in DOM: update active state if changed
-      if (marker._flaneurIsActive !== isActive) {
+      // Marker already exists in DOM: update icon and popup if category/favorite/status/active changed
+      const categoryChanged = marker._flaneurCategory !== s.category;
+      const favChanged = marker._flaneurFavorite !== s.favorite;
+      const statusChanged = marker._flaneurStatus !== s.status;
+      const activeChanged = marker._flaneurIsActive !== isActive;
+
+      if (categoryChanged || favChanged || statusChanged || activeChanged) {
         marker._flaneurIsActive = isActive;
+        marker._flaneurCategory = s.category;
+        marker._flaneurFavorite = s.favorite;
+        marker._flaneurStatus = s.status;
         marker.setIcon(createMarkerIcon(s.category, s.favorite, s.status === 'visited', isActive));
         marker.setZIndexOffset(isActive ? 2500 : (s.favorite ? 50 : 0));
+        marker.setPopupContent(() => createSpotPopupElement(s));
       }
     }
   });
@@ -5687,9 +5691,9 @@ function scrollCardIntoFeed(targetCard) {
         activeStatusFilter = 'all';
         statusFilterButtons.forEach(b => b.classList.toggle('active', b.dataset.status === 'all'));
       }
-      if (activeCategoryFilter !== 'all') {
-        activeCategoryFilter = 'all';
-        categoryPillsContainer.querySelectorAll('.cat-pill').forEach(p => p.classList.toggle('active', p.dataset.category === 'all'));
+      if (activeCategory !== 'all') {
+        activeCategory = 'all';
+        renderCategoryChips();
       }
       applyFiltersAndRender(false, spot.id);
       targetIdx = currentFilteredSpotsCache.findIndex(s => s.id === spot.id);

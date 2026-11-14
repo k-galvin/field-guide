@@ -562,15 +562,9 @@ export function getStoredSpots() {
   }
 }
 
-let lastSavedSpotsLength = -1;
-let lastSavedFirstId = '';
-
 export function saveStoredSpots(spots) {
   try {
     if (!Array.isArray(spots)) return;
-    if (spots.length === lastSavedSpotsLength && spots.length > 0 && spots[0].id === lastSavedFirstId) {
-      return; // Skip redundant serialization and localStorage write
-    }
     const sorted = sortSpotsDeterministically(spots);
     // Sanitize any massive data URLs to safeguard localStorage quota
     const sanitized = sorted.map(s => {
@@ -581,8 +575,6 @@ export function saveStoredSpots(spots) {
       return s;
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
-    lastSavedSpotsLength = sorted.length;
-    lastSavedFirstId = sorted.length > 0 ? sorted[0].id : '';
   } catch (e) {
     console.error('Failed to save spots to localStorage', e);
   }

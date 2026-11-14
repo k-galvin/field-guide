@@ -354,6 +354,9 @@ function createSingleMarker(spot, activeSpotId) {
   });
   marker._flaneurSpotId = spot.id;
   marker._flaneurIsActive = isActive;
+  marker._flaneurCategory = spot.category;
+  marker._flaneurFavorite = spot.favorite;
+  marker._flaneurStatus = spot.status;
 
   markerMap.set(spot.id, marker);
 
@@ -481,11 +484,20 @@ function updateVisibleMarkers() {
         marker.addTo(markersLayer);
       }
     } else {
-      // Marker already exists in DOM: update active state if changed
-      if (marker._flaneurIsActive !== isActive) {
+      // Marker already exists in DOM: update icon and popup if category/favorite/status/active changed
+      const categoryChanged = marker._flaneurCategory !== s.category;
+      const favChanged = marker._flaneurFavorite !== s.favorite;
+      const statusChanged = marker._flaneurStatus !== s.status;
+      const activeChanged = marker._flaneurIsActive !== isActive;
+
+      if (categoryChanged || favChanged || statusChanged || activeChanged) {
         marker._flaneurIsActive = isActive;
+        marker._flaneurCategory = s.category;
+        marker._flaneurFavorite = s.favorite;
+        marker._flaneurStatus = s.status;
         marker.setIcon(createMarkerIcon(s.category, s.favorite, s.status === 'visited', isActive));
         marker.setZIndexOffset(isActive ? 2500 : (s.favorite ? 50 : 0));
+        marker.setPopupContent(() => createSpotPopupElement(s));
       }
     }
   });

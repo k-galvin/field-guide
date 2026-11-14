@@ -442,9 +442,9 @@ function scrollCardIntoFeed(targetCard) {
         activeStatusFilter = 'all';
         statusFilterButtons.forEach(b => b.classList.toggle('active', b.dataset.status === 'all'));
       }
-      if (activeCategoryFilter !== 'all') {
-        activeCategoryFilter = 'all';
-        categoryPillsContainer.querySelectorAll('.cat-pill').forEach(p => p.classList.toggle('active', p.dataset.category === 'all'));
+      if (activeCategory !== 'all') {
+        activeCategory = 'all';
+        renderCategoryChips();
       }
       applyFiltersAndRender(false, spot.id);
       targetIdx = currentFilteredSpotsCache.findIndex(s => s.id === spot.id);
