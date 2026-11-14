@@ -104,6 +104,12 @@ const REGION_DEFINITIONS = [
     description: 'Western, Southern & Northern Europe'
   },
   {
+    id: 'africa_middle_east',
+    name: 'Africa & Middle East',
+    code: 'MEA',
+    description: 'North Africa, Sub-Saharan Africa & Middle East'
+  },
+  {
     id: 'asia_pacific',
     name: 'Asia & Pacific',
     code: 'APAC',

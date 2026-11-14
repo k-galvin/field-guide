@@ -4,15 +4,15 @@ const STORAGE_KEY = 'flaneur_spots_v2';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 export const DEFAULT_CITIES = [
-  'Amsterdam', 'Banff', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
-  'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
-  'English Countryside', 'Florence', 'Grand Canyon', 'Helsinki', 'Huntington Beach',
-  'Iceland', 'Irish Countryside', 'Italian Riviera', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
-  'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Marin', 'Melbourne', 'Mexico City',
-  'Monterey', 'Montreal', 'Newport Beach', 'New York', 'Nice', 'Normandy', 'Ojai', 'Orange', 'Orange County',
-  'Oslo', 'Palm Springs', 'Paris', 'Phoenix', 'Porto', 'Portland', 'Prague', 'Provence', 'Quebec City', 'Rome',
-  'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
-  'Seattle', 'Sedona', 'South Bay Area', 'Stockholm', 'Sydney', 'Tokyo', 'Tuscany', 'Vancouver', 'Venice', 'Versailles', 'Vienna'
+  'Amsterdam', 'Austin', 'Banff', 'Barcelona', 'Berlin', 'Biarritz', 'Boston', 'Budapest',
+  'Charleston', 'Chicago', 'Copenhagen', 'Cordoba', 'Costa Mesa', 'Denver', 'Dublin', 'Edinburgh', 'Encinitas',
+  'English Countryside', 'Florence', 'Geneva', 'Granada', 'Grand Canyon', 'Helsinki', 'Huntington Beach',
+  'Iceland', 'Irish Countryside', 'Istanbul', 'Italian Riviera', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
+  'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Madrid', 'Marin', 'Marrakesh', 'Melbourne', 'Mexico City',
+  'Monte Carlo', 'Monterey', 'Montreal', 'Munich', 'New Orleans', 'Newport Beach', 'New York', 'Nice', 'Normandy', 'Oaxaca', 'Ojai', 'Orange', 'Orange County',
+  'Osaka', 'Oslo', 'Palm Springs', 'Paris', 'Phoenix', 'Portland', 'Portland, Maine', 'Porto', 'Prague', 'Provence', 'Quebec City', 'Rome',
+  'Salerno', 'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
+  'Seattle', 'Sedona', 'Seoul', 'Sevilla', 'South Bay Area', 'Stockholm', 'Sydney', 'Tokyo', 'Toronto', 'Tuscany', 'Vancouver', 'Venice', 'Versailles', 'Vienna', 'Zurich'
 ];
 
 export const KNOWN_CITY_META = {
@@ -57,6 +57,11 @@ export const KNOWN_CITY_META = {
   'sedona': { code: 'SED', country: 'Arizona', region: 'americas', type: 'city' },
   'grand canyon': { code: 'GCN', country: 'Arizona', region: 'americas', type: 'area' },
   'austin': { code: 'AUS', country: 'Texas', region: 'americas', type: 'city' },
+  'denver': { code: 'DEN', country: 'Colorado', region: 'americas', type: 'city' },
+  'charleston': { code: 'CHS', country: 'South Carolina', region: 'americas', type: 'city' },
+  'portland, maine': { code: 'PWM', country: 'Maine', region: 'americas', type: 'city' },
+  'portland (maine)': { code: 'PWM', country: 'Maine', region: 'americas', type: 'city' },
+  'portland maine': { code: 'PWM', country: 'Maine', region: 'americas', type: 'city' },
   'nashville': { code: 'BNA', country: 'Tennessee', region: 'americas', type: 'city' },
   'new orleans': { code: 'MSY', country: 'Louisiana', region: 'americas', type: 'city' },
   'detroit': { code: 'DTW', country: 'Michigan', region: 'americas', type: 'city' },
@@ -71,12 +76,14 @@ export const KNOWN_CITY_META = {
   'montreal': { code: 'YUL', country: 'Canada', region: 'americas', type: 'city' },
   'quebec city': { code: 'YQB', country: 'Canada', region: 'americas', type: 'city' },
   'mexico city': { code: 'CDMX', country: 'Mexico', region: 'americas', type: 'city' },
+  'oaxaca': { code: 'OAX', country: 'Mexico', region: 'americas', type: 'city' },
   'são paulo': { code: 'GRU', country: 'Brazil', region: 'americas', type: 'city' },
   'sao paulo': { code: 'GRU', country: 'Brazil', region: 'americas', type: 'city' },
   'buenos aires': { code: 'EZE', country: 'Argentina', region: 'americas', type: 'city' },
 
   // Europe - France
   'paris': { code: 'PAR', country: 'France', region: 'europe', type: 'city' },
+  'biarritz': { code: 'BIQ', country: 'France', region: 'europe', type: 'city' },
   'nice': { code: 'NCE', country: 'France', region: 'europe', type: 'city' },
   'lyon': { code: 'LYS', country: 'France', region: 'europe', type: 'city' },
   'provence': { code: 'PRV', country: 'France', region: 'europe', type: 'area' },
@@ -90,6 +97,7 @@ export const KNOWN_CITY_META = {
   'florence': { code: 'FLR', country: 'Italy', region: 'europe', type: 'city' },
   'venice': { code: 'VCE', country: 'Italy', region: 'europe', type: 'city' },
   'milan': { code: 'MIL', country: 'Italy', region: 'europe', type: 'city' },
+  'salerno': { code: 'QSR', country: 'Italy', region: 'europe', type: 'city' },
   'tuscany': { code: 'TUS', country: 'Italy', region: 'europe', type: 'area' },
   'italian riviera': { code: 'RIV', country: 'Italy', region: 'europe', type: 'area' },
   'italian countryside': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
@@ -107,6 +115,11 @@ export const KNOWN_CITY_META = {
   // Europe - Spain & Portugal
   'barcelona': { code: 'BCN', country: 'Spain', region: 'europe', type: 'city' },
   'madrid': { code: 'MAD', country: 'Spain', region: 'europe', type: 'city' },
+  'granada': { code: 'GRX', country: 'Spain', region: 'europe', type: 'city' },
+  'sevilla': { code: 'SVQ', country: 'Spain', region: 'europe', type: 'city' },
+  'seville': { code: 'SVQ', country: 'Spain', region: 'europe', type: 'city' },
+  'cordoba': { code: 'ODB', country: 'Spain', region: 'europe', type: 'city' },
+  'córdoba': { code: 'ODB', country: 'Spain', region: 'europe', type: 'city' },
   'lisbon': { code: 'LIS', country: 'Portugal', region: 'europe', type: 'city' },
   'porto': { code: 'OPO', country: 'Portugal', region: 'europe', type: 'city' },
 
@@ -136,16 +149,28 @@ export const KNOWN_CITY_META = {
   'irish countryside': { code: 'IRE', country: 'Ireland', region: 'europe', type: 'area' },
   'antwerp': { code: 'ANR', country: 'Belgium', region: 'europe', type: 'city' },
   'geneva': { code: 'GVA', country: 'Switzerland', region: 'europe', type: 'city' },
+  'zurich': { code: 'ZRH', country: 'Switzerland', region: 'europe', type: 'city' },
+  'zürich': { code: 'ZRH', country: 'Switzerland', region: 'europe', type: 'city' },
+  'monte carlo': { code: 'MCM', country: 'Monaco', region: 'europe', type: 'city' },
+  'monaco': { code: 'MCM', country: 'Monaco', region: 'europe', type: 'city' },
   'kyiv': { code: 'IEV', country: 'Ukraine', region: 'europe', type: 'city' },
-  'marrakesh': { code: 'RAK', country: 'Morocco', region: 'europe', type: 'city' },
   'istanbul': { code: 'IST', country: 'Turkey', region: 'europe', type: 'city' },
-  'lagos': { code: 'LOS', country: 'Nigeria', region: 'europe', type: 'city' },
+
+  // Africa & Middle East
+  'marrakesh': { code: 'RAK', country: 'Morocco', region: 'africa_middle_east', type: 'city' },
+  'marrakech': { code: 'RAK', country: 'Morocco', region: 'africa_middle_east', type: 'city' },
+  'lagos': { code: 'LOS', country: 'Nigeria', region: 'africa_middle_east', type: 'city' },
+  'cairo': { code: 'CAI', country: 'Egypt', region: 'africa_middle_east', type: 'city' },
+  'cape town': { code: 'CPT', country: 'South Africa', region: 'africa_middle_east', type: 'city' },
+  'dubai': { code: 'DXB', country: 'United Arab Emirates', region: 'africa_middle_east', type: 'city' },
 
   // Asia & Pacific
   'tokyo': { code: 'TYO', country: 'Japan', region: 'asia_pacific', type: 'city' },
   'kyoto': { code: 'KYO', country: 'Japan', region: 'asia_pacific', type: 'city' },
+  'osaka': { code: 'KIX', country: 'Japan', region: 'asia_pacific', type: 'city' },
   'kobe': { code: 'UKB', country: 'Japan', region: 'asia_pacific', type: 'city' },
   'seoul': { code: 'SEL', country: 'South Korea', region: 'asia_pacific', type: 'city' },
+  'sol': { code: 'SEL', country: 'South Korea', region: 'asia_pacific', type: 'city' },
   'bangkok': { code: 'BKK', country: 'Thailand', region: 'asia_pacific', type: 'city' },
   'hanoi': { code: 'HAN', country: 'Vietnam', region: 'asia_pacific', type: 'city' },
   'hong kong': { code: 'HKG', country: 'Hong Kong', region: 'asia_pacific', type: 'city' },

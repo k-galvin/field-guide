@@ -28,9 +28,27 @@ export async function fetchRemoteSpots() {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { data, error } = await sb.from(SPOTS_TABLE).select('*').order('name', { ascending: true }).limit(1000);
-      if (error) throw error;
-      return (data || []).map(mapRowToSpot);
+      let allRows = [];
+      let page = 0;
+      const pageSize = 1000;
+      let hasMore = true;
+      while (hasMore) {
+        const from = page * pageSize;
+        const to = from + pageSize - 1;
+        const { data, error } = await sb.from(SPOTS_TABLE).select('*').order('name', { ascending: true }).range(from, to);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          allRows.push(...data);
+          if (data.length < pageSize) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        } else {
+          hasMore = false;
+        }
+      }
+      return allRows.map(mapRowToSpot);
     } catch (e) {
       console.warn('Supabase JS fetch failed, falling back to REST:', e);
     }
@@ -38,15 +56,34 @@ export async function fetchRemoteSpots() {
 
   // REST fallback
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*&order=name.asc&limit=1000`, {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
+    let allRows = [];
+    let page = 0;
+    const pageSize = 1000;
+    let hasMore = true;
+    while (hasMore) {
+      const from = page * pageSize;
+      const to = from + pageSize - 1;
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*&order=name.asc`, {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Range': `${from}-${to}`
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        allRows.push(...data);
+        if (data.length < pageSize) {
+          hasMore = false;
+        } else {
+          page++;
+        }
+      } else {
+        hasMore = false;
       }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    return (data || []).map(mapRowToSpot);
+    }
+    return allRows.map(mapRowToSpot);
   } catch (err) {
     console.warn('Remote fetch failed:', err);
     return null;

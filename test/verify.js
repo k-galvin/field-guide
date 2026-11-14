@@ -108,6 +108,8 @@ assert.strictEqual(getCityRegion('Costa Mesa'), 'americas');
 assert.strictEqual(getCityRegion('New York'), 'americas');
 assert.strictEqual(getCityRegion('London'), 'europe');
 assert.strictEqual(getCityRegion('Paris'), 'europe');
+assert.strictEqual(getCityRegion('Marrakesh'), 'africa_middle_east');
+assert.strictEqual(getCityRegion('Lagos'), 'africa_middle_east');
 assert.strictEqual(getCityRegion('Tokyo'), 'asia_pacific');
 assert.strictEqual(getCityRegion('Melbourne'), 'asia_pacific');
 assert.strictEqual(getCityRegion('Unknownville'), 'other');
@@ -259,6 +261,42 @@ expectedNewSpots.forEach(exp => {
   assert(match, `Expected spot matching '${exp.name}' in city '${exp.city}'`);
 });
 console.log('✓ All 20 newly requested spots verified in sample database');
+
+console.log('Testing newly added wishlist destinations & spots across 22 cities...');
+const expectedWishlistCities = [
+  { name: 'Bacha Coffee', city: 'Marrakesh' },
+  { name: 'Museum of Innocence', city: 'Istanbul' },
+  { name: 'Carmen de los Mártires', city: 'Granada' },
+  { name: 'Palacio de las Dueñas', city: 'Sevilla' },
+  { name: 'Cine Doré', city: 'Madrid' },
+  { name: 'Plage de la Côte des Basques', city: 'Biarritz' },
+  { name: 'Palacio de Viana', city: 'Cordoba' },
+  { name: 'Giardino della Minerva', city: 'Salerno' },
+  { name: 'Villa Paloma', city: 'Monte Carlo' },
+  { name: 'Café Schober', city: 'Zurich' },
+  { name: 'Museum Brandhorst', city: 'Munich' },
+  { name: 'Do You Read Me?!', city: 'Berlin' },
+  { name: 'Bains des Pâquis', city: 'Geneva' },
+  { name: 'Barton Springs Pool', city: 'Austin' },
+  { name: 'Soma Chocolatemaker', city: 'Toronto' },
+  { name: 'Crema Micro-Roasters', city: 'Denver' },
+  { name: 'Faulkner House Books', city: 'New Orleans' },
+  { name: 'Harken Café & Bakery', city: 'Charleston' },
+  { name: 'Tandem Coffee', city: 'Portland, Maine' },
+  { name: 'Jardín Etnobotánico', city: 'Oaxaca' },
+  { name: 'Nakanoshima Museum of Art', city: 'Osaka' },
+  { name: 'Onion Anguk', city: 'Seoul' }
+];
+
+expectedWishlistCities.forEach(exp => {
+  const match = SAMPLE_SPOTS.find(s => s.name.includes(exp.name) && s.city === exp.city);
+  assert(match, `Expected wishlist spot matching '${exp.name}' in city '${exp.city}'`);
+  assert.strictEqual(match.status, 'wishlist', `Spot '${match.name}' should have status 'wishlist'`);
+  assert(match.photoUrl && match.photoUrl.length > 0, `Spot '${match.name}' must have a valid photoUrl`);
+  assert(match.photoUrl.startsWith('http'), `Spot '${match.name}' photoUrl should be a direct public CDN URL`);
+  assert(match.notes && match.notes.length > 20, `Spot '${match.name}' must have an editorial description`);
+});
+console.log('✓ All 22 new wishlist spots verified with real photos, descriptions, and wishlist status');
 
 console.log('Testing category modification fingerprint sensitivity...');
 // Verify that card fingerprint updates when spot category changes

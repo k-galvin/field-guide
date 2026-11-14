@@ -8,15 +8,15 @@ const STORAGE_KEY = 'flaneur_spots_v2';
 const CITIES_KEY = 'flaneur_cities_v1';
 
 const DEFAULT_CITIES = [
-  'Amsterdam', 'Banff', 'Barcelona', 'Berlin', 'Boston', 'Budapest',
-  'Chicago', 'Copenhagen', 'Costa Mesa', 'Dublin', 'Edinburgh', 'Encinitas',
-  'English Countryside', 'Florence', 'Grand Canyon', 'Helsinki', 'Huntington Beach',
-  'Iceland', 'Irish Countryside', 'Italian Riviera', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
-  'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Marin', 'Melbourne', 'Mexico City',
-  'Monterey', 'Montreal', 'Newport Beach', 'New York', 'Nice', 'Normandy', 'Ojai', 'Orange', 'Orange County',
-  'Oslo', 'Palm Springs', 'Paris', 'Phoenix', 'Porto', 'Portland', 'Prague', 'Provence', 'Quebec City', 'Rome',
-  'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
-  'Seattle', 'Sedona', 'South Bay Area', 'Stockholm', 'Sydney', 'Tokyo', 'Tuscany', 'Vancouver', 'Venice', 'Versailles', 'Vienna'
+  'Amsterdam', 'Austin', 'Banff', 'Barcelona', 'Berlin', 'Biarritz', 'Boston', 'Budapest',
+  'Charleston', 'Chicago', 'Copenhagen', 'Cordoba', 'Costa Mesa', 'Denver', 'Dublin', 'Edinburgh', 'Encinitas',
+  'English Countryside', 'Florence', 'Geneva', 'Granada', 'Grand Canyon', 'Helsinki', 'Huntington Beach',
+  'Iceland', 'Irish Countryside', 'Istanbul', 'Italian Riviera', 'Joshua Tree', 'Kyoto', 'Laguna Beach',
+  'Lisbon', 'Loire Valley', 'London', 'Los Angeles', 'Madrid', 'Marin', 'Marrakesh', 'Melbourne', 'Mexico City',
+  'Monte Carlo', 'Monterey', 'Montreal', 'Munich', 'New Orleans', 'Newport Beach', 'New York', 'Nice', 'Normandy', 'Oaxaca', 'Ojai', 'Orange', 'Orange County',
+  'Osaka', 'Oslo', 'Palm Springs', 'Paris', 'Phoenix', 'Portland', 'Portland, Maine', 'Porto', 'Prague', 'Provence', 'Quebec City', 'Rome',
+  'Salerno', 'San Diego', 'San Francisco', 'Santa Ana', 'Santa Fe', 'Scottish Countryside',
+  'Seattle', 'Sedona', 'Seoul', 'Sevilla', 'South Bay Area', 'Stockholm', 'Sydney', 'Tokyo', 'Toronto', 'Tuscany', 'Vancouver', 'Venice', 'Versailles', 'Vienna', 'Zurich'
 ];
 
 const KNOWN_CITY_META = {
@@ -61,6 +61,11 @@ const KNOWN_CITY_META = {
   'sedona': { code: 'SED', country: 'Arizona', region: 'americas', type: 'city' },
   'grand canyon': { code: 'GCN', country: 'Arizona', region: 'americas', type: 'area' },
   'austin': { code: 'AUS', country: 'Texas', region: 'americas', type: 'city' },
+  'denver': { code: 'DEN', country: 'Colorado', region: 'americas', type: 'city' },
+  'charleston': { code: 'CHS', country: 'South Carolina', region: 'americas', type: 'city' },
+  'portland, maine': { code: 'PWM', country: 'Maine', region: 'americas', type: 'city' },
+  'portland (maine)': { code: 'PWM', country: 'Maine', region: 'americas', type: 'city' },
+  'portland maine': { code: 'PWM', country: 'Maine', region: 'americas', type: 'city' },
   'nashville': { code: 'BNA', country: 'Tennessee', region: 'americas', type: 'city' },
   'new orleans': { code: 'MSY', country: 'Louisiana', region: 'americas', type: 'city' },
   'detroit': { code: 'DTW', country: 'Michigan', region: 'americas', type: 'city' },
@@ -75,12 +80,14 @@ const KNOWN_CITY_META = {
   'montreal': { code: 'YUL', country: 'Canada', region: 'americas', type: 'city' },
   'quebec city': { code: 'YQB', country: 'Canada', region: 'americas', type: 'city' },
   'mexico city': { code: 'CDMX', country: 'Mexico', region: 'americas', type: 'city' },
+  'oaxaca': { code: 'OAX', country: 'Mexico', region: 'americas', type: 'city' },
   'são paulo': { code: 'GRU', country: 'Brazil', region: 'americas', type: 'city' },
   'sao paulo': { code: 'GRU', country: 'Brazil', region: 'americas', type: 'city' },
   'buenos aires': { code: 'EZE', country: 'Argentina', region: 'americas', type: 'city' },
 
   // Europe - France
   'paris': { code: 'PAR', country: 'France', region: 'europe', type: 'city' },
+  'biarritz': { code: 'BIQ', country: 'France', region: 'europe', type: 'city' },
   'nice': { code: 'NCE', country: 'France', region: 'europe', type: 'city' },
   'lyon': { code: 'LYS', country: 'France', region: 'europe', type: 'city' },
   'provence': { code: 'PRV', country: 'France', region: 'europe', type: 'area' },
@@ -94,6 +101,7 @@ const KNOWN_CITY_META = {
   'florence': { code: 'FLR', country: 'Italy', region: 'europe', type: 'city' },
   'venice': { code: 'VCE', country: 'Italy', region: 'europe', type: 'city' },
   'milan': { code: 'MIL', country: 'Italy', region: 'europe', type: 'city' },
+  'salerno': { code: 'QSR', country: 'Italy', region: 'europe', type: 'city' },
   'tuscany': { code: 'TUS', country: 'Italy', region: 'europe', type: 'area' },
   'italian riviera': { code: 'RIV', country: 'Italy', region: 'europe', type: 'area' },
   'italian countryside': { code: 'ITA', country: 'Italy', region: 'europe', type: 'area' },
@@ -111,6 +119,11 @@ const KNOWN_CITY_META = {
   // Europe - Spain & Portugal
   'barcelona': { code: 'BCN', country: 'Spain', region: 'europe', type: 'city' },
   'madrid': { code: 'MAD', country: 'Spain', region: 'europe', type: 'city' },
+  'granada': { code: 'GRX', country: 'Spain', region: 'europe', type: 'city' },
+  'sevilla': { code: 'SVQ', country: 'Spain', region: 'europe', type: 'city' },
+  'seville': { code: 'SVQ', country: 'Spain', region: 'europe', type: 'city' },
+  'cordoba': { code: 'ODB', country: 'Spain', region: 'europe', type: 'city' },
+  'córdoba': { code: 'ODB', country: 'Spain', region: 'europe', type: 'city' },
   'lisbon': { code: 'LIS', country: 'Portugal', region: 'europe', type: 'city' },
   'porto': { code: 'OPO', country: 'Portugal', region: 'europe', type: 'city' },
 
@@ -140,16 +153,28 @@ const KNOWN_CITY_META = {
   'irish countryside': { code: 'IRE', country: 'Ireland', region: 'europe', type: 'area' },
   'antwerp': { code: 'ANR', country: 'Belgium', region: 'europe', type: 'city' },
   'geneva': { code: 'GVA', country: 'Switzerland', region: 'europe', type: 'city' },
+  'zurich': { code: 'ZRH', country: 'Switzerland', region: 'europe', type: 'city' },
+  'zürich': { code: 'ZRH', country: 'Switzerland', region: 'europe', type: 'city' },
+  'monte carlo': { code: 'MCM', country: 'Monaco', region: 'europe', type: 'city' },
+  'monaco': { code: 'MCM', country: 'Monaco', region: 'europe', type: 'city' },
   'kyiv': { code: 'IEV', country: 'Ukraine', region: 'europe', type: 'city' },
-  'marrakesh': { code: 'RAK', country: 'Morocco', region: 'europe', type: 'city' },
   'istanbul': { code: 'IST', country: 'Turkey', region: 'europe', type: 'city' },
-  'lagos': { code: 'LOS', country: 'Nigeria', region: 'europe', type: 'city' },
+
+  // Africa & Middle East
+  'marrakesh': { code: 'RAK', country: 'Morocco', region: 'africa_middle_east', type: 'city' },
+  'marrakech': { code: 'RAK', country: 'Morocco', region: 'africa_middle_east', type: 'city' },
+  'lagos': { code: 'LOS', country: 'Nigeria', region: 'africa_middle_east', type: 'city' },
+  'cairo': { code: 'CAI', country: 'Egypt', region: 'africa_middle_east', type: 'city' },
+  'cape town': { code: 'CPT', country: 'South Africa', region: 'africa_middle_east', type: 'city' },
+  'dubai': { code: 'DXB', country: 'United Arab Emirates', region: 'africa_middle_east', type: 'city' },
 
   // Asia & Pacific
   'tokyo': { code: 'TYO', country: 'Japan', region: 'asia_pacific', type: 'city' },
   'kyoto': { code: 'KYO', country: 'Japan', region: 'asia_pacific', type: 'city' },
+  'osaka': { code: 'KIX', country: 'Japan', region: 'asia_pacific', type: 'city' },
   'kobe': { code: 'UKB', country: 'Japan', region: 'asia_pacific', type: 'city' },
   'seoul': { code: 'SEL', country: 'South Korea', region: 'asia_pacific', type: 'city' },
+  'sol': { code: 'SEL', country: 'South Korea', region: 'asia_pacific', type: 'city' },
   'bangkok': { code: 'BKK', country: 'Thailand', region: 'asia_pacific', type: 'city' },
   'hanoi': { code: 'HAN', country: 'Vietnam', region: 'asia_pacific', type: 'city' },
   'hong kong': { code: 'HKG', country: 'Hong Kong', region: 'asia_pacific', type: 'city' },
@@ -3307,6 +3332,359 @@ const SAMPLE_SPOTS = [
     visitDate: '',
     photoUrl: 'images/spots/cdmx-contramar.jpg'
   },
+  // --- NEW USER WISHLIST DESTINATIONS ---
+  {
+    id: 'spot-marrakesh-dar-el-bacha',
+    name: 'Bacha Coffee (Dar el Bacha)',
+    city: 'Marrakesh',
+    neighborhood: 'Medina / Mouassine',
+    category: 'matcha_coffee',
+    status: 'wishlist',
+    favorite: true,
+    lat: 31.6318,
+    lng: -7.9934,
+    daysOpen: 'Tue - Sun',
+    hours: '10:00 - 18:00 (Closed Mon)',
+    notes: 'Housed within the 1910 palace of the Pasha of Marrakech. Soaring carved cedar ceilings, geometric zellij tilework, and over 200 rare 100% Arabica origins poured from gooseneck pots with fresh vanilla bean grinders and chantilly cream.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Dar_El_Bacha.jpg/1280px-Dar_El_Bacha.jpg'
+  },
+  {
+    id: 'spot-istanbul-museum-of-innocence',
+    name: 'The Museum of Innocence (Masumiyet Müzesi)',
+    city: 'Istanbul',
+    neighborhood: 'Çukurcuma / Beyoğlu',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 41.0310,
+    lng: 28.9796,
+    daysOpen: 'Tue - Sun',
+    hours: '10:00 - 18:00 (Closed Mon)',
+    notes: 'Nobel laureate Orhan Pamuk\'s physical novel-museum nestled in the cobblestone lanes of Çukurcuma. An obsessive, poetic archive of 1970s Istanbul life preserved across backlit wooden vitrines of vintage ephemera, cinema tickets, and porcelain teacups.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/The_Museum_of_Innocence.jpg/1280px-The_Museum_of_Innocence.jpg'
+  },
+  {
+    id: 'spot-granada-carmen-de-los-martires',
+    name: 'Carmen de los Mártires',
+    city: 'Granada',
+    neighborhood: 'Alhambra / Realejo',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 37.1725,
+    lng: -3.5861,
+    daysOpen: 'Daily',
+    hours: 'Daily 10:00 - 18:00',
+    notes: 'Secluded 19th-century romantic estate perched on the south slope of the Mauror hill beside the Alhambra. Peacocks wandering through baroque fountains, shaded cedar and myrtle groves, tranquil stone aqueducts, and panoramic vistas over the Vega and Sierra Nevada.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Jard%C3%ADn_de_El_Carmen_de_los_M%C3%A1rtires_%28Granada%29.jpg/1280px-Jard%C3%ADn_de_El_Carmen_de_los_M%C3%A1rtires_%28Granada%29.jpg'
+  },
+  {
+    id: 'spot-sevilla-palacio-de-las-duenas',
+    name: 'Palacio de las Dueñas',
+    city: 'Sevilla',
+    neighborhood: 'San Julián / Centro',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 37.3949,
+    lng: -5.9902,
+    daysOpen: 'Daily',
+    hours: 'Daily 10:00 - 18:00',
+    notes: 'Poetic 15th-century residence where poet Antonio Machado spent his childhood. Sun-drenched courtyards draped in climbing bougainvillea, fragrant Seville bitter-orange groves, Mudejar plasterwork, Gothic arcades, and an exquisite private library archive.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Yeser%C3%ADas%2C_Palacio_de_las_Due%C3%B1as_%28Sevilla%29.jpg/1280px-Yeser%C3%ADas%2C_Palacio_de_las_Due%C3%B1as_%28Sevilla%29.jpg'
+  },
+  {
+    id: 'spot-madrid-cine-dore',
+    name: 'Cine Doré (Filmoteca Española)',
+    city: 'Madrid',
+    neighborhood: 'Lavapiés / Antón Martín',
+    category: 'theater_cinema',
+    status: 'wishlist',
+    favorite: true,
+    lat: 40.4124,
+    lng: -3.6991,
+    daysOpen: 'Tue - Sun',
+    hours: 'Tue - Sun 16:30 - 22:30 (Closed Mon)',
+    notes: 'Historic 1923 modernist picture house with an iconic salmon-and-cream stucco facade and curved art deco balcony. Home to the Spanish Film Archive, projecting 35mm classics beneath gilded plaster ceilings, with an intimate sunlit lobby cafe and film bookshop.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Cine-Dore-Madrid-April-2024.jpg/1280px-Cine-Dore-Madrid-April-2024.jpg'
+  },
+  {
+    id: 'spot-biarritz-cote-des-basques',
+    name: 'Plage de la Côte des Basques',
+    city: 'Biarritz',
+    neighborhood: 'Côte des Basques',
+    category: 'surf_movement',
+    status: 'wishlist',
+    favorite: true,
+    lat: 43.4795,
+    lng: -1.5679,
+    daysOpen: 'Daily',
+    hours: 'Open 24 hours',
+    notes: 'The legendary birthplace of European surfing in 1957, framed by dramatic sandstone sea cliffs and the medieval turrets of Villa Belza. A sweeping Atlantic promenade perfect for golden hour sunset walks when the low tide reveals expansive wet sands and rolling longboard waves.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Biarritz-Plage-de-la-Cote-des-Basques-Sauveteurs-byRundvald.jpg/1280px-Biarritz-Plage-de-la-Cote-des-Basques-Sauveteurs-byRundvald.jpg'
+  },
+  {
+    id: 'spot-cordoba-palacio-de-viana',
+    name: 'Palacio de Viana',
+    city: 'Cordoba',
+    neighborhood: 'Santa Marina',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 37.8897,
+    lng: -4.7745,
+    daysOpen: 'Tue - Sun',
+    hours: 'Tue - Sun 10:00 - 19:00 (Closed Mon)',
+    notes: 'Renaissance palace renowned as the Museum of Patios, interconnecting 12 whitewashed Andalusian courtyards spanning five centuries of garden architecture. Filled with vibrant indigo flowerpots, blooming star jasmine, gurgling stone fountains, and ancient citrus trees.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/C%C3%B3rdoba_-_Palacio_de_Viana_-_01.jpg/1280px-C%C3%B3rdoba_-_Palacio_de_Viana_-_01.jpg'
+  },
+  {
+    id: 'spot-salerno-giardino-della-minerva',
+    name: 'Giardino della Minerva',
+    city: 'Salerno',
+    neighborhood: 'Centro Storico',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 40.6806,
+    lng: 14.7558,
+    daysOpen: 'Tue - Sun',
+    hours: 'Tue - Sun 09:30 - 17:00 (Closed Mon)',
+    notes: 'First recorded botanical garden in Europe, terraced on the steep medieval slopes above Salerno by the 14th-century physician Matthaeus Platearius. Tiered irrigation waterways, aromatic medicinal herbs, lime trees, and an open-air tisana tea room with panoramic vistas across the Gulf of Salerno.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Giardino_della_Minerva_Salerno_43.JPG/1280px-Giardino_della_Minerva_Salerno_43.JPG'
+  },
+  {
+    id: 'spot-monte-carlo-villa-paloma',
+    name: 'Villa Paloma (Nouveau Musée National de Monaco)',
+    city: 'Monte Carlo',
+    neighborhood: 'Jardin Exotique',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 43.7314,
+    lng: 7.4147,
+    daysOpen: 'Daily',
+    hours: 'Daily 10:00 - 18:00',
+    notes: 'Immaculately restored Belle Époque patrician villa overlooking the Mediterranean, housing thought-provoking contemporary art and architectural exhibitions. Peaceful terraced Italianate gardens shaded by olive and cypress trees high above the harbor.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Nouveau_mus%C3%A9e_national_de_Monaco_%28novembre_2021%29.jpg/1280px-Nouveau_mus%C3%A9e_national_de_Monaco_%28novembre_2021%29.jpg'
+  },
+  {
+    id: 'spot-zurich-cafe-schober',
+    name: 'Café Schober',
+    city: 'Zurich',
+    neighborhood: 'Niederdorf / Altstadt',
+    category: 'pastry_bakery',
+    status: 'wishlist',
+    favorite: true,
+    lat: 47.3712,
+    lng: 8.5445,
+    daysOpen: 'Daily',
+    hours: 'Daily 08:00 - 19:00',
+    notes: 'Enchanting 19th-century salon de thé on cobblestoned Napfgasse, famous for baroque red-velvet banquettes, gilded moldings, and handcrafted Swiss patisserie. Order their legendary thick artisanal hot chocolate topped with freshly whipped double cream.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/7445_-_Z%C3%BCrich_-_Caf%C3%A9_Schober_-_Hot_Chocolate.JPG/1280px-7445_-_Z%C3%BCrich_-_Caf%C3%A9_Schober_-_Hot_Chocolate.JPG'
+  },
+  {
+    id: 'spot-munich-museum-brandhorst',
+    name: 'Museum Brandhorst',
+    city: 'Munich',
+    neighborhood: 'Maxvorstadt / Kunstareal',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 48.1498,
+    lng: 11.5742,
+    daysOpen: 'Tue - Sun',
+    hours: 'Tue - Sun 10:00 - 18:00 (Closed Mon)',
+    notes: 'Architectural gem by Sauerbruch Hutton clad in 36,000 multi-colored glazed ceramic louvers. Bathed in diffused natural daylight, housing the largest Cy Twombly collection outside the US—including the monumental 12-canvas Lepanto cycle—and postwar art monographs.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Museum_Brandhorst_June_2014_01.JPG/1280px-Museum_Brandhorst_June_2014_01.JPG'
+  },
+  {
+    id: 'spot-berlin-do-you-read-me',
+    name: 'Do You Read Me?!',
+    city: 'Berlin',
+    neighborhood: 'Mitte / Auguststraße',
+    category: 'books',
+    status: 'wishlist',
+    favorite: true,
+    lat: 52.5276,
+    lng: 13.3962,
+    daysOpen: 'Mon - Sat',
+    hours: 'Mon - Sat 11:00 - 19:00 (Closed Sun)',
+    notes: 'The gold standard for contemporary print culture on gallery-lined Auguststraße. A sleek black-and-wood storefront curating rare international architecture journals, photography monographs, indie zines, and literary quarterlies from Tokyo, London, and New York.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Auguststra%C3%9Fe%2C_Berlin_%2820251220-P1074703%29.jpg/1280px-Auguststra%C3%9Fe%2C_Berlin_%2820251220-P1074703%29.jpg'
+  },
+  {
+    id: 'spot-geneva-bains-des-paquis',
+    name: 'Bains des Pâquis',
+    city: 'Geneva',
+    neighborhood: 'Pâquis / Lake Geneva',
+    category: 'surf_movement',
+    status: 'wishlist',
+    favorite: true,
+    lat: 46.2105,
+    lng: 6.1558,
+    daysOpen: 'Daily',
+    hours: 'Daily 07:00 - 23:00',
+    notes: 'Beloved 1930s open-air bathhouse stretching out on a yellow jetty into Lake Geneva. The quintessential local ritual for morning lake swims with unobstructed views of the Jet d\'Eau, followed by warm spiced mint tea, artisanal muesli, and sunset Gruyère fondue on wooden boardwalks.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Bains_des_paquis_Gen%C3%A8ve.jpg/1280px-Bains_des_paquis_Gen%C3%A8ve.jpg'
+  },
+  {
+    id: 'spot-austin-barton-springs',
+    name: 'Barton Springs Pool',
+    city: 'Austin',
+    neighborhood: 'Zilker / South Congress',
+    category: 'surf_movement',
+    status: 'wishlist',
+    favorite: true,
+    lat: 30.2638,
+    lng: -97.7711,
+    daysOpen: 'Fri - Wed',
+    hours: 'Fri - Wed 05:00 - 22:00 (Closed Thu)',
+    notes: 'Natural three-acre limestone swimming pool fed by underground artesian springs, maintaining a refreshing 68°F year-round. Flanked by grassy shaded pecan slopes, where swimmers gather for meditative early morning laps and twilight stargazing swims.',
+    visitDate: '',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Aerial_image_of_Barton_springs_pool_in_Austin%2C_TX.jpg/1280px-Aerial_image_of_Barton_springs_pool_in_Austin%2C_TX.jpg'
+  },
+  {
+    id: 'spot-toronto-distillery-soma',
+    name: 'Soma Chocolatemaker & Distillery Historic District',
+    city: 'Toronto',
+    neighborhood: 'Distillery District',
+    category: 'pastry_bakery',
+    status: 'wishlist',
+    favorite: true,
+    lat: 43.6502,
+    lng: -79.3592,
+    daysOpen: 'Daily',
+    hours: 'Daily 10:00 - 19:00',
+    notes: 'Pioneering small-batch bean-to-bar chocolate atelier and espresso bar housed in a 19th-century Victorian brick-and-beam whiskey distillery. Sip thick spicy Mayan hot chocolates and single-origin cortados while watching micro-batch cacao winnowing in their open glass laboratory.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Distillery_District%2C_Toronto%2C_Canada%2C_2006.jpg/1280px-Distillery_District%2C_Toronto%2C_Canada%2C_2006.jpg'
+  },
+  {
+    id: 'spot-denver-larimer-crema',
+    name: 'Larimer Square & Crema Micro-Roasters',
+    city: 'Denver',
+    neighborhood: 'RiNo Art District / LoDo',
+    category: 'matcha_coffee',
+    status: 'wishlist',
+    favorite: true,
+    lat: 39.7538,
+    lng: -104.9982,
+    daysOpen: 'Daily',
+    hours: 'Daily 07:00 - 17:00',
+    notes: 'Exposed red-brick specialty espresso sanctuary nestled amongst the murals of Denver\'s creative core. Pulling rotating single-origin roasts from North American micro-roasters, paired with house-made cardamom sweet potato waffles and cold-pressed botanical tonics.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/LarimerSquareDenver.JPG/1280px-LarimerSquareDenver.JPG'
+  },
+  {
+    id: 'spot-new-orleans-faulkner-house',
+    name: 'Faulkner House Books',
+    city: 'New Orleans',
+    neighborhood: 'French Quarter / Pirate\'s Alley',
+    category: 'books',
+    status: 'wishlist',
+    favorite: true,
+    lat: 29.9576,
+    lng: -90.0637,
+    daysOpen: 'Daily',
+    hours: 'Daily 10:00 - 17:00',
+    notes: 'The sanctum where William Faulkner rented rooms in 1925 to write his first novel, Soldier\'s Pay. Tucked down shaded stone-paved Pirate\'s Alley behind St. Louis Cathedral, with floor-to-ceiling dark walnut bookcases stocked with rare first editions, Southern literature, and poetry.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Pirates_Alley_1955_New_Orleans.jpg/1280px-Pirates_Alley_1955_New_Orleans.jpg'
+  },
+  {
+    id: 'spot-charleston-harken-french-quarter',
+    name: 'Harken Café & Bakery (French Quarter)',
+    city: 'Charleston',
+    neighborhood: 'French Quarter / Queen St',
+    category: 'pastry_bakery',
+    status: 'wishlist',
+    favorite: true,
+    lat: 32.7774,
+    lng: -79.9298,
+    daysOpen: 'Wed - Mon',
+    hours: 'Wed - Mon 07:00 - 15:00 (Closed Tue)',
+    notes: 'Intimate hearth bakery tucked into an 18th-century storefront on historic Queen Street. Weathered heart-pine floors, antique botanical presses, and marble pastry counters laden with sourdough hand-pies, seasonal lavender honey tarts, and velvet pour-over coffees.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/Broad_Street%2C_French_Quarter%2C_Charleston%2C_SC_%2849431795963%29.jpg/1280px-Broad_Street%2C_French_Quarter%2C_Charleston%2C_SC_%2849431795963%29.jpg'
+  },
+  {
+    id: 'spot-portland-maine-tandem-old-port',
+    name: 'Tandem Coffee & Bakery (Old Port & West End)',
+    city: 'Portland, Maine',
+    neighborhood: 'West End / Congress St',
+    category: 'pastry_bakery',
+    status: 'wishlist',
+    favorite: true,
+    lat: 43.6521,
+    lng: -70.2748,
+    daysOpen: 'Thu - Mon',
+    hours: 'Thu - Mon 08:00 - 14:00 (Closed Tue - Wed)',
+    notes: 'Beloved 1960s mid-century converted service station in Portland\'s tree-lined West End. Renowned for James Beard-nominated baker Briana Holt\'s legendary loaded sea-salt butter biscuits, miso sourdough cookies, and immaculately balanced seasonal light-roast espresso.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Old_Port_%28Portland%2C_Maine%29_-_IMG_8081.JPG/1280px-Old_Port_%28Portland%2C_Maine%29_-_IMG_8081.JPG'
+  },
+  {
+    id: 'spot-oaxaca-jardin-etnobotanico',
+    name: 'Jardín Etnobotánico de Oaxaca',
+    city: 'Oaxaca',
+    neighborhood: 'Centro Histórico',
+    category: 'parks_nature',
+    status: 'wishlist',
+    favorite: true,
+    lat: 17.0664,
+    lng: -96.7226,
+    daysOpen: 'Mon - Sat',
+    hours: 'Mon - Sat 10:00 - 17:00 (Closed Sun)',
+    notes: 'Sculptural living museum designed by master artist Francisco Toledo inside the former 16th-century monastery grounds of Santo Domingo. Features towering organ-pipe cacti, endemic agaves, and geometric limestone water mirrors reflecting Oaxaca\'s golden highland light.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Jard%C3%ADn_etnobot%C3%A1nico_de_Oaxaca1.jpg/1280px-Jard%C3%ADn_etnobot%C3%A1nico_de_Oaxaca1.jpg'
+  },
+  {
+    id: 'spot-osaka-nakanoshima-wad',
+    name: 'Nakanoshima Museum of Art & Wad Ceramic Cafe',
+    city: 'Osaka',
+    neighborhood: 'Nakanoshima / Chuo-ku',
+    category: 'museums_art',
+    status: 'wishlist',
+    favorite: true,
+    lat: 34.6926,
+    lng: 135.4912,
+    daysOpen: 'Tue - Sun',
+    hours: 'Tue - Sun 10:00 - 17:00 (Closed Mon)',
+    notes: 'Striking black-clad minimalist cube on Nakanoshima island surrounded by riverside promenades. Showcases modern Kansai painting, gutai movement masters, and Japanese industrial design; pairs effortlessly with an afternoon ceremonial matcha whisked in handmade kintsugi ceramic bowls.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Nakanoshima_Museum_of_Art%2C_Osaka.jpg/1280px-Nakanoshima_Museum_of_Art%2C_Osaka.jpg'
+  },
+  {
+    id: 'spot-seoul-onion-bukchon',
+    name: 'Onion Anguk & Bukchon Hanok Craft Village',
+    city: 'Seoul',
+    neighborhood: 'Jongno-gu / Bukchon',
+    category: 'pastry_bakery',
+    status: 'wishlist',
+    favorite: true,
+    lat: 37.5794,
+    lng: 126.9866,
+    daysOpen: 'Daily',
+    hours: 'Daily 07:00 - 22:00',
+    notes: 'Restored traditional Korean hanok featuring exposed timber rafters, paper screens, and a gravel courtyard. Guests sit on floor cushions overlooking stone tile eaves while savoring Pandoro iced with powdered sugar, injeolmi pastries, and single-origin pour overs.',
+    visitDate: '',
+    photoUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Bukchon-ro_11-gil_street_with_hanok_houses_at_blue_hour_in_Bukchon_Hanok_Village_Seoul.jpg/1280px-Bukchon-ro_11-gil_street_with_hanok_houses_at_blue_hour_in_Bukchon_Hanok_Village_Seoul.jpg'
+  },
 ];
 
 
@@ -4210,9 +4588,27 @@ async function fetchRemoteSpots() {
   const sb = getSupabase();
   if (sb) {
     try {
-      const { data, error } = await sb.from(SPOTS_TABLE).select('*').order('name', { ascending: true }).limit(1000);
-      if (error) throw error;
-      return (data || []).map(mapRowToSpot);
+      let allRows = [];
+      let page = 0;
+      const pageSize = 1000;
+      let hasMore = true;
+      while (hasMore) {
+        const from = page * pageSize;
+        const to = from + pageSize - 1;
+        const { data, error } = await sb.from(SPOTS_TABLE).select('*').order('name', { ascending: true }).range(from, to);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          allRows.push(...data);
+          if (data.length < pageSize) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        } else {
+          hasMore = false;
+        }
+      }
+      return allRows.map(mapRowToSpot);
     } catch (e) {
       console.warn('Supabase JS fetch failed, falling back to REST:', e);
     }
@@ -4220,15 +4616,34 @@ async function fetchRemoteSpots() {
 
   // REST fallback
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*&order=name.asc&limit=1000`, {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
+    let allRows = [];
+    let page = 0;
+    const pageSize = 1000;
+    let hasMore = true;
+    while (hasMore) {
+      const from = page * pageSize;
+      const to = from + pageSize - 1;
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?select=*&order=name.asc`, {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Range': `${from}-${to}`
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        allRows.push(...data);
+        if (data.length < pageSize) {
+          hasMore = false;
+        } else {
+          page++;
+        }
+      } else {
+        hasMore = false;
       }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    return (data || []).map(mapRowToSpot);
+    }
+    return allRows.map(mapRowToSpot);
   } catch (err) {
     console.warn('Remote fetch failed:', err);
     return null;
@@ -4850,6 +5265,12 @@ const REGION_DEFINITIONS = [
     name: 'Europe',
     code: 'EUR',
     description: 'Western, Southern & Northern Europe'
+  },
+  {
+    id: 'africa_middle_east',
+    name: 'Africa & Middle East',
+    code: 'MEA',
+    description: 'North Africa, Sub-Saharan Africa & Middle East'
   },
   {
     id: 'asia_pacific',
