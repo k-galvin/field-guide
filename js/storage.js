@@ -2,6 +2,8 @@
 
 const STORAGE_KEY = 'flaneur_spots_v2';
 const CITIES_KEY = 'flaneur_cities_v1';
+const PENDING_UPSERTS_KEY = 'flaneur_pending_spot_upserts';
+const PENDING_DELETES_KEY = 'flaneur_pending_spot_deletes';
 
 export const DEFAULT_CITIES = [
   'Amsterdam', 'Austin', 'Banff', 'Barcelona', 'Berlin', 'Biarritz', 'Boston', 'Budapest',
@@ -578,6 +580,86 @@ export function saveStoredSpots(spots) {
   } catch (e) {
     console.error('Failed to save spots to localStorage', e);
   }
+}
+
+function readPendingIdSet(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
+  } catch (e) {
+    return new Set();
+  }
+}
+
+function writePendingIdSet(key, set) {
+  try {
+    localStorage.setItem(key, JSON.stringify([...set]));
+  } catch (e) {
+    console.error('Failed to save pending sync queue', e);
+  }
+}
+
+function toIdList(spotIds) {
+  return (Array.isArray(spotIds) ? spotIds : [spotIds])
+    .filter(id => id !== undefined && id !== null && id !== '')
+    .map(String);
+}
+
+/** Returns the set of spot IDs with local edits/additions awaiting cloud sync. */
+export function getPendingSpotUpserts() {
+  return readPendingIdSet(PENDING_UPSERTS_KEY);
+}
+
+/** Records spot ID(s) as needing cloud upsert and clears any pending delete for them. */
+export function markSpotPendingUpsert(spotIds) {
+  const ids = toIdList(spotIds);
+  if (ids.length === 0) return;
+  const upserts = readPendingIdSet(PENDING_UPSERTS_KEY);
+  const deletes = readPendingIdSet(PENDING_DELETES_KEY);
+  ids.forEach(id => {
+    upserts.add(id);
+    deletes.delete(id);
+  });
+  writePendingIdSet(PENDING_UPSERTS_KEY, upserts);
+  writePendingIdSet(PENDING_DELETES_KEY, deletes);
+}
+
+/** Clears spot ID(s) from the pending cloud upsert queue after successful sync. */
+export function clearSpotPendingUpsert(spotIds) {
+  const ids = toIdList(spotIds);
+  if (ids.length === 0) return;
+  const upserts = readPendingIdSet(PENDING_UPSERTS_KEY);
+  ids.forEach(id => upserts.delete(id));
+  writePendingIdSet(PENDING_UPSERTS_KEY, upserts);
+}
+
+/** Returns the set of spot IDs deleted locally and awaiting cloud deletion. */
+export function getPendingSpotDeletes() {
+  return readPendingIdSet(PENDING_DELETES_KEY);
+}
+
+/** Records spot ID(s) as needing cloud deletion and clears any pending upsert for them. */
+export function markSpotPendingDelete(spotIds) {
+  const ids = toIdList(spotIds);
+  if (ids.length === 0) return;
+  const deletes = readPendingIdSet(PENDING_DELETES_KEY);
+  const upserts = readPendingIdSet(PENDING_UPSERTS_KEY);
+  ids.forEach(id => {
+    deletes.add(id);
+    upserts.delete(id);
+  });
+  writePendingIdSet(PENDING_DELETES_KEY, deletes);
+  writePendingIdSet(PENDING_UPSERTS_KEY, upserts);
+}
+
+/** Clears spot ID(s) from the pending cloud deletion queue after successful sync. */
+export function clearSpotPendingDelete(spotIds) {
+  const ids = toIdList(spotIds);
+  if (ids.length === 0) return;
+  const deletes = readPendingIdSet(PENDING_DELETES_KEY);
+  ids.forEach(id => deletes.delete(id));
+  writePendingIdSet(PENDING_DELETES_KEY, deletes);
 }
 
 export function exportBackupJSON(spots, cities) {

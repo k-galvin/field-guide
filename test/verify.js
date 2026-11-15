@@ -308,4 +308,33 @@ const updatedSpot = { ...initialSpot, category: 'matcha_coffee' };
 assert.notStrictEqual(computeFingerprint(initialSpot), computeFingerprint(updatedSpot), 'Fingerprint must change when category changes');
 console.log('✓ Category change triggers DOM reconciliation and re-render');
 
+console.log('Testing pending sync queue persistence...');
+const memStore = new Map();
+globalThis.localStorage = {
+  getItem: (k) => (memStore.has(k) ? memStore.get(k) : null),
+  setItem: (k, v) => memStore.set(k, String(v)),
+  removeItem: (k) => memStore.delete(k)
+};
+const {
+  getPendingSpotUpserts,
+  markSpotPendingUpsert,
+  clearSpotPendingUpsert,
+  getPendingSpotDeletes,
+  markSpotPendingDelete,
+  clearSpotPendingDelete
+} = await import('../js/storage.js');
+
+markSpotPendingUpsert('sf-ferry-building');
+assert(getPendingSpotUpserts().has('sf-ferry-building'), 'Edited spot should be marked pending upsert');
+markSpotPendingDelete('sf-ferry-building');
+assert(!getPendingSpotUpserts().has('sf-ferry-building'), 'Deleting a spot should clear pending upsert');
+assert(getPendingSpotDeletes().has('sf-ferry-building'), 'Deleted spot should be marked pending delete');
+markSpotPendingUpsert('sf-ferry-building');
+assert(!getPendingSpotDeletes().has('sf-ferry-building'), 'Upserting a spot should clear pending delete');
+clearSpotPendingUpsert('sf-ferry-building');
+assert(!getPendingSpotUpserts().has('sf-ferry-building'), 'Clearing pending upsert should remove spot ID');
+clearSpotPendingDelete('sf-ferry-building');
+assert(!getPendingSpotDeletes().has('sf-ferry-building'), 'Clearing pending delete should remove spot ID');
+console.log('✓ Pending sync queue tracks upserts and deletes cleanly');
+
 console.log('All Day Loop algorithms & Destination Atlas verified successfully!');

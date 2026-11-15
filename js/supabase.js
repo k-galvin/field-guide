@@ -199,6 +199,7 @@ export async function upsertRemoteSpot(spot) {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
       method: 'POST',
+      keepalive: true,
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
@@ -232,6 +233,7 @@ export async function deleteRemoteSpot(id) {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?id=eq.${encodeURIComponent(id)}`, {
       method: 'DELETE',
+      keepalive: true,
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`

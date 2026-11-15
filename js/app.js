@@ -17,7 +17,13 @@ import {
   saveDestinationType,
   getCustomDestinationTypes,
   DEFAULT_CITIES,
-  escapeHtml
+  escapeHtml,
+  getPendingSpotUpserts,
+  markSpotPendingUpsert,
+  clearSpotPendingUpsert,
+  getPendingSpotDeletes,
+  markSpotPendingDelete,
+  clearSpotPendingDelete
 } from './storage.js';
 import { SAMPLE_SPOTS } from './sample-data.js';
 import {
@@ -505,10 +511,55 @@ function updateSyncStatus(state, text) {
   }
 }
 
+function updatePendingOrSyncedStatus(countText = 'synced') {
+  const hasPending = getPendingSpotUpserts().size > 0 || getPendingSpotDeletes().size > 0;
+  if (hasPending) {
+    updateSyncStatus('offline', 'pending sync');
+  } else {
+    updateSyncStatus('synced', countText);
+  }
+}
+
+async function syncSingleSpotToRemote(spot) {
+  if (!spot) return false;
+  markSpotPendingUpsert(spot.id);
+  updateSyncStatus('syncing', 'syncing...');
+  const ok = await upsertRemoteSpot(spot);
+  if (ok) {
+    clearSpotPendingUpsert(spot.id);
+    updatePendingOrSyncedStatus('synced');
+  } else {
+    updateSyncStatus('offline', 'pending sync');
+  }
+  return ok;
+}
+
+async function deleteSingleSpotFromRemote(id) {
+  markSpotPendingDelete(id);
+  updateSyncStatus('syncing', 'syncing...');
+  const ok = await deleteRemoteSpot(id);
+  if (ok) {
+    clearSpotPendingDelete(id);
+    updatePendingOrSyncedStatus('synced');
+  } else {
+    updateSyncStatus('offline', 'pending sync');
+  }
+  return ok;
+}
+
 async function syncWithSupabase(manual = false) {
   updateSyncStatus('syncing', manual ? 'syncing...' : 'syncing...');
 
   try {
+    // 0. Flush any pending local deletions before fetching remote state
+    const pendingDeletes = getPendingSpotDeletes();
+    for (const delId of pendingDeletes) {
+      const deleted = await deleteRemoteSpot(delId);
+      if (deleted) {
+        clearSpotPendingDelete(delId);
+      }
+    }
+
     // 1. Fetch current remote spots from Supabase
     const remote = await fetchRemoteSpots();
 
@@ -518,27 +569,38 @@ async function syncWithSupabase(manual = false) {
       return;
     }
 
-    // 2. Push any newly created local spots (e.g. created offline via + Add Spot)
-    const remoteMap = new Map(remote.map(r => [r.id, r]));
-    const localNewSpots = spots.filter(s => !remoteMap.has(s.id) && String(s.id).startsWith('spot-'));
+    const remainingDeletes = getPendingSpotDeletes();
+    let mergedRemote = remote.filter(r => !remainingDeletes.has(String(r.id)));
 
-    if (localNewSpots.length > 0) {
-      console.log(`Pushing ${localNewSpots.length} newly added local spots to Supabase...`);
-      updateSyncStatus('syncing', `uploading ${localNewSpots.length}...`);
-      await pushSpotsToRemote(localNewSpots);
-      remote.push(...localNewSpots);
+    // 2. Push any pending local edits/additions and newly created local spots
+    const pendingUpserts = getPendingSpotUpserts();
+    const remoteMap = new Map(mergedRemote.map(r => [r.id, r]));
+    const spotsToPush = spots.filter(s =>
+      !remainingDeletes.has(String(s.id)) &&
+      (pendingUpserts.has(String(s.id)) || (!remoteMap.has(s.id) && String(s.id).startsWith('spot-')))
+    );
+
+    if (spotsToPush.length > 0) {
+      console.log(`Pushing ${spotsToPush.length} pending local spot(s) to Supabase...`);
+      updateSyncStatus('syncing', `uploading ${spotsToPush.length}...`);
+      const pushed = await pushSpotsToRemote(spotsToPush);
+      if (pushed) {
+        clearSpotPendingUpsert(spotsToPush.map(s => s.id));
+      }
+
+      // Preserve local pending edits over stale remote rows
+      const pushMap = new Map(spotsToPush.map(s => [s.id, s]));
+      mergedRemote = mergedRemote.map(r => pushMap.get(r.id) || r);
+      spotsToPush.forEach(s => {
+        if (!remoteMap.has(s.id)) {
+          mergedRemote.push(s);
+        }
+      });
     }
 
-    // Remote Supabase is source of truth
-    const isDataDifferent = (spots.length !== remote.length) ||
-      (localNewSpots.length > 0) ||
-      spots.some(s => {
-        const r = remoteMap.get(s.id);
-        return !r || r.category !== s.category || r.photoUrl !== s.photoUrl || r.status !== s.status || r.name !== s.name || r.notes !== s.notes || r.hours !== s.hours || r.city !== s.city;
-      });
     const prevActiveCity = activeCity;
 
-    spots = remote;
+    spots = mergedRemote;
     saveStoredSpots(spots);
 
     // 4. Synchronize cities strictly from dedicated field_guide_cities and spots
@@ -610,7 +672,7 @@ async function syncWithSupabase(manual = false) {
     applyFiltersAndRender(false);
     renderCityManagerList();
 
-    updateSyncStatus('synced', `synced (${spots.length})`);
+    updatePendingOrSyncedStatus(`synced (${spots.length})`);
 
     if (manual) {
       alert(`Sync complete! ${spots.length} total spots synced across cloud and device.`);
@@ -625,13 +687,22 @@ async function syncWithSupabase(manual = false) {
 async function initCloudSync() {
   await syncWithSupabase(false);
 
+  window.addEventListener('online', () => {
+    syncWithSupabase(false);
+  });
+
   // Realtime WebSocket listener for changes from other devices (e.g. phone <-> laptop)
   subscribeToRemoteChanges((payload) => {
     console.log('Realtime change from Supabase:', payload);
-    updateSyncStatus('syncing', 'syncing...');
     const { eventType, new: newRow, old: oldRow } = payload;
+    const pendingUpserts = getPendingSpotUpserts();
+    const pendingDeletes = getPendingSpotDeletes();
 
     if (eventType === 'INSERT' || eventType === 'UPDATE') {
+      if (pendingUpserts.has(String(newRow.id)) || pendingDeletes.has(String(newRow.id))) {
+        return; // Preserve pending local change until cloud sync completes
+      }
+      updateSyncStatus('syncing', 'syncing...');
       const updated = mapRowToSpot(newRow);
       const idx = spots.findIndex(s => s.id === updated.id);
       if (idx !== -1) {
@@ -640,12 +711,16 @@ async function initCloudSync() {
         spots.unshift(updated);
       }
     } else if (eventType === 'DELETE') {
+      if (pendingUpserts.has(String(oldRow.id))) {
+        return; // Preserve pending local edit/addition
+      }
+      updateSyncStatus('syncing', 'syncing...');
       spots = spots.filter(s => s.id !== oldRow.id);
     }
 
     saveStoredSpots(spots);
     applyFiltersAndRender(false);
-    setTimeout(() => updateSyncStatus('synced', `synced (${spots.length})`), 400);
+    setTimeout(() => updatePendingOrSyncedStatus(`synced (${spots.length})`), 400);
   });
 }
 
@@ -1419,8 +1494,7 @@ function toggleSpotStatus(id) {
     feed.scrollTop = savedScrollTop;
   }
 
-  updateSyncStatus('syncing', 'syncing...');
-  upsertRemoteSpot(target).then(() => updateSyncStatus('synced', 'synced'));
+  syncSingleSpotToRemote(target);
 }
 
 /**
@@ -1441,8 +1515,7 @@ function toggleFavorite(id) {
     feed.scrollTop = savedScrollTop;
   }
 
-  updateSyncStatus('syncing', 'syncing...');
-  upsertRemoteSpot(target).then(() => updateSyncStatus('synced', 'synced'));
+  syncSingleSpotToRemote(target);
 }
 
 /**
@@ -1497,8 +1570,7 @@ function deleteSpot(id) {
     }
   }
 
-  updateSyncStatus('syncing', 'syncing...');
-  deleteRemoteSpot(id).then(() => updateSyncStatus('synced', 'synced'));
+  deleteSingleSpotFromRemote(id);
 }
 
 /**
@@ -1674,6 +1746,9 @@ function handleSpotFormSubmit(e) {
 
   const spotToSync = isEditing ? spots.find(s => s.id === targetId) : spots[0];
   saveStoredSpots(spots);
+  if (spotToSync) {
+    syncSingleSpotToRemote(spotToSync);
+  }
   closeModal(modalSpot);
 
   // If new spot was added to a different city than currently viewing, switch to that city
@@ -1706,11 +1781,6 @@ function handleSpotFormSubmit(e) {
       editedCard.classList.add('spot-card-updated');
       setTimeout(() => editedCard.classList.remove('spot-card-updated'), 1500);
     }
-  }
-
-  if (spotToSync) {
-    updateSyncStatus('syncing', 'syncing...');
-    upsertRemoteSpot(spotToSync).then(() => updateSyncStatus('synced', 'synced'));
   }
 }
 
@@ -1980,11 +2050,19 @@ function handleConfirmKmlImport() {
   saveStoredSpots(spots);
 
   // Sync imported spots to Supabase via batch push
+  const importedIds = toImport.map(s => s.id);
+  markSpotPendingUpsert(importedIds);
   updateSyncStatus('syncing', `uploading ${count}...`);
-  pushSpotsToRemote(toImport).then(() => {
-    updateSyncStatus('synced', `synced (${spots.length})`);
+  pushSpotsToRemote(toImport).then((ok) => {
+    if (ok) {
+      clearSpotPendingUpsert(importedIds);
+      updatePendingOrSyncedStatus(`synced (${spots.length})`);
+    } else {
+      updateSyncStatus('offline', 'pending sync');
+    }
   }).catch(err => {
     console.warn('Batch upload failed:', err);
+    updateSyncStatus('offline', 'pending sync');
   });
 
   // Ensure target city is in stored cities list
@@ -2597,7 +2675,7 @@ function renderCityManagerList() {
         if (spotCount > 0) {
           const spotsToDelete = spots.filter(s => s.city.toLowerCase() === cityToRemove.toLowerCase());
           for (const s of spotsToDelete) {
-            deleteRemoteSpot(s.id);
+            deleteSingleSpotFromRemote(s.id);
           }
           spots = spots.filter(s => s.city.toLowerCase() !== cityToRemove.toLowerCase());
           saveStoredSpots(spots);
