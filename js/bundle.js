@@ -4321,12 +4321,12 @@ function setOnSpotUnfocusListener(cb) {
  */
 function handleMarkerSelection(spot) {
   if (!spot) return;
-  const prevSpotId = activeSpotIdCache;
-  activeSpotIdCache = spot.id;
-
-  if (mapInstance) {
-    mapInstance.closePopup();
+  const currentMarker = markerMap.get(spot.id);
+  if (activeSpotIdCache === spot.id && currentMarker && currentMarker._flaneurIsActive && currentMarker.isPopupOpen()) {
+    return;
   }
+
+  const prevSpotId = activeSpotIdCache;
 
   if (prevSpotId && prevSpotId !== spot.id && markerMap.has(prevSpotId)) {
     const prevMarker = markerMap.get(prevSpotId);
@@ -4335,11 +4335,18 @@ function handleMarkerSelection(spot) {
       prevMarker._flaneurIsActive = false;
       prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
       prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
-      prevMarker.closePopup();
+      if (prevMarker.isPopupOpen()) {
+        prevMarker.closePopup();
+      }
     }
   }
 
-  const currentMarker = markerMap.get(spot.id);
+  if (mapInstance && (!currentMarker || !currentMarker.isPopupOpen())) {
+    mapInstance.closePopup();
+  }
+
+  activeSpotIdCache = spot.id;
+
   if (currentMarker) {
     currentMarker._flaneurIsActive = true;
     currentMarker.setIcon(createMarkerIcon(spot.category, spot.favorite, spot.status === 'visited', true));
@@ -4618,11 +4625,6 @@ function focusSpot(spot) {
   if (!mapInstance || !spot || typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return;
 
   const prevSpotId = activeSpotIdCache;
-  activeSpotIdCache = spot.id;
-
-  if (mapInstance) {
-    mapInstance.closePopup();
-  }
 
   if (prevSpotId && prevSpotId !== spot.id && markerMap.has(prevSpotId)) {
     const prevMarker = markerMap.get(prevSpotId);
@@ -4631,9 +4633,17 @@ function focusSpot(spot) {
       prevMarker._flaneurIsActive = false;
       prevMarker.setIcon(createMarkerIcon(prevSpot.category, prevSpot.favorite, prevSpot.status === 'visited', false));
       prevMarker.setZIndexOffset(prevSpot.favorite ? 50 : 0);
-      prevMarker.closePopup();
+      if (prevMarker.isPopupOpen()) {
+        prevMarker.closePopup();
+      }
     }
   }
+
+  if (mapInstance && prevSpotId !== spot.id) {
+    mapInstance.closePopup();
+  }
+
+  activeSpotIdCache = spot.id;
 
   const currentCenter = mapInstance.getCenter();
   const currentZoom = mapInstance.getZoom();
