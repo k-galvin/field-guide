@@ -12,13 +12,70 @@ export function getSupabase() {
   if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
     try {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-        auth: { persistSession: false }
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
       });
     } catch (e) {
       console.warn('Could not initialize Supabase client:', e);
     }
   }
   return supabaseClient;
+}
+
+/**
+ * Retrieve the current Supabase Auth session, if signed in
+ */
+export async function getAuthSession() {
+  const sb = getSupabase();
+  if (!sb || !sb.auth) return null;
+  try {
+    const { data, error } = await sb.auth.getSession();
+    if (error) return null;
+    return data?.session || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function hasAuthenticatedSession() {
+  const session = await getAuthSession();
+  return Boolean(session && session.access_token);
+}
+
+export async function signInWithEmail(email, password) {
+  const sb = getSupabase();
+  if (!sb || !sb.auth) {
+    return { error: new Error('Supabase client unavailable') };
+  }
+  return await sb.auth.signInWithPassword({ email, password });
+}
+
+export async function signOut() {
+  const sb = getSupabase();
+  if (!sb || !sb.auth) return { error: null };
+  return await sb.auth.signOut();
+}
+
+export function onAuthStateChange(callback) {
+  const sb = getSupabase();
+  if (!sb || !sb.auth || !sb.auth.onAuthStateChange) return null;
+  const { data } = sb.auth.onAuthStateChange((event, session) => {
+    if (callback) callback(event, session);
+  });
+  return data?.subscription || null;
+}
+
+async function getAuthHeaders(extra = {}) {
+  const session = await getAuthSession();
+  if (!session || !session.access_token) return null;
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${session.access_token}`,
+    ...extra
+  };
 }
 
 /**
@@ -130,25 +187,26 @@ export async function fetchRemoteCities() {
  */
 export async function upsertRemoteCity(cityName) {
   if (!cityName) return false;
+  if (!(await hasAuthenticatedSession())) return false;
   const sb = getSupabase();
   if (sb) {
     try {
-      await sb.from(CITIES_TABLE).upsert({ name: cityName });
-      return true;
+      const { error } = await sb.from(CITIES_TABLE).upsert({ name: cityName });
+      if (!error) return true;
     } catch (e) {}
   }
+  const headers = await getAuthHeaders({
+    'Content-Type': 'application/json',
+    'Prefer': 'resolution=merge-duplicates'
+  });
+  if (!headers) return false;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}`, {
       method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
+      headers,
       body: JSON.stringify({ name: cityName })
     });
-    return true;
+    return res.ok;
   } catch (e) {
     return false;
   }
@@ -159,22 +217,22 @@ export async function upsertRemoteCity(cityName) {
  */
 export async function deleteRemoteCity(cityName) {
   if (!cityName) return false;
+  if (!(await hasAuthenticatedSession())) return false;
   const sb = getSupabase();
   if (sb) {
     try {
-      await sb.from(CITIES_TABLE).delete().eq('name', cityName);
-      return true;
+      const { error } = await sb.from(CITIES_TABLE).delete().eq('name', cityName);
+      if (!error) return true;
     } catch (e) {}
   }
+  const headers = await getAuthHeaders();
+  if (!headers) return false;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}?name=eq.${encodeURIComponent(cityName)}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}?name=eq.${encodeURIComponent(cityName)}`, {
       method: 'DELETE',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
-      }
+      headers
     });
-    return true;
+    return res.ok;
   } catch (e) {
     return false;
   }
@@ -184,6 +242,7 @@ export async function deleteRemoteCity(cityName) {
  * Upsert a spot to remote Supabase table
  */
 export async function upsertRemoteSpot(spot) {
+  if (!(await hasAuthenticatedSession())) return false;
   const row = mapSpotToRow(spot);
   const sb = getSupabase();
   if (sb) {
@@ -196,16 +255,16 @@ export async function upsertRemoteSpot(spot) {
     }
   }
 
+  const headers = await getAuthHeaders({
+    'Content-Type': 'application/json',
+    'Prefer': 'resolution=merge-duplicates'
+  });
+  if (!headers) return false;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
       method: 'POST',
       keepalive: true,
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
+      headers,
       body: JSON.stringify(row)
     });
     return res.ok;
@@ -219,6 +278,7 @@ export async function upsertRemoteSpot(spot) {
  * Delete a spot from remote Supabase table
  */
 export async function deleteRemoteSpot(id) {
+  if (!(await hasAuthenticatedSession())) return false;
   const sb = getSupabase();
   if (sb) {
     try {
@@ -230,14 +290,13 @@ export async function deleteRemoteSpot(id) {
     }
   }
 
+  const headers = await getAuthHeaders();
+  if (!headers) return false;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?id=eq.${encodeURIComponent(id)}`, {
       method: 'DELETE',
       keepalive: true,
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
-      }
+      headers
     });
     return res.ok;
   } catch (e) {
@@ -250,27 +309,12 @@ export async function deleteRemoteSpot(id) {
  * Seed initial spots if remote table is empty
  */
 export async function seedRemoteSpotsIfEmpty(localSpots) {
+  if (!(await hasAuthenticatedSession())) return false;
   try {
     const existing = await fetchRemoteSpots();
     if (existing && existing.length === 0 && localSpots && localSpots.length > 0) {
       console.log('Seeding Supabase spots table with initial curated spots...');
-      const rows = localSpots.map(mapSpotToRow);
-      const sb = getSupabase();
-      if (sb) {
-        await sb.from(SPOTS_TABLE).upsert(rows);
-      } else {
-        await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'resolution=merge-duplicates'
-          },
-          body: JSON.stringify(rows)
-        });
-      }
-      return true;
+      return await pushSpotsToRemote(localSpots);
     }
   } catch (e) {
     console.warn('Failed to seed Supabase table:', e);
@@ -303,6 +347,7 @@ export function subscribeToRemoteChanges(callback) {
  */
 export async function pushSpotsToRemote(spotsArray) {
   if (!spotsArray || spotsArray.length === 0) return true;
+  if (!(await hasAuthenticatedSession())) return false;
   const rows = spotsArray.map(mapSpotToRow);
 
   const sb = getSupabase();
@@ -317,15 +362,15 @@ export async function pushSpotsToRemote(spotsArray) {
   }
 
   // REST fallback
+  const headers = await getAuthHeaders({
+    'Content-Type': 'application/json',
+    'Prefer': 'resolution=merge-duplicates'
+  });
+  if (!headers) return false;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
       method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
+      headers,
       body: JSON.stringify(rows)
     });
     return res.ok;

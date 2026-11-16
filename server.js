@@ -41,7 +41,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
-// Explicitly listen on 0.0.0.0 so both localhost (127.0.0.1) and IPv6 can connect
-server.listen(PORT, '0.0.0.0', () => {
+// Bind to localhost only so local dev server is not exposed on public networks
+server.listen(PORT, '127.0.0.1', () => {
   console.log(`Flâneur server running at http://localhost:${PORT}/ and http://127.0.0.1:${PORT}/`);
 });

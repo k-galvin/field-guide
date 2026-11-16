@@ -60,7 +60,11 @@ import {
   mapRowToSpot,
   fetchRemoteCities,
   upsertRemoteCity,
-  deleteRemoteCity
+  deleteRemoteCity,
+  getAuthSession,
+  signInWithEmail,
+  signOut,
+  onAuthStateChange
 } from './supabase.js';
 import {
   searchPhotonPlaces,
@@ -374,6 +378,10 @@ function init() {
       readonlyGuideBanner.style.display = 'flex';
       readonlyCityName.textContent = activeCity === 'all' ? 'All Destinations' : activeCity;
     }
+    const authBtn = document.getElementById('btn-auth');
+    if (authBtn) authBtn.style.display = 'none';
+  } else {
+    initAuthControls();
   }
 
   // Populate category chips with SVGs
@@ -2777,6 +2785,88 @@ function handleAddNewCity() {
   } else {
     setActiveCity(newCity);
     closeModal(modalCities);
+  }
+}
+
+/**
+ * Supabase Auth Controls for Cloud Sync
+ */
+function refreshAuthUI(session) {
+  const btnAuth = document.getElementById('btn-auth');
+  const signedInInfo = document.getElementById('auth-signed-in-info');
+  const userEmailEl = document.getElementById('auth-user-email');
+  const credFields = document.getElementById('auth-credentials-fields');
+  const submitBtn = document.getElementById('btn-auth-submit');
+  const signOutBtn = document.getElementById('btn-auth-signout');
+  const modalTitle = document.getElementById('modal-auth-title');
+
+  const isSignedIn = Boolean(session && session.user);
+  if (btnAuth) {
+    btnAuth.textContent = isSignedIn ? 'account' : 'sign in';
+    btnAuth.title = isSignedIn
+      ? `Signed in as ${session.user.email || 'owner'}`
+      : 'Sign in to sync edits to cloud';
+  }
+  if (signedInInfo) signedInInfo.style.display = isSignedIn ? 'block' : 'none';
+  if (userEmailEl && isSignedIn) userEmailEl.textContent = session.user.email || 'Authenticated';
+  if (credFields) credFields.style.display = isSignedIn ? 'none' : 'block';
+  if (submitBtn) submitBtn.style.display = isSignedIn ? 'none' : 'inline-flex';
+  if (signOutBtn) signOutBtn.style.display = isSignedIn ? 'inline-flex' : 'none';
+  if (modalTitle) modalTitle.textContent = isSignedIn ? 'Cloud Sync Account' : 'Sign In to Sync';
+}
+
+function initAuthControls() {
+  const btnAuth = document.getElementById('btn-auth');
+  const modalAuth = document.getElementById('modal-auth');
+  const authForm = document.getElementById('auth-form');
+  const authEmail = document.getElementById('auth-email');
+  const authPassword = document.getElementById('auth-password');
+  const authError = document.getElementById('auth-error-msg');
+  const btnSignOut = document.getElementById('btn-auth-signout');
+
+  if (!btnAuth || !modalAuth) return;
+
+  getAuthSession().then(refreshAuthUI);
+  onAuthStateChange((_event, session) => {
+    refreshAuthUI(session);
+  });
+
+  btnAuth.addEventListener('click', async () => {
+    if (authError) authError.style.display = 'none';
+    const session = await getAuthSession();
+    refreshAuthUI(session);
+    openModal(modalAuth);
+  });
+
+  if (authForm) {
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (authError) authError.style.display = 'none';
+      const email = authEmail ? authEmail.value.trim() : '';
+      const password = authPassword ? authPassword.value : '';
+      if (!email || !password) return;
+
+      const { data, error } = await signInWithEmail(email, password);
+      if (error) {
+        if (authError) {
+          authError.textContent = error.message || 'Sign in failed';
+          authError.style.display = 'block';
+        }
+        return;
+      }
+      if (authPassword) authPassword.value = '';
+      refreshAuthUI(data?.session || null);
+      closeModal(modalAuth);
+      syncWithSupabase(true);
+    });
+  }
+
+  if (btnSignOut) {
+    btnSignOut.addEventListener('click', async () => {
+      await signOut();
+      refreshAuthUI(null);
+      closeModal(modalAuth);
+    });
   }
 }
 

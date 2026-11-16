@@ -325,7 +325,7 @@ function createSpotPopupElement(spot) {
         <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="popup-btn-nav">
           directions ↗
         </a>
-        <button type="button" class="popup-btn-detail" data-id="${spot.id}">
+        <button type="button" class="popup-btn-detail" data-id="${escapeHtml(String(spot.id))}">
           edit
         </button>
       </div>

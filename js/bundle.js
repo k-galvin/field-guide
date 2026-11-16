@@ -4380,7 +4380,7 @@ function createSpotPopupElement(spot) {
         <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="popup-btn-nav">
           directions ↗
         </a>
-        <button type="button" class="popup-btn-detail" data-id="${spot.id}">
+        <button type="button" class="popup-btn-detail" data-id="${escapeHtml(String(spot.id))}">
           edit
         </button>
       </div>
@@ -4771,13 +4771,70 @@ function getSupabase() {
   if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
     try {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-        auth: { persistSession: false }
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
       });
     } catch (e) {
       console.warn('Could not initialize Supabase client:', e);
     }
   }
   return supabaseClient;
+}
+
+/**
+ * Retrieve the current Supabase Auth session, if signed in
+ */
+async function getAuthSession() {
+  const sb = getSupabase();
+  if (!sb || !sb.auth) return null;
+  try {
+    const { data, error } = await sb.auth.getSession();
+    if (error) return null;
+    return data?.session || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function hasAuthenticatedSession() {
+  const session = await getAuthSession();
+  return Boolean(session && session.access_token);
+}
+
+async function signInWithEmail(email, password) {
+  const sb = getSupabase();
+  if (!sb || !sb.auth) {
+    return { error: new Error('Supabase client unavailable') };
+  }
+  return await sb.auth.signInWithPassword({ email, password });
+}
+
+async function signOut() {
+  const sb = getSupabase();
+  if (!sb || !sb.auth) return { error: null };
+  return await sb.auth.signOut();
+}
+
+function onAuthStateChange(callback) {
+  const sb = getSupabase();
+  if (!sb || !sb.auth || !sb.auth.onAuthStateChange) return null;
+  const { data } = sb.auth.onAuthStateChange((event, session) => {
+    if (callback) callback(event, session);
+  });
+  return data?.subscription || null;
+}
+
+async function getAuthHeaders(extra = {}) {
+  const session = await getAuthSession();
+  if (!session || !session.access_token) return null;
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${session.access_token}`,
+    ...extra
+  };
 }
 
 /**
@@ -4889,25 +4946,26 @@ async function fetchRemoteCities() {
  */
 async function upsertRemoteCity(cityName) {
   if (!cityName) return false;
+  if (!(await hasAuthenticatedSession())) return false;
   const sb = getSupabase();
   if (sb) {
     try {
-      await sb.from(CITIES_TABLE).upsert({ name: cityName });
-      return true;
+      const { error } = await sb.from(CITIES_TABLE).upsert({ name: cityName });
+      if (!error) return true;
     } catch (e) {}
   }
+  const headers = await getAuthHeaders({
+    'Content-Type': 'application/json',
+    'Prefer': 'resolution=merge-duplicates'
+  });
+  if (!headers) return false;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}`, {
       method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
+      headers,
       body: JSON.stringify({ name: cityName })
     });
-    return true;
+    return res.ok;
   } catch (e) {
     return false;
   }
@@ -4918,22 +4976,22 @@ async function upsertRemoteCity(cityName) {
  */
 async function deleteRemoteCity(cityName) {
   if (!cityName) return false;
+  if (!(await hasAuthenticatedSession())) return false;
   const sb = getSupabase();
   if (sb) {
     try {
-      await sb.from(CITIES_TABLE).delete().eq('name', cityName);
-      return true;
+      const { error } = await sb.from(CITIES_TABLE).delete().eq('name', cityName);
+      if (!error) return true;
     } catch (e) {}
   }
+  const headers = await getAuthHeaders();
+  if (!headers) return false;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}?name=eq.${encodeURIComponent(cityName)}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${CITIES_TABLE}?name=eq.${encodeURIComponent(cityName)}`, {
       method: 'DELETE',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
-      }
+      headers
     });
-    return true;
+    return res.ok;
   } catch (e) {
     return false;
   }
@@ -4943,6 +5001,7 @@ async function deleteRemoteCity(cityName) {
  * Upsert a spot to remote Supabase table
  */
 async function upsertRemoteSpot(spot) {
+  if (!(await hasAuthenticatedSession())) return false;
   const row = mapSpotToRow(spot);
   const sb = getSupabase();
   if (sb) {
@@ -4955,16 +5014,16 @@ async function upsertRemoteSpot(spot) {
     }
   }
 
+  const headers = await getAuthHeaders({
+    'Content-Type': 'application/json',
+    'Prefer': 'resolution=merge-duplicates'
+  });
+  if (!headers) return false;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
       method: 'POST',
       keepalive: true,
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
+      headers,
       body: JSON.stringify(row)
     });
     return res.ok;
@@ -4978,6 +5037,7 @@ async function upsertRemoteSpot(spot) {
  * Delete a spot from remote Supabase table
  */
 async function deleteRemoteSpot(id) {
+  if (!(await hasAuthenticatedSession())) return false;
   const sb = getSupabase();
   if (sb) {
     try {
@@ -4989,14 +5049,13 @@ async function deleteRemoteSpot(id) {
     }
   }
 
+  const headers = await getAuthHeaders();
+  if (!headers) return false;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}?id=eq.${encodeURIComponent(id)}`, {
       method: 'DELETE',
       keepalive: true,
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
-      }
+      headers
     });
     return res.ok;
   } catch (e) {
@@ -5009,27 +5068,12 @@ async function deleteRemoteSpot(id) {
  * Seed initial spots if remote table is empty
  */
 async function seedRemoteSpotsIfEmpty(localSpots) {
+  if (!(await hasAuthenticatedSession())) return false;
   try {
     const existing = await fetchRemoteSpots();
     if (existing && existing.length === 0 && localSpots && localSpots.length > 0) {
       console.log('Seeding Supabase spots table with initial curated spots...');
-      const rows = localSpots.map(mapSpotToRow);
-      const sb = getSupabase();
-      if (sb) {
-        await sb.from(SPOTS_TABLE).upsert(rows);
-      } else {
-        await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'resolution=merge-duplicates'
-          },
-          body: JSON.stringify(rows)
-        });
-      }
-      return true;
+      return await pushSpotsToRemote(localSpots);
     }
   } catch (e) {
     console.warn('Failed to seed Supabase table:', e);
@@ -5062,6 +5106,7 @@ function subscribeToRemoteChanges(callback) {
  */
 async function pushSpotsToRemote(spotsArray) {
   if (!spotsArray || spotsArray.length === 0) return true;
+  if (!(await hasAuthenticatedSession())) return false;
   const rows = spotsArray.map(mapSpotToRow);
 
   const sb = getSupabase();
@@ -5076,15 +5121,15 @@ async function pushSpotsToRemote(spotsArray) {
   }
 
   // REST fallback
+  const headers = await getAuthHeaders({
+    'Content-Type': 'application/json',
+    'Prefer': 'resolution=merge-duplicates'
+  });
+  if (!headers) return false;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${SPOTS_TABLE}`, {
       method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
+      headers,
       body: JSON.stringify(rows)
     });
     return res.ok;
@@ -5733,6 +5778,10 @@ function init() {
       readonlyGuideBanner.style.display = 'flex';
       readonlyCityName.textContent = activeCity === 'all' ? 'All Destinations' : activeCity;
     }
+    const authBtn = document.getElementById('btn-auth');
+    if (authBtn) authBtn.style.display = 'none';
+  } else {
+    initAuthControls();
   }
 
   // Populate category chips with SVGs
@@ -8136,6 +8185,88 @@ function handleAddNewCity() {
   } else {
     setActiveCity(newCity);
     closeModal(modalCities);
+  }
+}
+
+/**
+ * Supabase Auth Controls for Cloud Sync
+ */
+function refreshAuthUI(session) {
+  const btnAuth = document.getElementById('btn-auth');
+  const signedInInfo = document.getElementById('auth-signed-in-info');
+  const userEmailEl = document.getElementById('auth-user-email');
+  const credFields = document.getElementById('auth-credentials-fields');
+  const submitBtn = document.getElementById('btn-auth-submit');
+  const signOutBtn = document.getElementById('btn-auth-signout');
+  const modalTitle = document.getElementById('modal-auth-title');
+
+  const isSignedIn = Boolean(session && session.user);
+  if (btnAuth) {
+    btnAuth.textContent = isSignedIn ? 'account' : 'sign in';
+    btnAuth.title = isSignedIn
+      ? `Signed in as ${session.user.email || 'owner'}`
+      : 'Sign in to sync edits to cloud';
+  }
+  if (signedInInfo) signedInInfo.style.display = isSignedIn ? 'block' : 'none';
+  if (userEmailEl && isSignedIn) userEmailEl.textContent = session.user.email || 'Authenticated';
+  if (credFields) credFields.style.display = isSignedIn ? 'none' : 'block';
+  if (submitBtn) submitBtn.style.display = isSignedIn ? 'none' : 'inline-flex';
+  if (signOutBtn) signOutBtn.style.display = isSignedIn ? 'inline-flex' : 'none';
+  if (modalTitle) modalTitle.textContent = isSignedIn ? 'Cloud Sync Account' : 'Sign In to Sync';
+}
+
+function initAuthControls() {
+  const btnAuth = document.getElementById('btn-auth');
+  const modalAuth = document.getElementById('modal-auth');
+  const authForm = document.getElementById('auth-form');
+  const authEmail = document.getElementById('auth-email');
+  const authPassword = document.getElementById('auth-password');
+  const authError = document.getElementById('auth-error-msg');
+  const btnSignOut = document.getElementById('btn-auth-signout');
+
+  if (!btnAuth || !modalAuth) return;
+
+  getAuthSession().then(refreshAuthUI);
+  onAuthStateChange((_event, session) => {
+    refreshAuthUI(session);
+  });
+
+  btnAuth.addEventListener('click', async () => {
+    if (authError) authError.style.display = 'none';
+    const session = await getAuthSession();
+    refreshAuthUI(session);
+    openModal(modalAuth);
+  });
+
+  if (authForm) {
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (authError) authError.style.display = 'none';
+      const email = authEmail ? authEmail.value.trim() : '';
+      const password = authPassword ? authPassword.value : '';
+      if (!email || !password) return;
+
+      const { data, error } = await signInWithEmail(email, password);
+      if (error) {
+        if (authError) {
+          authError.textContent = error.message || 'Sign in failed';
+          authError.style.display = 'block';
+        }
+        return;
+      }
+      if (authPassword) authPassword.value = '';
+      refreshAuthUI(data?.session || null);
+      closeModal(modalAuth);
+      syncWithSupabase(true);
+    });
+  }
+
+  if (btnSignOut) {
+    btnSignOut.addEventListener('click', async () => {
+      await signOut();
+      refreshAuthUI(null);
+      closeModal(modalAuth);
+    });
   }
 }
 

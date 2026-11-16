@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Field Guide">
   <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#ffffff">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=2">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png?v=2">
@@ -38,6 +39,9 @@
       <span id="sync-status" class="sync-indicator" title="Supabase Cloud Sync Status">
         <span class="sync-dot"></span> <span id="sync-status-text">synced</span>
       </span>
+      <button id="btn-auth" class="btn" title="Sign in to sync edits to cloud">
+        sign in
+      </button>
       <button id="btn-share-guide" class="btn" title="Share curated guide with friends">
         ↗ share
       </button>
@@ -481,6 +485,47 @@
       <div class="modal-footer">
         <button type="button" class="btn" data-close-modal="modal-share">Done</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal: Supabase Cloud Sync Sign In -->
+  <div class="modal-overlay" id="modal-auth" role="dialog" aria-modal="true" aria-labelledby="modal-auth-title">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-header">
+        <div>
+          <div class="atlas-modal-overline">CLOUD SYNC AUTH</div>
+          <h2 class="modal-title" id="modal-auth-title">Sign In to Sync</h2>
+        </div>
+        <button type="button" class="modal-close-btn" data-close-modal="modal-auth">&times;</button>
+      </div>
+      <form id="auth-form">
+        <div class="modal-body">
+          <p class="share-modal-desc" id="auth-modal-desc">
+            Sign in with your Supabase account to sync additions, edits, and deletions across devices. Without signing in, changes stay local in this browser.
+          </p>
+          <div id="auth-signed-in-info" style="display: none; margin-bottom: 1rem;">
+            <p class="share-modal-desc" style="margin-bottom: 0;">
+              Signed in as <strong id="auth-user-email"></strong>.
+            </p>
+          </div>
+          <div id="auth-credentials-fields">
+            <div class="form-group">
+              <label for="auth-email">Email</label>
+              <input type="email" id="auth-email" autocomplete="email" required placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+              <label for="auth-password">Password</label>
+              <input type="password" id="auth-password" autocomplete="current-password" required placeholder="••••••••">
+            </div>
+          </div>
+          <div id="auth-error-msg" style="display: none; color: var(--accent, #b91c1c); font-family: var(--font-mono); font-size: 12px; margin-top: 8px;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" data-close-modal="modal-auth">Cancel</button>
+          <button type="button" id="btn-auth-signout" class="btn" style="display: none;">Sign Out</button>
+          <button type="submit" id="btn-auth-submit" class="btn btn-primary">Sign In</button>
+        </div>
+      </form>
     </div>
   </div>
 
